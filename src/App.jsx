@@ -1,11 +1,11 @@
+import { Outlet } from 'react-router-dom'
+// import { AuthProvider } from './contexts/AuthContext'
 
-import './App.css'
-
-function App() {
-
+export default function App() {
   return (
-    <h1 className="text-red-600 underline">Hello</h1>
+    <div className="min-h-screen">
+      <Outlet />
+    </div>
+    // <AuthProvider>
   )
 }
-
-export default App
