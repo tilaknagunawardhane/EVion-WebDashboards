@@ -42,33 +42,6 @@ export default function DashboardPage() {
     }
   ]
 
-  const statusItems = [
-    { 
-      label: 'Active', 
-      value: '04', 
-      color: COLORS.primary,
-      indicator: '●'
-    },
-    { 
-      label: 'Faulted', 
-      value: '01', 
-      color: COLORS.danger,
-      indicator: '●'
-    },
-    { 
-      label: 'Occupied', 
-      value: '04', 
-      color: COLORS.HighlightText,
-      indicator: '●'
-    },
-    { 
-      label: 'Available', 
-      value: '03', 
-      color: COLORS.secondaryText,
-      indicator: '●'
-    }
-  ]
-
   return (
     <div style={{ fontFamily: FONTS.family.sans, padding: '24px' }}>
       {/* Welcome Header */}
@@ -98,6 +71,7 @@ export default function DashboardPage() {
               style={{ 
                 width: '20px', 
                 height: '20px',
+                
                 filter: `brightness(0) saturate(100%) invert(48%) sepia(99%) saturate(1230%) hue-rotate(130deg) brightness(95%) contrast(101%)`
               }}
             />
@@ -151,16 +125,15 @@ export default function DashboardPage() {
         </div>
         
         <StatusCard 
-          title="Connector Status" 
-          items={statusItems}
-          style={{
-            backgroundColor: 'white',
-            border: `1px solid ${COLORS.border}`,
-            borderRadius: '12px',
-            padding: '24px',
-            boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'
-          }}
-        />
+  title="Connector Status" 
+  style={{
+    backgroundColor: 'white',
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: '12px',
+    padding: '24px',
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'
+  }}
+/>
       </div>
 
       {/* Bottom Section */}

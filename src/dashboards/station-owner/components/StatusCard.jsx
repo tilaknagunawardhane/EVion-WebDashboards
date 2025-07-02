@@ -1,7 +1,8 @@
-import { COLORS } from '../../../constants/colors'
-import { FONTS } from '../../../constants/fonts'
+import { COLORS } from '../../../constants/colors';
+import { FONTS } from '../../../constants/fonts';
+import ConnectorStatusChart from '../components/ConnectorStatusChart';
 
-export default function StatusCard({ title, items, style }) {
+export default function StatusCard({ title, style }) {
   return (
     <div style={{ 
       backgroundColor: 'white',
@@ -22,41 +23,9 @@ export default function StatusCard({ title, items, style }) {
         {title}
       </h3>
       
-      <div style={{ display: 'grid', gap: '16px' }}>
-        {items.map((item, index) => (
-          <div 
-            key={index} 
-            style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ 
-                color: item.color,
-                fontSize: '20px',
-                lineHeight: '20px'
-              }}>
-                {item.indicator}
-              </span>
-              <span style={{ 
-                color: COLORS.mainTextColor,
-                fontSize: FONTS.sizes.base
-              }}>
-                {item.label}
-              </span>
-            </div>
-            <span style={{ 
-              color: COLORS.mainTextColor,
-              fontSize: FONTS.sizes.base,
-              fontWeight: FONTS.weights.medium
-            }}>
-              {item.value}
-            </span>
-          </div>
-        ))}
+      <div style={{ height: '250px' }}>
+        <ConnectorStatusChart />
       </div>
     </div>
-  )
+  );
 }
