@@ -19,25 +19,16 @@ export default function Button({
 
   const variantStyles = {
     primary: {
-      backgroundColor: COLORS.primary[600],
+      backgroundColor: COLORS.primary,
       color: 'white',
-      '&:hover': {
-        backgroundColor: COLORS.primary[700]
-      }
     },
     secondary: {
-      backgroundColor: COLORS.gray[200],
-      color: COLORS.gray[800],
-      '&:hover': {
-        backgroundColor: COLORS.gray[300]
-      }
+      backgroundColor: COLORS.bgGreen,
+      color: COLORS.mainTextColor,
     },
     danger: {
-      backgroundColor: COLORS.error[500],
+      backgroundColor: COLORS.danger,
       color: 'white',
-      '&:hover': {
-        backgroundColor: COLORS.error[600]
-      }
     }
   }
 

@@ -9,8 +9,8 @@ export default function StationsPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Stations</h1>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        <h1 className="text-2xl font-bold" style={{ color: '#2d3436' }}>My Stations</h1>
+        <button className="px-4 py-2 rounded-md" style={{ backgroundColor: '#00b894', color: 'white' }}>
           Add Station
         </button>
       </div>

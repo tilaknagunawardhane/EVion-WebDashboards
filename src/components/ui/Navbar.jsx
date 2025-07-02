@@ -10,7 +10,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold text-blue-600">
+              <Link to="/" className="text-xl font-bold" style={{ color: '#00b894' }}>
                 EVION
               </Link>
             </div>
@@ -18,12 +18,13 @@ export default function Navbar() {
           <div className="flex items-center">
             {currentUser ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-500">
+                <span className="text-sm font-medium" style={{ color: '#2d3436' }}>
                   {currentUser.name}
                 </span>
                 <button
                   onClick={logout}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                  className="text-sm font-medium"
+                  style={{ color: '#959595' }}
                 >
                   Sign out
                 </button>
@@ -31,7 +32,8 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/auth"
-                className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                className="text-sm font-medium"
+                style={{ color: '#959595' }}
               >
                 Sign in
               </Link>

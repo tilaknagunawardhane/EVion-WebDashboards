@@ -23,7 +23,7 @@ export default function LoginForm() {
           className="block"
           style={{
             fontSize: FONTS.sizes.sm,
-            color: COLORS.gray[700],
+            color: COLORS.mainTextColor,
             fontWeight: FONTS.weights.medium
           }}
         >
@@ -32,9 +32,9 @@ export default function LoginForm() {
         <input
           {...register('email', { required: true })}
           type="email"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+          className="mt-1 block w-full rounded-md"
           style={{
-            borderColor: COLORS.gray[300],
+            borderColor: COLORS.stroke,
             padding: '0.5rem 0.75rem',
             fontSize: FONTS.sizes.sm
           }}
@@ -47,7 +47,7 @@ export default function LoginForm() {
           className="block"
           style={{
             fontSize: FONTS.sizes.sm,
-            color: COLORS.gray[700],
+            color: COLORS.mainTextColor,
             fontWeight: FONTS.weights.medium
           }}
         >
@@ -56,9 +56,9 @@ export default function LoginForm() {
         <input
           {...register('password', { required: true })}
           type="password"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+          className="mt-1 block w-full rounded-md"
           style={{
-            borderColor: COLORS.gray[300],
+            borderColor: COLORS.stroke,
             padding: '0.5rem 0.75rem',
             fontSize: FONTS.sizes.sm
           }}
@@ -71,7 +71,7 @@ export default function LoginForm() {
           className="block"
           style={{
             fontSize: FONTS.sizes.sm,
-            color: COLORS.gray[700],
+            color: COLORS.mainTextColor,
             fontWeight: FONTS.weights.medium
           }}
         >
@@ -79,9 +79,9 @@ export default function LoginForm() {
         </label>
         <select
           {...register('role', { required: true })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+          className="mt-1 block w-full rounded-md"
           style={{
-            borderColor: COLORS.gray[300],
+            borderColor: COLORS.stroke,
             padding: '0.5rem 0.75rem',
             fontSize: FONTS.sizes.sm
           }}

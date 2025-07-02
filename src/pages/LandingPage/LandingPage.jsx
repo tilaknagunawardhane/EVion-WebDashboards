@@ -10,7 +10,7 @@ export default function LandingPage() {
           className="font-bold mb-6"
           style={{
             fontSize: FONTS.sizes['5xl'],
-            color: COLORS.text.primary
+            color: COLORS.mainTextColor
           }}
         >
           Welcome to EVION
@@ -19,7 +19,7 @@ export default function LandingPage() {
           className="max-w-md mx-auto md:max-w-3xl mb-10"
           style={{
             fontSize: FONTS.sizes.xl,
-            color: COLORS.text.secondary
+            color: COLORS.secondaryText
           }}
         >
           Manage your charging stations with ease
@@ -30,7 +30,7 @@ export default function LandingPage() {
             className="inline-flex items-center rounded-md shadow-sm"
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: COLORS.primary.main,
+              backgroundColor: COLORS.primary,
               color: 'white',
               fontSize: FONTS.sizes.base,
               fontWeight: FONTS.weights.medium
@@ -43,8 +43,8 @@ export default function LandingPage() {
             className="inline-flex items-center rounded-md shadow-sm"
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: COLORS.background.light,
-              color: COLORS.primary.main,
+              backgroundColor: COLORS.bgGreen,
+              color: COLORS.primary,
               fontSize: FONTS.sizes.base,
               fontWeight: FONTS.weights.medium
             }}
