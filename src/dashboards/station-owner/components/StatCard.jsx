@@ -1,42 +1,58 @@
 import { COLORS } from '../../../constants/colors'
 import { FONTS } from '../../../constants/fonts'
 
-
-export default function StatCard({ title, value, icon, trend }) {
+export default function StatCard({ title, value, activeSessions, icon }) {
   return (
     <div 
-      className="p-4 rounded-lg shadow-sm flex flex-col"
+      className="p-4 rounded-lg flex flex-col"
       style={{ 
         backgroundColor: 'white',
-        border: `1px solid ${COLORS.border}`
+        border: `1px solid ${COLORS.border}`,
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'
       }}
     >
-      <div className="flex justify-between items-start mb-2">
-        <p 
-          className="text-sm"
-          style={{ color: COLORS.secondaryText }}
-        >
-          {title}
-        </p>
-        <div className="p-2 rounded-md" style={{ backgroundColor: COLORS.bgGreen }}>
+      {/* Title Row */}
+      <div className="flex items-center mb-4">
+        <div style={{ marginRight: 12 }}>
           {icon}
         </div>
+        <h3 
+          className="text-base font-medium"
+          style={{ 
+            color: COLORS.mainTextColor,
+            fontFamily: FONTS.family.sans
+          }}
+        >
+          {title}
+        </h3>
       </div>
+
+      {/* Main Value */}
       <p 
-        className="text-2xl font-semibold mb-1"
-        style={{ color: COLORS.mainTextColor }}
+        className="text-2xl font-medium mb-2"
+        style={{ 
+          color: COLORS.mainTextColor,
+          fontFamily: FONTS.family.sans
+        }}
       >
         {value}
       </p>
-      {trend && (
+
+      {/* Active Sessions */}
+      {activeSessions && (
         <div className="flex items-center">
+          <div 
+            className="w-2 h-2 rounded-full mr-2"
+            style={{ backgroundColor: COLORS.primary }}
+          ></div>
           <span 
-            className="text-xs"
+            className="text-sm"
             style={{ 
-              color: trend.value > 0 ? COLORS.primary : COLORS.danger 
+              color: COLORS.secondaryText,
+              fontFamily: FONTS.family.sans
             }}
           >
-            {trend.value > 0 ? '↑' : '↓'} {Math.abs(trend.value)}% {trend.label}
+            {activeSessions} Active Sessions
           </span>
         </div>
       )}
