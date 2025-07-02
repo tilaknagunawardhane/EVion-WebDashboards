@@ -14,7 +14,7 @@ export default function StationOwnerDashboard() {
   const navItems = [
     { 
       name: 'Dashboard', 
-      path: '/station-owner/dashboard', 
+      path: '/station-owner/dashboards', 
       icon: DashboardIcon
     },
     { 

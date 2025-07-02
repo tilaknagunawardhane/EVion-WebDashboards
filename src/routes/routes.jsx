@@ -6,6 +6,7 @@ import AdminDashboard from '../dashboards/admin/Dashboard'
 import UsersPage from '../dashboards/admin/pages/Users'
 import StationOwnerDashboard from '../dashboards/station-owner/Dashboard'
 import StationsPage from '../dashboards/station-owner/pages/Stations'
+import DashboardPage from '../dashboards/station-owner/pages/Dash'
 import SettingsPage from '../dashboards/station-owner/pages/Settings'
 import SupportOfficerDashboard from '../dashboards/support-officer/Dashboard'
 import TasksPage from '../dashboards/support-officer/pages/Tasks'
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
         path: 'station-owner',
         element: <PrivateRoute><StationOwnerDashboard /></PrivateRoute>,
         children: [
+          { path: 'dashboards', element: <DashboardPage /> },
           { path: 'stations', element: <StationsPage /> },
           { path: 'settings', element: <SettingsPage /> }
         ]
