@@ -32,7 +32,7 @@ export default function LandingPage() {
               padding: '0.75rem 1.5rem',
               backgroundColor: COLORS.primary,
               color: 'white',
-              fontSize: FONTS.sizes.base,
+              fontSize: FONTS.sizes.sm,
               fontWeight: FONTS.weights.medium
             }}
           >
@@ -45,7 +45,7 @@ export default function LandingPage() {
               padding: '0.75rem 1.5rem',
               backgroundColor: COLORS.bgGreen,
               color: COLORS.primary,
-              fontSize: FONTS.sizes.base,
+              fontSize: FONTS.sizes.sm,
               fontWeight: FONTS.weights.medium
             }}
           >
