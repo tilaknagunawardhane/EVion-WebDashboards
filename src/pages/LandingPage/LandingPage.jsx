@@ -13,7 +13,7 @@ export default function LandingPage() {
             color: COLORS.mainTextColor
           }}
         >
-          Welcome to EVION
+          Welcome to EVION !
         </h1>
         <p 
           className="max-w-md mx-auto md:max-w-3xl mb-10"
