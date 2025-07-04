@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../ui/Button';
 import InputField from '../ui/InputField';
 import { COLORS, FONTS } from '../../constants'
-import evStationImage from '../../assets/ev_station.svg';
+import stationImage from '../../assets/electric-car.svg';
 import evionLogo from '../../assets/Logo 2.svg';
 import Google from '../../assets/Google.svg';
 import { useAuth } from '../../contexts/AuthContext';
@@ -14,31 +14,40 @@ export default function LoginForm() {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+
+  const [errors, setErrors] = useState({
+    email: '',
+    password: ''
+  });
 
 
-  const handleLogin = (e) => {
+  const handleSignin = (e) => {
     e.preventDefault();
-    setEmailError('');
-    setPasswordError('');
+    
+    const newErrors = { email: '', password: '' };
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
     let valid = true;
     
-    if (!email) {
-      setEmailError('Please enter your email');
+    if (!email.trim()) {
+      newErrors.email = 'Please enter your email';
       valid = false;
     } else if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address');
+      newErrors.email = 'Please enter a valid email address';
       valid = false;
     }
 
     if (!password) {
-      setPasswordError('Please enter your password');
+      newErrors.password = 'Please enter your password';
+      valid = false;
+    } else if (!passwordRegex.test(password)) {
+      newErrors.password = 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character';
       valid = false;
     }
+
+    setErrors(newErrors);
 
     if (!valid) return;
 
@@ -71,9 +80,9 @@ export default function LoginForm() {
             Power Your Station, Smarter
           </h1>
           <p style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes['base'], fontFamily: FONTS.family.sans, fontWeight: FONTS.weights['500'], marginTop: '1rem' }}>
-            Access your dashboard to manage chargers, track bookings, and grow your EV business.
+            Access your dashboard to manage chargers & grow your EV business.
           </p>
-          <img src={evStationImage} alt="EV Station" className="mt-6 w-full h-auto object-cover rounded-lg" />
+          <img src={stationImage} alt="Dashboard" className="mt-6 w-full h-auto object-cover rounded-lg" />
         </div>
 
         {/* Right Section */}
@@ -82,10 +91,10 @@ export default function LoginForm() {
             <div className="h-full overflow-y-auto">
             <div className="mb-6">
               <h2 style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes['2xl'], fontFamily: FONTS.family.sans, fontWeight: FONTS.weights['500'] }}>
-                Login
+                Sign In
               </h2>
             </div>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleSignin} className="space-y-4">
               <InputField
                 label="Email"
                 type="email"
@@ -93,8 +102,8 @@ export default function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                error={!!emailError}
-                errorMessage={emailError}
+                error={!!errors.email}
+                errorMessage={errors.email}
               />
               <InputField
                 label="Password"
@@ -103,8 +112,8 @@ export default function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                error={!!passwordError}
-                errorMessage={passwordError}
+                error={!!errors.password}
+                errorMessage={errors.password}
               />
               <div className="text-right">
                 <a
@@ -117,15 +126,15 @@ export default function LoginForm() {
                 </a>
               </div>
               <Button variant="primary" type="submit" className="w-full">
-                Login
+                Sign In
               </Button>
-              <div className="text-center mt-0 mb-2" style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.normal }}>
+              {/* <div className="text-center mt-0 mb-2" style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.normal }}>
                 or
               </div>
               <Button variant="outline" className="w-full flex items-center justify-center gap-2">
                 <img src={Google} alt="Google" className="w-6 h-auto object-cover rounded-lg" />
                 Sign in with Google
-              </Button>
+              </Button> */}
               <div className="text-center mt-4">
                 <span style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.normal }}>
                   Don’t have an account?
@@ -136,7 +145,7 @@ export default function LoginForm() {
                   style={{ color: COLORS.primary, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.medium }}
                   className="hover:text-opacity-80"
                 >
-                  Sign up
+                  Sign Up
                 </a>
               </div>
             </form>
