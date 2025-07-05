@@ -12,6 +12,7 @@ import SupportOfficerDashboard from '../dashboards/support-officer/Dashboard'
 import TasksPage from '../dashboards/support-officer/pages/Tasks'
 import AdminRoute from './AdminRoute'
 import PrivateRoute from './PrivateRoute'
+import ProfileSetup from '../components/auth/ProfileSetup'
 import { AuthProvider } from '../contexts/AuthContext'
 
 const router = createBrowserRouter([
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <LandingPage /> },
       { path: 'auth', element: <AuthPage /> },
+      { path: 'profilesetup', element: <ProfileSetup />},
       {
         path: 'admin',
         element: <PrivateRoute><AdminRoute><AdminDashboard /></AdminRoute></PrivateRoute>,
@@ -38,7 +40,7 @@ const router = createBrowserRouter([
         children: [
           { path: 'dashboards', element: <DashboardPage /> },
           { path: 'stations', element: <StationsPage /> },
-          { path: 'settings', element: <SettingsPage /> }
+          { path: 'settings', element: <SettingsPage /> },
         ]
       },
       {

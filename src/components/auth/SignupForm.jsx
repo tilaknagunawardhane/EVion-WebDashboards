@@ -68,6 +68,8 @@ export default function SignupForm() {
 
     const userData = { email, role: 'station-owner' }; // Adjust role based on your logic
     login(userData);
+
+    navigate('/profilesetup');
   };
 
   const handleSignin = () => {
