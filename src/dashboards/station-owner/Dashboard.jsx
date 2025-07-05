@@ -62,7 +62,7 @@ export default function StationOwnerDashboard() {
     <img 
       src={IconComponent} 
       alt="" 
-      className="w-5 h-5 mr-3" 
+      className="w-4 h-4 mr-3" 
       style={{ 
         filter: isActive 
           ? 'brightness(0) invert(1)'  // White for active state
@@ -94,12 +94,12 @@ export default function StationOwnerDashboard() {
                 <NavLink
                   to={item.path}
                   className={({ isActive }) => 
-                    `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'font-semibold' : ''}`
+                    `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'font-medium' : ''}`
                   }
                   style={({ isActive }) => ({ 
                     backgroundColor: isActive ? COLORS.primary : 'transparent',
                     color: isActive ? COLORS.background : COLORS.secondaryText,
-                    fontSize: FONTS.sizes.base
+                    fontSize: FONTS.sizes.sm
                   })}
                 >
                   {({ isActive }) => (
@@ -122,12 +122,12 @@ export default function StationOwnerDashboard() {
                 <NavLink
                   to={item.path}
                   className={({ isActive }) => 
-                    `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'font-semibold' : ''}`
+                    `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'font-medium' : ''}`
                   }
                   style={({ isActive }) => ({ 
                     backgroundColor: isActive ? COLORS.primary : 'transparent',
                     color: isActive ? COLORS.background : COLORS.secondaryText,
-                    fontSize: FONTS.sizes.base
+                    fontSize: FONTS.sizes.sm
                   })}
                 >
                   {({ isActive }) => (
