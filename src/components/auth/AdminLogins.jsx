@@ -8,7 +8,7 @@ import evionLogo from '../../assets/Logo 2.svg';
 import Google from '../../assets/Google.svg';
 import { useAuth } from '../../contexts/AuthContext';
 
-export default function AdminLogins() {
+export default function LoginForm() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -51,7 +51,7 @@ export default function AdminLogins() {
 
     if (!valid) return;
 
-    const userData = { email, role: 'station-owner' }; // Adjust role based on your logic
+    const userData = { email, role: 'admin' }; // Adjust role based on your logic
     login(userData);
   };
 
