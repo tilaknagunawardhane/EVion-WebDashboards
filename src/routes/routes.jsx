@@ -15,6 +15,8 @@ import PrivateRoute from './PrivateRoute'
 import ProfileSetup from '../components/auth/ProfileSetup'
 import { AuthProvider } from '../contexts/AuthContext'
 
+import AdminDash from '../dashboards/admin/pages/Dash'
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -31,7 +33,9 @@ const router = createBrowserRouter([
         path: 'admin',
         element: <PrivateRoute><AdminRoute><AdminDashboard /></AdminRoute></PrivateRoute>,
         children: [
-          { path: 'users', element: <UsersPage /> }
+          { path: 'users', element: <UsersPage /> },
+          { path: 'dashboard', element: <AdminDash /> },
+
         ]
       },
       {

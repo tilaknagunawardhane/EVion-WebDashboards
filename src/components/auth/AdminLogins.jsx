@@ -55,13 +55,13 @@ export default function LoginForm() {
     login(userData);
   };
 
-  const handleForgotPassword = () => {
-    navigate('/forgot-password');
-  };
+//   const handleForgotPassword = () => {
+//     navigate('/forgot-password');
+//   };
 
-  const handleSignUp = () => {
-    navigate('/auth?mode=signup');
-  };
+//   const handleSignUp = () => {
+//     navigate('/auth?mode=signup');
+//   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -91,7 +91,7 @@ export default function LoginForm() {
             <div className="h-full overflow-y-auto">
             <div className="mb-6">
               <h2 style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes['2xl'], fontFamily: FONTS.family.sans, fontWeight: FONTS.weights['500'] }}>
-                Sign In
+                Admin Login
               </h2>
             </div>
             <form onSubmit={handleSignin} className="space-y-4">
@@ -115,7 +115,7 @@ export default function LoginForm() {
                 error={!!errors.password}
                 errorMessage={errors.password}
               />
-              <div className="text-right">
+              {/* <div className="text-right">
                 <a
                   href="#"
                   onClick={handleForgotPassword}
@@ -124,7 +124,7 @@ export default function LoginForm() {
                 >
                   Forgot Password?
                 </a>
-              </div>
+              </div> */}
               <Button variant="primary" type="submit" className="w-full">
                 Sign In
               </Button>
@@ -135,7 +135,7 @@ export default function LoginForm() {
                 <img src={Google} alt="Google" className="w-6 h-auto object-cover rounded-lg" />
                 Sign in with Google
               </Button> */}
-              <div className="text-center mt-4">
+              {/* <div className="text-center mt-4">
                 <span style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.normal }}>
                   Don’t have an account?
                 </span>{' '}
@@ -147,7 +147,7 @@ export default function LoginForm() {
                 >
                   Sign Up
                 </a>
-              </div>
+              </div> */}
             </form>
             </div>
           </div>
@@ -157,109 +157,3 @@ export default function LoginForm() {
   );
 }
 
-
-
-
-// import { useForm } from 'react-hook-form'
-// import { useAuth } from '../../contexts/AuthContext'
-// import { COLORS, FONTS } from '../../constants'
-// import Button from '../ui/Button'
-// import { FaGoogle } from 'react-icons/fa'
-// import { Link } from 'react-router-dom'
-// import logo from '../../assets/Logo 2.png'
-
-// export default function LoginForm() {
-//   const { register, handleSubmit } = useForm()
-//   const { login } = useAuth()
-
-//   const onSubmit = (data) => {
-//     login({ 
-//       email: data.email, 
-//       role: data.role, 
-//       name: data.role === 'admin' ? 'Admin User' : 'Station Owner' 
-//     })
-//   }
-
-//   return (
-//     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-//       <div>
-//         <label 
-//           htmlFor="email"
-//           className="block"
-//           style={{
-//             fontSize: FONTS.sizes.sm,
-//             color: COLORS.mainTextColor,
-//             fontWeight: FONTS.weights.medium
-//           }}
-//         >
-//           Email
-//         </label>
-//         <input
-//           {...register('email', { required: true })}
-//           type="email"
-//           className="mt-1 block w-full rounded-md"
-//           style={{
-//             borderColor: COLORS.stroke,
-//             padding: '0.5rem 0.75rem',
-//             fontSize: FONTS.sizes.sm
-//           }}
-//         />
-//       </div>
-
-//       <div>
-//         <label 
-//           htmlFor="password"
-//           className="block"
-//           style={{
-//             fontSize: FONTS.sizes.sm,
-//             color: COLORS.mainTextColor,
-//             fontWeight: FONTS.weights.medium
-//           }}
-//         >
-//           Password
-//         </label>
-//         <input
-//           {...register('password', { required: true })}
-//           type="password"
-//           className="mt-1 block w-full rounded-md"
-//           style={{
-//             borderColor: COLORS.stroke,
-//             padding: '0.5rem 0.75rem',
-//             fontSize: FONTS.sizes.sm
-//           }}
-//         />
-//       </div>
-
-//       <div>
-//         <label 
-//           htmlFor="role"
-//           className="block"
-//           style={{
-//             fontSize: FONTS.sizes.sm,
-//             color: COLORS.mainTextColor,
-//             fontWeight: FONTS.weights.medium
-//           }}
-//         >
-//           Role
-//         </label>
-//         <select
-//           {...register('role', { required: true })}
-//           className="mt-1 block w-full rounded-md"
-//           style={{
-//             borderColor: COLORS.stroke,
-//             padding: '0.5rem 0.75rem',
-//             fontSize: FONTS.sizes.sm
-//           }}
-//         >
-//           <option value="station-owner">Station Owner</option>
-//           <option value="admin">Admin</option>
-//           <option value="support-officer">Support Officer</option>
-//         </select>
-//       </div>
-
-//       <Button type="submit" variant="primary" className="w-full">
-//         Sign In
-//       </Button>
-//     </form>
-//   )
-// }
