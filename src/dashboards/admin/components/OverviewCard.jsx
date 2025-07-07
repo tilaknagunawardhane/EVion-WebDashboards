@@ -2,9 +2,9 @@ import React from 'react';
 import { COLORS } from '../../../constants/colors';
 import { FONTS } from '../../../constants/fonts';
 
-export default function OverviewCard({ title, children }) {
+export default function OverviewCard({ title, children, padding = 'p-4' }) {
   return (
-    <div className="p-6 rounded-lg" style={{ 
+    <div className={`${padding} rounded-lg`} style={{ 
       backgroundColor: 'white',
       border: `1px solid ${COLORS.border}`,
       boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'

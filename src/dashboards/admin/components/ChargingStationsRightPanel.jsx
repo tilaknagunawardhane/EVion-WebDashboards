@@ -19,12 +19,12 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
   const newRequests = requests?.filter(r => r.status === 'new') || [];
 
   const renderGreenIcon = (IconComponent) => (
-  <img 
-    src={IconComponent} 
-    alt="" 
-    className="w-5 h-5" 
-    style={{ 
-      filter: `
+    <img
+      src={IconComponent}
+      alt=""
+      className="w-5 h-5"
+      style={{
+        filter: `
         brightness(0) 
         saturate(100%) 
         invert(67%) 
@@ -34,9 +34,9 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
         brightness(95%) 
         contrast(101%)
       `, // This filter converts black to #00b894 green
-    }} 
-  />
-);
+      }}
+    />
+  );
 
   return (
     <div
@@ -56,7 +56,7 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 flex items-center justify-center rounded-lg" style={{ backgroundColor: COLORS.bgGreen }}>
-                   {renderGreenIcon(StationsIcon)}
+                    {renderGreenIcon(StationsIcon)}
                   </div>
                   <div style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.semibold }}>Charging Stations</div>
                 </div>
@@ -99,12 +99,31 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
             </div>
           </div>
         </OverviewCard>
+
+        <Button
+          variant="primary"
+          type="button"
+          size="base"
+          style={{
+            backgroundColor: COLORS.primary,  // Green background
+            color: COLORS.mainTextColor,      // Text color
+            borderColor: COLORS.stroke,       // Border color
+            padding: '2px 8px',               // Custom padding
+            // Add any other custom styles here
+          }}
+          className='mt-4 w-full'
+        >
+          View all requests
+        </Button>
+
+
         <div>
+          <div style={{ width: '100%', height: '1px', backgroundColor: COLORS.stroke, margin: '20px 0 20px' }}></div>
           <h4 style={{
             fontSize: FONTS.sizes.base,
             fontWeight: FONTS.weights.semibold,
             color: COLORS.mainTextColor,
-            marginBottom: '12px'
+            marginBottom: '18px'
           }}>
             New Requests
           </h4>

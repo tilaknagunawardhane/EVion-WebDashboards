@@ -92,7 +92,7 @@ export default function ChargingStations() {
                         />
                     </div>
 
-                    <OverviewCard>
+                    <OverviewCard padding='p-6'>
                     {/* Stations Table */}
                     <div className="bg-white rounded-sm shadow-sm overflow-hidden"
                          style={{

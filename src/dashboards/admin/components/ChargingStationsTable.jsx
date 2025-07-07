@@ -288,8 +288,8 @@ export default function ChargingStationsTable({ stations, filter, sort, search }
   return (
     <div className="overflow-hidden bg-white">
       <div className="relative overflow-x-auto">
-      <div className="max-h-[500px] overflow-y-auto">
-        <table className="w-full text-sm" style={{ fontFamily: FONTS.family.sans }}>
+      <div className="max-h-[500px] overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <table className="w-full text-sm " style={{ fontFamily: FONTS.family.sans }}>
           <thead>
             <tr style={{ 
               background: COLORS.bgGreen,
