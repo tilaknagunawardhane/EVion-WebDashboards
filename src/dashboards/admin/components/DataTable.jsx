@@ -1,5 +1,6 @@
 import React from 'react';
 import { COLORS, FONTS } from '../../../constants';
+import { useNavigate } from 'react-router-dom';
 
 const getStatusStyle = (status) => {
   switch(status) {
@@ -137,7 +138,15 @@ const renderCellContent = (value, column) => {
   return value;
 };
 
-export default function DataTable({ columns, data, filter, sort, search }) {
+export default function DataTable({ columns, data, filter, sort, search, onRowClick }) {
+  const navigate = useNavigate();
+
+  const handleRowClick = (rowData) => {
+    if (onRowClick) {
+      onRowClick(rowData);
+    }
+  };
+
   return (
     <div className="overflow-hidden bg-white">
       <div className="relative overflow-x-auto">
@@ -173,7 +182,10 @@ export default function DataTable({ columns, data, filter, sort, search }) {
                     fontSize: FONTS.sizes.sm,
                     color: COLORS.mainTextColor,
                     fontWeight: FONTS.weights.normal,
+                    cursor: 'pointer', // Add pointer cursor
                   }}
+                  onClick={() => handleRowClick(row)} // Add click handler
+                  className="hover:bg-gray-50 transition-colors duration-150" // Add hover effect
                 >
                   {columns.map((column) => (
                     <td 

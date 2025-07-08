@@ -5,48 +5,52 @@ import ChargingStationsRightPanel from '../components/ChargingStationsRightPanel
 import { COLORS, FONTS } from '../../../constants';
 import NotificationsIcon from '../../../assets/notifications.svg';
 import OverviewCard from '../components/OverviewCard';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function ChargingStations() {
+    const navigate = useNavigate();
+
     const [search, setSearch] = React.useState('');
     const [filter, setFilter] = React.useState({});
     const [sort, setSort] = React.useState('Date Joined');
     const [stations, setStations] = React.useState([]);
     const [requests, setRequests] = React.useState([
-      {
-        id: 1,
-        type: 'station',
-        status: 'new',
-        title: 'A request to add a new charging station',
-        date: '5 Sat, 08:11 AM'
-      },
-      {
-        id: 2,
-        type: 'station',
-        status: 'new',
-        title: 'A request to update charging station info',
-        date: '5 Sat, 08:11 AM'
-      },
-      {
-        id: 3,
-        type: 'connector',
-        status: 'new',
-        title: 'A request to add a new connector',
-        date: '5 Sat, 08:11 AM'
-      },
-      {
-        id: 4,
-        type: 'station',
-        status: 'review',
-        title: 'Station upgrade request',
-        date: '4 Fri, 03:45 PM'
-      },
-      {
-        id: 5,
-        type: 'connector',
-        status: 'review',
-        title: 'Connector replacement',
-        date: '3 Thu, 11:20 AM'
-      }
+        {
+            id: 1,
+            type: 'station',
+            status: 'new',
+            title: 'A request to add a new charging station',
+            date: '5 Sat, 08:11 AM'
+        },
+        {
+            id: 2,
+            type: 'station',
+            status: 'new',
+            title: 'A request to update charging station info',
+            date: '5 Sat, 08:11 AM'
+        },
+        {
+            id: 3,
+            type: 'connector',
+            status: 'new',
+            title: 'A request to add a new connector',
+            date: '5 Sat, 08:11 AM'
+        },
+        {
+            id: 4,
+            type: 'station',
+            status: 'review',
+            title: 'Station upgrade request',
+            date: '4 Fri, 03:45 PM'
+        },
+        {
+            id: 5,
+            type: 'connector',
+            status: 'review',
+            title: 'Connector replacement',
+            date: '3 Thu, 11:20 AM'
+        }
     ]);
 
     const stationFilterOptions = [
@@ -65,23 +69,23 @@ export default function ChargingStations() {
 
     // Define columns for stations table
     const stationColumns = [
-        'Station Name', 
-        'Owner Name', 
-        'Joined On', 
-        'District', 
-        'City', 
-        'Address Line', 
-        'Revenue', 
-        'Bookings', 
-        'No of Chargers', 
-        'Type1', 
-        'Type2', 
-        'CCS1', 
-        'CCS2', 
-        'CHAdeMO', 
+        'Station Name',
+        'Owner Name',
+        'Joined On',
+        'District',
+        'City',
+        'Address Line',
+        'Revenue',
+        'Bookings',
+        'No of Chargers',
+        'Type1',
+        'Type2',
+        'CCS1',
+        'CCS2',
+        'CHAdeMO',
         'Tesla',
-        'No of Active Reports', 
-        'Status', 
+        'No of Active Reports',
+        'Status',
         'Quick Actions'
     ];
 
@@ -131,8 +135,8 @@ export default function ChargingStations() {
     ];
 
     return (
-        <div style={{ 
-            fontFamily: FONTS.family.sans, 
+        <div style={{
+            fontFamily: FONTS.family.sans,
             padding: '24px',
         }}>
             {/* Header Section */}
@@ -151,8 +155,8 @@ export default function ChargingStations() {
                                 cursor: 'pointer'
                             }}
                         />
-                        <span className="absolute top-0 right-0 w-2 h-2 rounded-full" 
-                              style={{ backgroundColor: COLORS.primary }}></span>
+                        <span className="absolute top-0 right-0 w-2 h-2 rounded-full"
+                            style={{ backgroundColor: COLORS.primary }}></span>
                     </div>
                 </div>
             </div>
@@ -179,16 +183,19 @@ export default function ChargingStations() {
                     <OverviewCard padding='p-6'>
                         {/* Stations Table */}
                         <div className="bg-white rounded-sm shadow-sm overflow-hidden"
-                             style={{
-                                 border: `1px solid ${COLORS.border}`,
-                                 boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
-                             }}>
+                            style={{
+                                border: `1px solid ${COLORS.border}`,
+                                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
+                            }}>
                             <DataTable
                                 columns={stationColumns}
                                 data={stations.length > 0 ? stations : stationData}
                                 filter={filter}
                                 sort={sort}
                                 search={search}
+                                onRowClick={(station)=>{
+                                    navigate();
+                                }}
                             />
                         </div>
                     </OverviewCard>

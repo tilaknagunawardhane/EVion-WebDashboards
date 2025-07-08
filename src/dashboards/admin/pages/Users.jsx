@@ -5,8 +5,10 @@ import UsersRightPanel from '../components/UsersRightPanel';
 import { COLORS, FONTS } from '../../../constants';
 import NotificationsIcon from '../../../assets/notifications.svg';
 import OverviewCard from '../components/OverviewCard';
+import { useNavigate } from 'react-router-dom';
 
 export default function UsersPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState('Date of Registration');
@@ -76,6 +78,7 @@ export default function UsersPage() {
   // More comprehensive sample user data
   const userData = [
     {
+      id: '001',
       Name: 'John Doe',
       Email: 'john@example.com',
       'Contact Number': '+1234567890',
@@ -93,8 +96,8 @@ export default function UsersPage() {
       'Account Status': 'Active',
       'Quick Actions': ['View', 'Disable', 'Delete'],
       flagged: false
-    },
-    {
+    },{
+      id: '002',
       Name: 'Jane Smith',
       Email: 'jane@example.com',
       'Contact Number': '+1987654321',
@@ -114,6 +117,7 @@ export default function UsersPage() {
       flagged: true
     },
     {
+      id: '003',
       Name: 'Robert Johnson',
       Email: 'robert@example.com',
       'Contact Number': '+1122334455',
@@ -199,6 +203,11 @@ export default function UsersPage() {
                 filter={filter}
                 sort={sort}
                 search={search}
+                onRowClick={(user) => {
+                  // Navigate to user detail page with user ID or email
+                  // This assumes you have a route like '/users/:id'
+                  navigate(`/admin/users/${user.id}`);
+                }}
               />
             </div>
           </OverviewCard>
@@ -207,9 +216,9 @@ export default function UsersPage() {
         {/* Right Side - 1/4 width */}
         <div className="lg:col-span-1">
           <div className="sticky top-6 space-y-6">
-            <UsersRightPanel 
-              users={users.length > 0 ? users : userData} 
-              requests={requests} 
+            <UsersRightPanel
+              users={users.length > 0 ? users : userData}
+              requests={requests}
             />
           </div>
         </div>
