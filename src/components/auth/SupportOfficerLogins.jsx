@@ -51,7 +51,7 @@ export default function LoginForm() {
 
     if (!valid) return;
 
-    const userData = { email, role: 'admin' }; // Adjust role based on your logic
+    const userData = { email, role: 'support-officer' };
     login(userData);
   };
 
@@ -91,7 +91,7 @@ export default function LoginForm() {
             <div className="h-full overflow-y-auto">
             <div className="mb-6">
               <h2 style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes['2xl'], fontFamily: FONTS.family.sans, fontWeight: FONTS.weights['500'] }}>
-                Admin Login
+                Support Officer Login
               </h2>
             </div>
             <form onSubmit={handleSignin} className="space-y-4">
