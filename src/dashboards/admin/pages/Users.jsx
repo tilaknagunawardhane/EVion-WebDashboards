@@ -96,7 +96,7 @@ export default function UsersPage() {
       'Account Status': 'Active',
       'Quick Actions': ['View', 'Disable', 'Delete'],
       flagged: false
-    },{
+    }, {
       id: '002',
       Name: 'Jane Smith',
       Email: 'jane@example.com',
@@ -208,6 +208,25 @@ export default function UsersPage() {
                   // This assumes you have a route like '/users/:id'
                   navigate(`/admin/users/${user.id}`);
                 }}
+                customActions={(user) => (
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="px-2.5 py-1 text-xs font-medium flex items-center gap-1"
+                      style={{ color: COLORS.primary }}
+                      onClick={() => console.log('View user', user.id)}
+
+                    >
+                      View
+                    </button>
+                    <button
+                      className="px-2.5 py-1 text-xs font-medium flex items-center gap-1"
+                      style={{ color: COLORS.danger }}
+                      onClick={() => console.log('Delete user', user.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               />
             </div>
           </OverviewCard>

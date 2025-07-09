@@ -40,41 +40,222 @@ export default function UserAccountPage() {
     }
   ]);
 
+   const userFilterOptions = [
+    { label: 'Status', value: 'status' },
+    { label: 'Users with Vehicles', value: 'userswithvehicles' },
+    { label: 'Users Who have Complained', value: 'complainedusers' },
+    { label: 'Users Who have Posted on Community', value: 'userspostcommunity' },
+  ];
+
+  const userSortOptions = [
+    { label: 'Date of Registration', value: 'dateRegistered' },
+    { label: 'No of Vehicles', value: 'noofvehicles' },
+    { label: 'Energy', value: 'energy' },
+    { label: 'Spend', value: 'spend' },
+    { label: 'Trips', value: 'trips' },
+    { label: 'Bookings', value: 'bookings' },
+    { label: 'Ratings', value: 'ratings' },
+    { label: 'Complaints', value: 'complaints' },
+    { label: 'Posts', value: 'posts' }
+  ];
+
   // Sample data for each tab
-  const tabData = {
-    sessions: {
-      columns: ['Date', 'Station', 'Energy (kWh)', 'Duration', 'Cost', 'Status'],
-      data: [
-        { id: 1, Date: '2023-06-15 09:30', Station: 'EV Central', 'Energy (kWh)': 24.5, Duration: '45 min', Cost: '$7.35', Status: 'Completed' },
-        { id: 2, Date: '2023-06-14 18:15', Station: 'Westside EV', 'Energy (kWh)': 18.2, Duration: '32 min', Cost: '$5.46', Status: 'Completed' },
-        { id: 3, Date: '2023-06-12 07:45', Station: 'North Power Hub', 'Energy (kWh)': 32.8, Duration: '58 min', Cost: '$9.84', Status: 'Completed' }
-      ]
-    },
-    bookings: {
-      columns: ['Date', 'Station', 'Time Slot', 'Status', 'Actions'],
-      data: [
-        { id: 1, Date: '2023-06-18', Station: 'EV Central', 'Time Slot': '10:00 - 11:00', Status: 'Confirmed', Actions: ['Cancel', 'Reschedule'] },
-        { id: 2, Date: '2023-06-17', Station: 'Mall Parking EV', 'Time Slot': '15:30 - 16:30', Status: 'Completed', Actions: ['Rate'] },
-        { id: 3, Date: '2023-06-20', Station: 'Tech Park Chargers', 'Time Slot': '09:00 - 10:00', Status: 'Upcoming', Actions: ['Cancel', 'Reschedule'] }
-      ]
-    },
-    payments: {
-      columns: ['Date', 'Transaction ID', 'Amount', 'Method', 'Status'],
-      data: [
-        { id: 1, Date: '2023-06-15', 'Transaction ID': 'TXN789456', Amount: '$7.35', Method: 'Credit Card', Status: 'Completed' },
-        { id: 2, Date: '2023-06-10', 'Transaction ID': 'TXN123456', Amount: '$12.50', Method: 'Wallet', Status: 'Completed' },
-        { id: 3, Date: '2023-06-05', 'Transaction ID': 'TXN654321', Amount: '$5.46', Method: 'Credit Card', Status: 'Refunded' }
-      ]
-    },
-    reports: {
-      columns: ['Report ID', 'Type', 'Date', 'Status', 'Actions'],
-      data: [
-        { id: 1, 'Report ID': 'RPT001', Type: 'Charging Issue', Date: '2023-06-12', Status: 'Resolved', Actions: ['View'] },
-        { id: 2, 'Report ID': 'RPT002', Type: 'Payment Dispute', Date: '2023-06-08', Status: 'In Progress', Actions: ['View'] },
-        { id: 3, 'Report ID': 'RPT003', Type: 'Station Feedback', Date: '2023-06-01', Status: 'Closed', Actions: ['View'] }
-      ]
-    }
-  };
+ const tabData = {
+  sessions: {
+    columns: [
+      'Session ID',
+      'Date',
+      'Start',
+      'End',
+      'Duration',
+      'Station',
+      'Location',
+      'Connector Type',
+      'Charger Type',
+      'Vehicle',
+      'Starting Bat. Level',
+      'Ending Bat. Level',
+      'Energy Delivered',
+      'Energy Cost',
+      'Status',
+      'Booking Fee',
+      'Charged Penalties',
+      'Total Fee',
+      'Payment Status',
+      'Rating Given',
+      'Complaints',
+      'Resolve Status',
+      'Refunds'
+    ],
+    data: [
+      {
+        'Session ID': 'SESS-001',
+        'Date': '2023-06-15',
+        'Start': '09:30',
+        'End': '10:15',
+        'Duration': '45 min',
+        'Station': 'EV Central',
+        'Location': '123 Main St, Metropolis',
+        'Connector Type': 'CCS2',
+        'Charger Type': 'DC',
+        'Vehicle': 'Tesla Model 3',
+        'Starting Bat. Level': '22%',
+        'Ending Bat. Level': '85%',
+        'Energy Delivered': '24.5 kWh',
+        'Energy Cost': '$7.35',
+        'Status': 'Booked',
+        'Booking Fee': '$2.00',
+        'Charged Penalties': '$0.00',
+        'Total Fee': '$9.35',
+        'Payment Status': 'Paid',
+        'Rating Given': '4.5',
+        'Complaints': 'None',
+        'Resolve Status': '-',
+        'Refunds': '$0.00'
+      },
+      // Add more session data as needed
+    ]
+  },
+  bookings: {
+    columns: [
+      'Session ID',
+      'Date',
+      'Slot',
+      'Start',
+      'End',
+      'Duration',
+      'Station',
+      'Location',
+      'Connector Type',
+      'Charger Type',
+      'Vehicle',
+      'Starting Bat. Level',
+      'Ending Bat. Level',
+      'Energy Delivered',
+      'Energy Cost',
+      'Booking Fee',
+      'Status',
+      'Reason to cancel',
+      'Charged Penalties',
+      'Total Fee',
+      'Rating Given',
+      'Complaints',
+      'Resolve Status',
+      'Refunds',
+      'View Receipt'
+    ],
+    data: [
+      {
+        'Session ID': 'BOOK-001',
+        'Date': '2023-06-18',
+        'Slot': '10:00 - 11:00',
+        'Start': '10:05',
+        'End': '10:50',
+        'Duration': '45 min',
+        'Station': 'Mall Parking EV',
+        'Location': '800 Shop Rd, Metropolis',
+        'Connector Type': 'Type 2',
+        'Charger Type': 'AC',
+        'Vehicle': 'Nissan Leaf',
+        'Starting Bat. Level': '30%',
+        'Ending Bat. Level': '90%',
+        'Energy Delivered': '18.2 kWh',
+        'Energy Cost': '$5.46',
+        'Booking Fee': '$1.50',
+        'Status': 'Attended',
+        'Reason to cancel': '-',
+        'Charged Penalties': '$0.00',
+        'Total Fee': '$6.96',
+        'Rating Given': '5.0',
+        'Complaints': 'None',
+        'Resolve Status': '-',
+        'Refunds': '$0.00',
+        'View Receipt': <a href="#" style={{ color: COLORS.primary }}>View</a>
+      },
+      // Add more booking data as needed
+    ]
+  },
+  payments: {
+    columns: [
+      'Session ID',
+      'Date & Time',
+      'Station',
+      'Location',
+      'Connector Type',
+      'Charger Type',
+      'Duration',
+      'Vehicle',
+      'Energy Delivered',
+      'Energy Cost',
+      'Booking Fee',
+      'Penalties',
+      'Total Fee',
+      'Complaint ID',
+      'Refunds',
+      'View Receipt'
+    ],
+    data: [
+      {
+        'Session ID': 'PAY-001',
+        'Date & Time': '2023-06-15 09:30',
+        'Station': 'Tech Park Chargers',
+        'Location': '200 Innovation Dr, Gotham',
+        'Connector Type': 'CHAdeMO',
+        'Charger Type': 'DC',
+        'Duration': '32 min',
+        'Vehicle': 'Toyota Prius',
+        'Energy Delivered': '15.8 kWh',
+        'Energy Cost': '$4.74',
+        'Booking Fee': '$1.00',
+        'Penalties': '$0.00',
+        'Total Fee': '$5.74',
+        'Complaint ID': '-',
+        'Refunds': '$0.00',
+        'View Receipt': <a href="#" style={{ color: COLORS.primary }}>View</a>
+      },
+      // Add more payment data as needed
+    ]
+  },
+  reports: {
+    columns: [
+      'Report ID',
+      'Reported On',
+      'Report category',
+      'Title',
+      'Description',
+      'Evidences',
+      'Station',
+      'Location',
+      'Charger ID',
+      'Connector Type',
+      'Booking ID',
+      'Status',
+      'Resolved On',
+      'Resolved By',
+      'Specific Actions took to resolve'
+    ],
+    data: [
+      {
+        'Report ID': 'REP-001',
+        'Reported On': '2023-06-12 14:30',
+        'Report category': 'Charging Station Related',
+        'Title': 'Station not charging',
+        'Description': 'Plugged in but no power delivery',
+        'Evidences': 'Photo attached',
+        'Station': 'Westside EV',
+        'Location': '456 Elm St, Gotham',
+        'Charger ID': 'CHG-789',
+        'Connector Type': 'CCS1',
+        'Booking ID': 'BOOK-045',
+        'Status': 'Resolved',
+        'Resolved On': '2023-06-13 10:15',
+        'Resolved By': 'Tech Team',
+        'Specific Actions took to resolve': 'Replaced faulty power module'
+      },
+      // Add more report data as needed
+    ]
+  }
+};
 
   // Get current user data based on ID
   const currentUser = {
@@ -148,8 +329,10 @@ export default function UserAccountPage() {
               setFilter={setFilter}
               sort={sort}
               setSort={setSort}
+              filterOptions={userFilterOptions}
+              sortOptions={userSortOptions}
               searchPlaceholder={`Search ${activeTab}...`}
-              showExportButton={true}
+              showExportButton={false}
               onExport={() => {
                 console.log(`Exporting ${activeTab} data...`);
               }}
@@ -169,6 +352,7 @@ export default function UserAccountPage() {
                 filter={filter}
                 sort={sort}
                 search={search}
+                
                 onRowClick={(row) => {
                   navigate(`/users/${id}/${activeTab}/${row.id}`);
                 }}
