@@ -49,8 +49,7 @@ export default function ChargingStationComplaintsChart() {
 
   const options = {
     responsive: true,
-    maintainAspectRatio: true,
-    aspectRatio: 1.5,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
@@ -58,12 +57,27 @@ export default function ChargingStationComplaintsChart() {
           color: COLORS.mainTextColor,
           font: {
             size: 12
-          }
-        }
+          },
+          usePointStyle: true,
+          padding: 20,
+          boxWidth: 10,
+        },
+      },
+      tooltip: {
+        backgroundColor: 'white', // Match RevenueTrendChart
+        titleColor: COLORS.mainTextColor,
+        bodyColor: COLORS.secondaryText,
+        borderColor: COLORS.border,
+        borderWidth: 1,
+        padding: 12,
+        usePointStyle: true,
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${context.raw}`,
+        },
       },
       title: {
         display: false,
-      }
+      },
     },
     scales: {
       x: {
@@ -74,7 +88,7 @@ export default function ChargingStationComplaintsChart() {
           color: COLORS.secondaryText,
           font: {
             size: 12
-          }
+          },
         },
         border: {
           display: false,
@@ -83,14 +97,15 @@ export default function ChargingStationComplaintsChart() {
       y: {
         beginAtZero: true,
         grid: {
-          color: '#f0f0f0',
+          color: COLORS.border,
           drawBorder: false,
         },
         ticks: {
           color: COLORS.secondaryText,
           font: {
             size: 12
-          }
+          },
+          // callback: (value) => value,
         },
         border: {
           display: false,
@@ -106,11 +121,24 @@ export default function ChargingStationComplaintsChart() {
         }
       },
     },
+    elements: {
+      bar: {
+        // borderWidth: 2,
+      },
+    },
   }
 
   return (
-    <div style={{ height: '300px' }}>
-        <Bar data={data} options={options} />
+    <div
+      style={{
+        height: '300px', // Match RevenueTrendChart
+        padding: '16px', // Match RevenueTrendChart
+        backgroundColor: 'white', // Match OverviewCard
+        borderRadius: '8px', // Match OverviewCard
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)', // Match OverviewCard
+      }}
+    >
+      <Bar data={data} options={options} />
     </div>
   )
 }

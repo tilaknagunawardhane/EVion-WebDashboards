@@ -6,10 +6,11 @@ import OverviewCard from '../../admin/components/OverviewCard'
 import NotificationsIcon from '../../../assets/notifications.svg'
 import RevenueTrendChart from '../components/RevenueTrendChart'
 import ConnectorStatusChart from '../components/ConnectorStatusChart'
-import ApprovalCard from '../../admin/components/ApprovalCard'
+import ApprovalCard from '../components/ApprovalCard'
 import MapImage from '../../../assets/map-placeholder.png' // Import your map image
 import { Colors } from 'chart.js'
 import ChargingStationComplaintsChart from '../components/ChargingStationComplaintsChart'
+import CommunityPostsChart from '../components/CommunityPostsChart'
 // import UserGrowthChart from '../components/UserGrowthChart'
 
 
@@ -118,23 +119,20 @@ export default function SupportOfficerDashboardPage() {
                 </div>
             </section>
 
-            {/* Connector Status with Map Section */}
+            {/* Row 3 */}
             <section className="mb-8">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                    {/* Map Section - takes 3/5 width */}
+
+                    {/* Community Post Section */}
                     <div className="lg:col-span-2">
                         <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                            Managed Chargers
+                            Community Posts
                         </h2>
                         <OverviewCard>
-                            <img
-                                src={MapImage}
-                                alt="Charging Stations Map"
-                                className="w-full h-full object-cover rounded-lg"
-                                style={{ height: '300px', width: '100%' }}
-                            />
+                        <CommunityPostsChart />
                         </OverviewCard>
                     </div>
+
 
                     {/* Right Side Section - takes 2/5 width */}
                     <div className="lg:col-span-2">
@@ -158,25 +156,28 @@ export default function SupportOfficerDashboardPage() {
                             {/* Approval Cards Section - top right */}
                             <div className="lg:col-span-1">
                                 <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                                    Approvals
+                                    Most Active Users
                                 </h2>
                                 <ApprovalCard
-                                    count="03"
-                                    title="Charging Station Approvals"
+                                    name="John Doe"
+                                    posts="5"
+                                    rejected="1"
                                     bgColor="#FFFFFF"
                                     textColor={COLORS.mainTextColor}
                                 // borderColor="#B3E0FF"
                                 />
                                 <ApprovalCard
-                                    count="15"
-                                    title="New Charger Approvals"
+                                    name="John Doe"
+                                    posts="8"
+                                    rejected="1"
                                     bgColor={COLORS.bgGreen}
                                     textColor={COLORS.mainTextColor}
                                 // borderColor="#B3E6B3"
                                 />
                                 <ApprovalCard
-                                    count="12"
-                                    title="Account Reactivations"
+                                    name="John Doe"
+                                    posts="9"
+                                    rejected="2"
                                     bgColor={COLORS.primary}
                                     textColor={COLORS.background}
                                 // borderColor="#FFD9B3"
