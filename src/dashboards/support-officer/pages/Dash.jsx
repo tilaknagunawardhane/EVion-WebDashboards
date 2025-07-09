@@ -1,6 +1,6 @@
 import { COLORS } from '../../../constants/colors'
 import { FONTS } from '../../../constants/fonts'
-import StatCard from '../../admin/components/StatCard'
+import StatCard from '../components/StatCard'
 import StatusCard from '../../admin/components/StatusCard'
 import OverviewCard from '../../admin/components/OverviewCard'
 import NotificationsIcon from '../../../assets/notifications.svg'
@@ -8,6 +8,7 @@ import RevenueTrendChart from '../../admin/components/RevenueTrendChart'
 import ConnectorStatusChart from '../../admin/components/ConnectorStatusChart'
 import ApprovalCard from '../../admin/components/ApprovalCard'
 import MapImage from '../../../assets/map-placeholder.png' // Import your map image
+import { Colors } from 'chart.js'
 // import UserGrowthChart from '../components/UserGrowthChart'
 
 
@@ -17,8 +18,8 @@ export default function SupportOfficerDashboardPage() {
         stats: {
             stations: { total: 448, pending: 3 },
             connectors: { total: 2302, faulted: 15 },
-            users: { total: 12501, riskPercentage: 3.87 },
-            revenue: { total: 52311, sessions: 45200, bookingFees: 7111 }
+            faultReports: { total: 24 },
+            communityPosts: { total: 3 }
         },
         trends: {
             chargingSessions: { approved: 52311, bookings: 45200, walkIns: 7111 },
@@ -65,6 +66,7 @@ export default function SupportOfficerDashboardPage() {
                         value={dashboardData.stats.stations.total}
                         subValue={`${dashboardData.stats.stations.pending} Pending`}
                         icon="stations"
+                        subValueColor={COLORS.primary}
                     />
 
                     <StatCard
@@ -72,20 +74,20 @@ export default function SupportOfficerDashboardPage() {
                         value={dashboardData.stats.connectors.total}
                         subValue={`${dashboardData.stats.connectors.faulted} Faulted`}
                         icon="connectors"
+                        subValueColor={COLORS.lightRed}
                     />
 
                     <StatCard
-                        title="EV Users"
-                        value={dashboardData.stats.users.total}
-                        subValue={`${dashboardData.stats.users.riskPercentage}% risk controls`}
-                        icon="users"
+                        title="Fault Reports"
+                        value={dashboardData.stats.faultReports.total}
+                        icon="faultReports"
+                        subValueColor={COLORS.lightRed}
                     />
 
                     <StatCard
-                        title="Revenue"
-                        value={`LKR ${dashboardData.stats.revenue.total.toLocaleString()}`}
-                        subValue="6.37%  ↑ vs last month"
-                        icon="revenue"
+                        title="Community Posts"
+                        value={dashboardData.stats.communityPosts.total}
+                        icon="communityPosts"
                     />
                 </div>
             </section>
