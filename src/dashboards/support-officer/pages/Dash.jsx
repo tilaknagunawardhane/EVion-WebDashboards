@@ -1,14 +1,15 @@
 import { COLORS } from '../../../constants/colors'
 import { FONTS } from '../../../constants/fonts'
 import StatCard from '../components/StatCard'
-import StatusCard from '../../admin/components/StatusCard'
+import StatusCard from '../components/StatusCard'
 import OverviewCard from '../../admin/components/OverviewCard'
 import NotificationsIcon from '../../../assets/notifications.svg'
-import RevenueTrendChart from '../../admin/components/RevenueTrendChart'
-import ConnectorStatusChart from '../../admin/components/ConnectorStatusChart'
+import RevenueTrendChart from '../components/RevenueTrendChart'
+import ConnectorStatusChart from '../components/ConnectorStatusChart'
 import ApprovalCard from '../../admin/components/ApprovalCard'
 import MapImage from '../../../assets/map-placeholder.png' // Import your map image
 import { Colors } from 'chart.js'
+import ChargingStationComplaintsChart from '../components/ChargingStationComplaintsChart'
 // import UserGrowthChart from '../components/UserGrowthChart'
 
 
@@ -20,21 +21,6 @@ export default function SupportOfficerDashboardPage() {
             connectors: { total: 2302, faulted: 15 },
             faultReports: { total: 24 },
             communityPosts: { total: 3 }
-        },
-        trends: {
-            chargingSessions: { approved: 52311, bookings: 45200, walkIns: 7111 },
-            revenue: { total: 52311, sessions: 45200, bookingFees: 7111 },
-            managedChargers: [
-                {
-                    name: 'Premasiri Khemadasa Marek',
-                    locations: [
-                        'Bloomfield, Cact and Athlone Club',
-                        'Seleney Mazurant & Cafe',
-                        'Sri Lanka Rupayahini (TV) Corporation'
-                    ]
-                },
-                // Add more managed chargers as needed
-            ]
         }
     }
 
@@ -94,32 +80,41 @@ export default function SupportOfficerDashboardPage() {
 
             {/* Main Charts Section */}
             <section className="mb-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Charging Session Trend */}
-                    <div>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+
+                    {/* Revenue Trend */}
+                    <div className="lg:col-span-2">
                         <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                            User Growth
+                            Report Trends
                         </h2>
                         <OverviewCard>
-                            <div className="flex flex-col">
-                                <div className="flex space-x-4 mb-4">
-                                    <span style={{ color: COLORS.secondaryText }}>New Users: 4,500</span>
-                                    <span style={{ color: COLORS.secondaryText }}>Active Users: 3,500</span>
-                                </div>
-                                {/* <UserGrowthChart data={dashboardData.userGrowth} /> */}
-                            </div>
+                            <RevenueTrendChart />
+                        </OverviewCard>
+                    </div>
+                    
+                    {/* Fault Status */}
+                    <div className="lg:col-span-1">
+                        <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
+                            Fault Status
+                        </h2>
+                        <StatusCard
+                            value={dashboardData.stats.faultReports.total}
+                            total={dashboardData.stats.connectors.total}
+                        >
+                            <ConnectorStatusChart />
+                        </StatusCard>
+                    </div>
+
+                    {/* Charging Station Complains */}
+                    <div className="lg:col-span-1">
+                        <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
+                            Complains
+                        </h2>
+                        <OverviewCard>
+                        <ChargingStationComplaintsChart />
                         </OverviewCard>
                     </div>
 
-                    {/* Revenue Trend */}
-                    <div>
-                        <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                            Revenue Trends
-                        </h2>
-                        <OverviewCard>
-                            <RevenueTrendChart data={dashboardData.trends.revenue} />
-                        </OverviewCard>
-                    </div>
                 </div>
             </section>
 
