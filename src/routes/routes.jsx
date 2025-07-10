@@ -13,6 +13,7 @@ import TasksPage from '../dashboards/support-officer/pages/Tasks'
 import AdminRoute from './AdminRoute'
 import PrivateRoute from './PrivateRoute'
 import ProfileSetup from '../components/auth/ProfileSetup'
+import InitAddStation from '../components/auth/InitAddStation'
 import { AuthProvider } from '../contexts/AuthContext'
 
 const router = createBrowserRouter([
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
       { index: true, element: <LandingPage /> },
       { path: 'auth', element: <AuthPage /> },
       { path: 'profilesetup', element: <ProfileSetup />},
+      { path: 'initaddstation', element: <InitAddStation />},
       {
         path: 'admin',
         element: <PrivateRoute><AdminRoute><AdminDashboard /></AdminRoute></PrivateRoute>,
