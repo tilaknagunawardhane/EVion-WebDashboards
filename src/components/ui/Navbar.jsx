@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { COLORS } from '../../constants'
 import logo4 from '../../assets/Logo4.png'
 import evionname from '../../assets/Evion logo.png'
+import evionLogo from '../../assets/Logo 2.svg';
 
 export default function Navbar() {
   const { currentUser, logout } = useAuth()
@@ -36,7 +37,7 @@ export default function Navbar() {
                 <button
                   onClick={logout}
                   className="text-sm font-medium"
-                  style={{ color: '#959595' }}
+                  style={{ color: COLORS.secondaryText }}
                 >
                   Sign out
                 </button>
