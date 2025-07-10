@@ -29,20 +29,25 @@ export default function Button({
     danger: {
       backgroundColor: COLORS.danger,
       color: 'white',
+    },
+    outline: {
+      // backgroundColor: COLORS.background,
+      color: COLORS.mainTextColor,
+      border: `1px solid ${COLORS.stroke}`,
     }
   }
 
   const sizeStyles = {
     sm: {
-      fontSize: FONTS.sizes.sm,
+      fontSize: FONTS.sizes.xs,
       padding: '0.25rem 0.75rem'
     },
     base: {
-      fontSize: FONTS.sizes.base,
-      padding: '0.5rem 1rem'
+      fontSize: FONTS.sizes.sm,
+      padding: '0.7rem 1rem'
     },
     lg: {
-      fontSize: FONTS.sizes.lg,
+      fontSize: FONTS.sizes.base,
       padding: '0.75rem 1.5rem'
     }
   }

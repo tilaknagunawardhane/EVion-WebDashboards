@@ -6,11 +6,14 @@ import AdminDashboard from '../dashboards/admin/Dashboard'
 import UsersPage from '../dashboards/admin/pages/Users'
 import StationOwnerDashboard from '../dashboards/station-owner/Dashboard'
 import StationsPage from '../dashboards/station-owner/pages/Stations'
+import DashboardPage from '../dashboards/station-owner/pages/Dash'
 import SettingsPage from '../dashboards/station-owner/pages/Settings'
 import SupportOfficerDashboard from '../dashboards/support-officer/Dashboard'
 import TasksPage from '../dashboards/support-officer/pages/Tasks'
 import AdminRoute from './AdminRoute'
 import PrivateRoute from './PrivateRoute'
+import ProfileSetup from '../components/auth/ProfileSetup'
+import InitAddStation from '../components/auth/InitAddStation'
 import { AuthProvider } from '../contexts/AuthContext'
 
 const router = createBrowserRouter([
@@ -24,6 +27,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <LandingPage /> },
       { path: 'auth', element: <AuthPage /> },
+      { path: 'profilesetup', element: <ProfileSetup />},
+      { path: 'initaddstation', element: <InitAddStation />},
       {
         path: 'admin',
         element: <PrivateRoute><AdminRoute><AdminDashboard /></AdminRoute></PrivateRoute>,
@@ -35,8 +40,9 @@ const router = createBrowserRouter([
         path: 'station-owner',
         element: <PrivateRoute><StationOwnerDashboard /></PrivateRoute>,
         children: [
+          { path: 'dashboards', element: <DashboardPage /> },
           { path: 'stations', element: <StationsPage /> },
-          { path: 'settings', element: <SettingsPage /> }
+          { path: 'settings', element: <SettingsPage /> },
         ]
       },
       {

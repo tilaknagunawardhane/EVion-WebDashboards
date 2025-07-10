@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import evionLogo from '../../assets/Logo 2.svg';
+import { COLORS } from '../../constants';
 
 export default function Navbar() {
   const { currentUser, logout } = useAuth()
@@ -10,8 +12,14 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold" style={{ color: '#00b894' }}>
-                EVION
+              <Link to="/" className="text-xl font-bold">
+                <div className="flex">
+                  <img 
+                    src={evionLogo} 
+                    alt="EVion Logo" 
+                    className="h-6 w-auto"
+                  />
+                </div>
               </Link>
             </div>
           </div>
@@ -24,7 +32,7 @@ export default function Navbar() {
                 <button
                   onClick={logout}
                   className="text-sm font-medium"
-                  style={{ color: '#959595' }}
+                  style={{ color: COLORS.secondaryText }}
                 >
                   Sign out
                 </button>
@@ -33,7 +41,7 @@ export default function Navbar() {
               <Link
                 to="/auth"
                 className="text-sm font-medium"
-                style={{ color: '#959595' }}
+                style={{ color: COLORS.secondaryText }}
               >
                 Sign in
               </Link>

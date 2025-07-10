@@ -13,7 +13,7 @@ export default function LandingPage() {
             color: COLORS.mainTextColor
           }}
         >
-          Welcome to EVION
+          Welcome to EVION !
         </h1>
         <p 
           className="max-w-md mx-auto md:max-w-3xl mb-10"
@@ -32,7 +32,7 @@ export default function LandingPage() {
               padding: '0.75rem 1.5rem',
               backgroundColor: COLORS.primary,
               color: 'white',
-              fontSize: FONTS.sizes.base,
+              fontSize: FONTS.sizes.sm,
               fontWeight: FONTS.weights.medium
             }}
           >
@@ -45,7 +45,7 @@ export default function LandingPage() {
               padding: '0.75rem 1.5rem',
               backgroundColor: COLORS.bgGreen,
               color: COLORS.primary,
-              fontSize: FONTS.sizes.base,
+              fontSize: FONTS.sizes.sm,
               fontWeight: FONTS.weights.medium
             }}
           >
