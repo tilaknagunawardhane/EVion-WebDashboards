@@ -2,12 +2,173 @@ import React, { useState } from 'react';
 import TabBar from '../../components/TabBar';
 import { COLORS, FONTS } from '../../../../constants';
 import NotificationsIcon from '../../../../assets/notifications.svg';
-import OverviewCard from '../../components/OverviewCard';
-import { useNavigate, useParams } from 'react-router-dom';
+import MainRequestCard from '../../components/requestComponents/MainRequestCard';
+import { useNavigate } from 'react-router-dom';
 
 export default function RequestsPage() {
   const [activeTab, setActiveTab] = useState('stations');
   const navigate = useNavigate();
+
+  // Sample data for station requests
+  const stationRequests = [
+    // New Requests
+    {
+      id: 1,
+      userName: "John Doe",
+      userType: "New User",
+      status: "NEW",
+      stationName: "EV Charging Station",
+      stationAddress: "No.24, Joshep Road, Wellpanna",
+      chargersRequested: "02",
+      date: "6 Jul 09:20 AM"
+    },
+    {
+      id: 2,
+      userName: "Robert Johnson",
+      userType: "New User",
+      status: "NEW",
+      stationName: "Mall Parking Chargers",
+      stationAddress: "456 Shopping Ave, Mega Mall",
+      chargersRequested: "01",
+      date: "5 Jul 10:45 AM"
+    },
+    {
+      id: 3,
+      userName: "Sarah Wilson",
+      userType: "Existing User",
+      status: "NEW",
+      stationName: "Office Park Charging",
+      stationAddress: "100 Business Blvd",
+      chargersRequested: "05",
+      date: "3 Jul 03:45 PM"
+    },
+    // In-Progress Requests
+    {
+      id: 4,
+      userName: "Jane Smith",
+      userType: "Existing User",
+      status: "IN-PROGRESS",
+      stationName: "City Center Charging",
+      stationAddress: "123 Main Street, Downtown",
+      chargersRequested: "04",
+      date: "5 Jul 02:15 PM"
+    },
+    {
+      id: 5,
+      userName: "Michael Brown",
+      userType: "New User",
+      status: "IN-PROGRESS",
+      stationName: "Apartment Complex",
+      stationAddress: "789 Residential Lane",
+      chargersRequested: "02",
+      date: "4 Jul 11:20 AM"
+    },
+    {
+      id: 6,
+      userName: "David Taylor",
+      userType: "New User",
+      status: "IN-PROGRESS",
+      stationName: "University Campus",
+      stationAddress: "College Avenue, Campus Town",
+      chargersRequested: "06",
+      date: "2 Jul 09:10 AM"
+    },
+    // Rejected Requests
+    {
+      id: 7,
+      userName: "Emily Davis",
+      userType: "Existing User",
+      status: "REJECTED",
+      stationName: "Highway Rest Stop",
+      stationAddress: "Mile Marker 42, Interstate 5",
+      chargersRequested: "03",
+      date: "4 Jul 04:30 PM"
+    }
+  ];
+
+  // Sample data for connector requests
+  const connectorRequests = [
+    // New Requests
+    {
+      id: 1,
+      userName: "Alex Johnson",
+      userType: "Existing User",
+      status: "NEW",
+      stationName: "Tech Park Charging",
+      stationAddress: "200 Tech Park Drive",
+      connectorType: "CCS2",
+      chargersRequested: "01",
+      date: "6 Jul 10:30 AM"
+    },
+    {
+      id: 2,
+      userName: "Olivia Martinez",
+      userType: "New User",
+      status: "NEW",
+      stationName: "Airport Parking",
+      stationAddress: "Terminal 1, International Airport",
+      connectorType: "CCS1",
+      chargersRequested: "02",
+      date: "4 Jul 05:15 PM"
+    },
+    {
+      id: 3,
+      userName: "Sophia Garcia",
+      userType: "New User",
+      status: "NEW",
+      stationName: "Community Center",
+      stationAddress: "100 Community Center Road",
+      connectorType: "CCS2",
+      chargersRequested: "01",
+      date: "3 Jul 04:20 PM"
+    },
+    // In-Progress Requests
+    {
+      id: 4,
+      userName: "Lisa Wong",
+      userType: "New User",
+      status: "IN-PROGRESS",
+      stationName: "Supermarket Chargers",
+      stationAddress: "123 Grocery Lane",
+      connectorType: "Type 2",
+      chargersRequested: "03",
+      date: "5 Jul 01:45 PM"
+    },
+    {
+      id: 5,
+      userName: "James Wilson",
+      userType: "Existing User",
+      status: "IN-PROGRESS",
+      stationName: "Gas Station Chargers",
+      stationAddress: "456 Fuel Avenue",
+      connectorType: "Type 2",
+      chargersRequested: "02",
+      date: "4 Jul 12:30 PM"
+    },
+    // Rejected Requests
+    {
+      id: 6,
+      userName: "Thomas Lee",
+      userType: "Existing User",
+      status: "REJECTED",
+      stationName: "Hotel Parking",
+      stationAddress: "789 Hospitality Street",
+      connectorType: "CHAdeMO",
+      chargersRequested: "01",
+      date: "5 Jul 11:20 AM"
+    },
+    {
+      id: 7,
+      userName: "Daniel Kim",
+      userType: "Existing User",
+      status: "REJECTED",
+      stationName: "Sports Complex",
+      stationAddress: "100 Athletic Drive",
+      connectorType: "CHAdeMO",
+      chargersRequested: "04",
+      date: "2 Jul 10:15 AM"
+    }
+  ];
 
   // Define your custom tabs
   const requestTabs = [
@@ -15,11 +176,18 @@ export default function RequestsPage() {
     { id: 'connectors', label: 'Connectors' }
   ];
 
-  // Optional: Define shortened labels for mobile
-  const mobileTabLabels = {
-    stations: 'Stations',
-    connectors: 'Connectors'
+  // Group requests by status
+  const groupRequestsByStatus = (requests) => {
+    return {
+      NEW: requests.filter(r => r.status === 'NEW'),
+      'IN-PROGRESS': requests.filter(r => r.status === 'IN-PROGRESS'),
+      REJECTED: requests.filter(r => r.status === 'REJECTED')
+    };
   };
+
+  // Get current requests based on active tab
+  const currentRequests = activeTab === 'stations' ? stationRequests : connectorRequests;
+  const groupedRequests = groupRequestsByStatus(currentRequests);
 
   return (
     <div style={{
@@ -51,24 +219,44 @@ export default function RequestsPage() {
         </div>
       </div>
 
-      {/* Tab Bar - Now with custom tabs */}
+      {/* Tab Bar */}
       <div className="mb-6">
         <TabBar 
           activeTab={activeTab} 
           setActiveTab={setActiveTab} 
           tabs={requestTabs}
-          mobileLabels={mobileTabLabels}
         />
       </div>
 
       {/* Tab Content */}
-      <div>
-        {activeTab === 'stations' && (
-          <div>Stations Content</div>
-        )}
-        {activeTab === 'connectors' && (
-          <div>Connectors Content</div>
-        )}
+      <div className="space-y-6">
+        {Object.entries(groupedRequests).map(([status, requests]) => (
+          requests.length > 0 && (
+            <div key={status} className="space-y-4">
+              <h2 className="text-lg font-semibold" style={{ 
+                color: COLORS.mainTextColor,
+                fontFamily: FONTS.family.sans
+              }}>
+                {status}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {requests.map(request => (
+                  <MainRequestCard 
+                    key={request.id}
+                    request={{
+                      ...request,
+                      // For connectors, show connector type in the address field
+                      stationAddress: request.connectorType 
+                        ? `Connector Type: ${request.connectorType}`
+                        : request.stationAddress
+                    }}
+                    onClick={() => navigate(`/admin/requests/${activeTab}/${request.id}`)}
+                  />
+                ))}
+              </div>
+            </div>
+          )
+        ))}
       </div>
     </div>
   );
