@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom'
+import { useNavigate} from 'react-router-dom';
 import Layout from '../../components/Layout'
 import { COLORS, FONTS } from '../../constants'
 import Button from '../ui/Button';
@@ -36,10 +37,11 @@ const DCconnectors = [
     'CCS1', 'CCS2', 'CHAdeMO', 'GB/T (Chinese Standard)', 'Tesla'
 ]
 
-export default function LandingPage() {
+export default function InitAddStation() {
     const [showForm, setShowForm] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [numChargers, setNumChargers] = useState(1);
+    const navigate = useNavigate();
     const [chargers, setChargers] = useState([
         { name: '', powerType: '', maxPower: '', connectors: []}
     ]);
@@ -82,6 +84,10 @@ export default function LandingPage() {
             name: '', powerType: '', maxPower: '', connectors: []
         });
         setChargers(newArray);
+    };
+
+      const handleAddStation = () => {
+        navigate('/initstation');
     };
 
     const closeForm = () => {
@@ -459,7 +465,7 @@ export default function LandingPage() {
                                 <Button variant="outline" onClick={() => setCurrentStep(1)}>
                                     Back
                                 </Button>
-                                <Button variant="primary">Add Station</Button>
+                                <Button variant="primary" onClick={handleAddStation}>Add Station</Button>
                             </div>
                         </div>
                         )}
