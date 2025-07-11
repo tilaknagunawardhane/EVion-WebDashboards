@@ -35,44 +35,7 @@ export default function UserAccountRightPanel({ user, stats, requests = [] }) {
       {/* User Stats Card */}
       <UserStatsCard stats={stats} />
 
-      <Button
-        variant="primary"
-        type="button"
-        size="base"
-        style={{
-          backgroundColor: COLORS.primary,
-          color: 'white',
-          padding: '10px 16px'
-        }}
-        className='w-full'
-      >
-        View all requests
-      </Button>
-
-      {/* Requests Section */}
-      <div>
-        <div style={{ 
-          width: '100%', 
-          height: '1px', 
-          backgroundColor: COLORS.stroke, 
-          margin: '0px 0 20px' 
-        }}></div>
-
-        <h4 style={{
-          fontSize: FONTS.sizes.base,
-          fontWeight: FONTS.weights.semibold,
-          color: COLORS.mainTextColor,
-          marginBottom: '18px'
-        }}>
-          New Requests
-        </h4>
-
-        <div className="space-y-3">
-          {newRequests.slice(0, 3).map((request, index) => (
-            <RequestCard key={index} request={request} />
-          ))}
-        </div>
-      </div>
+      
     </div>
   );
 }
