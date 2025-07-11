@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import DataTableTopBar from '../../components/DataTableTopBar';
 import DataTable from '../../components/DataTable';
-import UsersRightPanel from '../../components/UsersRightPanel';
+// import UsersRightPanel from '../../components/UsersRightPanel';
 import UserAccountRightPanel from '../../components/userComponents/userAccountRightPanel';
 import TabBar from '../../components/TabBar';
 import { COLORS, FONTS } from '../../../../constants';
@@ -16,30 +16,7 @@ export default function UserAccountPage() {
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState('Date');
   const [activeTab, setActiveTab] = useState('sessions');
-  const [users, setUsers] = useState([]);
-  const [requests, setRequests] = useState([
-    {
-      id: 1,
-      type: 'user',
-      status: 'new',
-      title: 'New user verification request',
-      date: '5 Sat, 08:11 AM'
-    },
-    {
-      id: 2,
-      type: 'user',
-      status: 'new',
-      title: 'User account reactivation request',
-      date: '5 Sat, 09:30 AM'
-    },
-    {
-      id: 3,
-      type: 'user',
-      status: 'review',
-      title: 'User complaint investigation',
-      date: '4 Fri, 03:45 PM'
-    }
-  ]);
+  
 
   const userFilterOptions = [
     { label: 'Status', value: 'status' },
@@ -296,7 +273,7 @@ export default function UserAccountPage() {
     'Overall Rating for Charging sessions': 4.2,
     'No of complaints': 1,
     'No of posts shared': 3,
-    'Account Status': 'Active',
+    'Account Status': 'Blocked',
     flagged: false,
     'Account Balance': '1100.00'
   };
@@ -308,9 +285,9 @@ export default function UserAccountPage() {
       backgroundColor: COLORS.background,
     }}>
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
+          <h1 className="text-xl md:text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
             {currentUser.Name}'s Account
           </h1>
           {/* <p style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}>
@@ -339,10 +316,11 @@ export default function UserAccountPage() {
         <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
 
+
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Side - 3/4 width */}
-        <div className="lg:col-span-3">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+        {/* Left Side */}
+        <div className="md:col-span-3">
 
           {/* Search and Filter Bar */}
           <div className="mb-6">
@@ -386,15 +364,14 @@ export default function UserAccountPage() {
         </div>
 
         {/* Right Side - 1/4 width */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-6 space-y-6">
+        {/* <div className="lg:col-span-1"> */}
+          <div className="md:sticky md:top-6 space-y-4 md:space-y-6">
             <UserAccountRightPanel
               user={currentUser}
               stats={stats}
-              requests={requests}
             />
           </div>
-        </div>
+        {/* </div> */}
       </div>
     </div>
   );

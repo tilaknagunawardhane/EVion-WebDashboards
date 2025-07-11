@@ -4,7 +4,7 @@ import SearchIcon from '../../../assets/search_icon.svg';
 import FilterIcon from '../../../assets/filter_icon.svg';
 import SortIcon from '../../../assets/sort_icon.svg';
 import ChevronDown from '../../../assets/chevron_down.svg';
-import ExportIcon from '../../../assets/export_icon.svg'; // You'll need to add an export icon
+import ExportIcon from '../../../assets/export_icon.svg';
 
 export default function DataTableTopBar({
   search,
@@ -16,35 +16,38 @@ export default function DataTableTopBar({
   filterOptions = [],
   sortOptions = [],
   searchPlaceholder = "Search...",
-  showExportButton = false, // New prop to control export button visibility
-  onExport = () => {} // New prop for export functionality
+  showSearchBar = true, // New prop to control search bar visibility
+  showExportButton = false,
+  onExport = () => {}
 }) {
   const [showFilter, setShowFilter] = useState(false);
   const [showSort, setShowSort] = useState(false);
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full mb-6">
-      {/* Search Bar - Left Side */}
-      <div className="flex-grow max-w-2xl">
-        <div className="relative w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <img src={SearchIcon} alt="Search" className="w-5 h-5 text-gray-400" />
+      {/* Search Bar - Left Side (only shown if showSearchBar is true) */}
+      {showSearchBar && (
+        <div className="flex-grow max-w-2xl">
+          <div className="relative w-full">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <img src={SearchIcon} alt="Search" className="w-5 h-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder={searchPlaceholder}
+              className="block w-full pl-10 pr-3 py-2.5 rounded-lg shadow-sm placeholder:text-gray-400 bg-white"
+              style={{
+                fontFamily: FONTS.family.sans,
+                fontSize: FONTS.sizes.sm,
+                color: COLORS.mainTextColor,
+                fontWeight: FONTS.weights.normal,
+              }}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
           </div>
-          <input
-            type="text"
-            placeholder={searchPlaceholder}
-            className="block w-full pl-10 pr-3 py-2.5 rounded-lg shadow-sm placeholder:text-gray-400 bg-white"
-            style={{
-              fontFamily: FONTS.family.sans,
-              fontSize: FONTS.sizes.sm,
-              color: COLORS.mainTextColor,
-              fontWeight: FONTS.weights.normal,
-            }}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
         </div>
-      </div>
+      )}
 
       {/* Filter/Sort/Export Buttons - Right Side */}
       <div className="flex gap-3 w-full md:w-auto">
@@ -167,7 +170,7 @@ export default function DataTableTopBar({
           </div>
         )}
 
-        {/* Export Button - Only shown when showExportButton is true */}
+        {/* Export Button */}
         {showExportButton && (
           <div className="relative flex-1 md:flex-none">
             <button

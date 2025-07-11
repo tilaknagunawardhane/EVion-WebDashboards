@@ -61,41 +61,47 @@ export default function UserProfileCard({ user }) {
     const renderStatusIcon = (IconComponent) => (
         <img
             src={IconComponent}
-            alt=""
-            className="w-6 h-6"
+            alt="User"
+            className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6" // More responsive icon sizing
             style={{
-                filter: currentStatus.iconColorFilter
+                filter: currentStatus.iconColorFilter,
+                minWidth: '1rem' // Ensure icon doesn't shrink too much
             }}
         />
     );
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2 xs:gap-3 sm:gap-4 w-full">
             {/* Main Profile Card */}
-            <div className='p-4 rounded-xl' style={{
+            <div className='p-2 xs:p-3 sm:p-4 rounded-md xs:rounded-lg sm:rounded-xl w-full' style={{
                 backgroundColor: currentStatus.bgColor,
                 border: `2px solid ${currentStatus.borderColor}`
             }}>
-                <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center">
+                <div className="flex flex-col gap-2 xs:gap-3 sm:gap-4 w-full">
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2 xs:gap-3 sm:gap-4 w-full">
+                            {/* Avatar Container */}
+                            <div className="w-10 h-10 xs:w-12 xs:h-12 sm:w-16 sm:h-16 rounded-full bg-white flex items-center justify-center flex-shrink-0">
                                 {renderStatusIcon(UserIcon)}
                             </div>
-                            <div>
-                                <h2 style={{
-                                    fontSize: FONTS.sizes.lg,
+                            
+                            {/* User Info */}
+                            <div className="flex-1 min-w-0 overflow-hidden">
+                                <h2 className="truncate text-sm xs:text-base sm:text-lg" style={{
                                     fontWeight: FONTS.weights.medium,
                                     color: COLORS.mainTextColor,
-                                    marginBottom: '4px'
+                                    marginBottom: '0.25rem'
                                 }}>
                                     {user.Name}
                                 </h2>
                                 <span
-                                    className="px-4.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-full"
+                                    className="px-3 py-1 xs:px-3 xs:py-1 text-xxs xs:text-xs inline-flex items-center gap-1 rounded-full"
                                     style={{
                                         background: currentStatus.statusBgColor,
-                                        color: currentStatus.statusTextColor
+                                        color: currentStatus.statusTextColor,
+                                        lineHeight: '1.2',
+                                        fontSize: FONTS.sizes.xs,
+
                                     }}
                                 >
                                     {user['Account Status']}
@@ -103,66 +109,76 @@ export default function UserProfileCard({ user }) {
                             </div>
                         </div>
                     </div>
-                    <div className='flex justify-between'>
-                        <div style={{
+                    
+                    {/* Date Joined */}
+                    <div className='flex justify-between items-center w-full'>
+                        <span className="text-xxs xs:text-xs" style={{
                             color: COLORS.secondaryText,
-                            fontSize: FONTS.sizes.xs,
-                            fontWeight: FONTS.weights.medium
+                            fontWeight: FONTS.weights.medium,
+                                        fontSize: FONTS.sizes.xs,
+
                         }}>
                             Date Joined:
-                        </div>
-                        <div style={{
+                        </span>
+                        <span className="text-xs xs:text-sm text-right" style={{
                             color: COLORS.mainTextColor,
-                            fontSize: FONTS.sizes.sm,
                             fontWeight: FONTS.weights.medium
                         }}>
                             {user['Date of Registration']}
-                        </div>
+                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* Blocked User Additional Card - Only shown when status is Blocked */}
+            {/* Blocked User Additional Card */}
             {user['Account Status'] === 'Blocked' && (
-                <div className='p-4 rounded-xl' style={{
+                <div className='p-2 xs:p-3 sm:p-4 rounded-md xs:rounded-lg sm:rounded-xl w-full' style={{
                     backgroundColor: COLORS.bgRed,
                     border: `2px solid ${COLORS.danger}`
                 }}>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1 xs:gap-2 sm:gap-3 w-full">
+                        {/* Balance */}
                         <div className='text-center'>
-                            <div style={{
+                            <div className="text-xs xs:text-sm" style={{
                                 color: COLORS.danger,
-                                fontSize: FONTS.sizes.sm,
                                 fontWeight: FONTS.weights.medium
                             }}>
                                 Balance
                             </div>
-                            <div style={{
+                            <div className="text-base xs:text-lg sm:text-xl" style={{
                                 color: COLORS.danger,
-                                fontSize: FONTS.sizes.xl,
-                                fontWeight: FONTS.weights.semibold
+                                fontWeight: FONTS.weights.semibold,
+                                whiteSpace: 'nowrap'
                             }}>
-                                <span style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.medium }}>-LKR </span>
+                                <span className="text-xxs xs:text-xs" style={{ 
+                                    fontWeight: FONTS.weights.medium,
+                                        fontSize: FONTS.sizes.sm,
+
+                                }}>
+                                    -LKR 
+                                </span>
+                                <span> </span>
                                 <span>{user['Account Balance'] || '0.00'}</span>
                             </div>
                         </div>
-                        <div className='flex justify-between'>
-                            <div style={{
+                        
+                        {/* Blocked Date */}
+                        <div className='flex justify-between items-center w-full'>
+                            <span className="text-xxs xs:text-xs" style={{
                                 color: COLORS.secondaryText,
-                                fontSize: FONTS.sizes.xs,
-                                fontWeight: FONTS.weights.medium
+                                fontWeight: FONTS.weights.medium,
+                                        fontSize: FONTS.sizes.xs,
+
                             }}>
                                 Blocked On:
-                            </div>
-                            <div style={{
+                            </span>
+                            <span className="text-xs xs:text-sm text-right" style={{
                                 color: COLORS.mainTextColor,
-                                fontSize: FONTS.sizes.sm,
                                 fontWeight: FONTS.weights.medium
                             }}>
                                 {user['Blocked Date'] || 'Not specified'}
-                            </div>
+                            </span>
                         </div>
-
                     </div>
                 </div>
             )}
