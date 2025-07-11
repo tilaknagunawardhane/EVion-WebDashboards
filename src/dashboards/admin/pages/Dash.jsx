@@ -38,7 +38,7 @@ export default function AdminDashboardPage() {
     }
 
     return (
-        <div style={{ fontFamily: FONTS.family.sans, padding: '24px' }}>
+        <div style={{ fontFamily: FONTS.family.sans, padding: '4px' }}>
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
