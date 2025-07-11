@@ -17,8 +17,8 @@ export default function AdminDashboardPage() {
         stats: {
             stations: { total: 448, pending: 3 },
             connectors: { total: 2302, faulted: 15 },
-            users: { total: 12501, riskPercentage: 3.87 },
-            revenue: { total: 52311, sessions: 45200, bookingFees: 7111 }
+            users: { total: 12501, riskPercentage: '-3.87' },
+            revenue: { total: 52311, sessions: 45200, bookingFees: '+7111' }
         },
         trends: {
             chargingSessions: { approved: 52311, bookings: 45200, walkIns: 7111 },
@@ -65,6 +65,7 @@ export default function AdminDashboardPage() {
                         value={dashboardData.stats.stations.total}
                         subValue={`${dashboardData.stats.stations.pending} Pending`}
                         icon="stations"
+
                     />
 
                     <StatCard
@@ -79,14 +80,18 @@ export default function AdminDashboardPage() {
                         value={dashboardData.stats.users.total}
                         subValue={`${dashboardData.stats.users.riskPercentage}% risk controls`}
                         icon="users"
+                        status={dashboardData.stats.users.riskPercentage.startsWith('+') ? 'positive' : 'negative'}
+
                     />
 
                     <StatCard
                         title="Revenue"
                         value={`LKR ${dashboardData.stats.revenue.total.toLocaleString()}`}
-                        subValue="6.37%  ↑ vs last month"
+                        subValue={`${dashboardData.stats.revenue.bookingFees}% vs last month`}
                         icon="revenue"
+                        status={dashboardData.stats.revenue.bookingFees.startsWith('+') ? 'positive' : 'negative'}
                     />
+                    
                 </div>
             </section>
 

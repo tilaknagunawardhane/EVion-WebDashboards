@@ -194,7 +194,7 @@ export default function ChargingStations() {
                                 sort={sort}
                                 search={search}
                                 onRowClick={(station)=>{
-                                    navigate();
+                                    navigate(`/admin/stations/${station.id}`);
                                 }}
                             />
                         </div>

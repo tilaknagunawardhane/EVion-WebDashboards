@@ -16,7 +16,7 @@ export default function UserAccountPage() {
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState('Date');
   const [activeTab, setActiveTab] = useState('sessions');
-  
+
 
   const userFilterOptions = [
     { label: 'Status', value: 'status' },
@@ -25,8 +25,8 @@ export default function UserAccountPage() {
     { label: 'Users Who have Posted on Community', value: 'userspostcommunity' },
   ];
 
-const userAccountTabs = [
-   { id: 'sessions', label: 'Charging Sessions' },
+  const userAccountTabs = [
+    { id: 'sessions', label: 'Charging Sessions' },
     { id: 'bookings', label: 'Bookings' },
     { id: 'payments', label: 'Payments' },
     { id: 'reports', label: 'Reports' }
@@ -325,9 +325,9 @@ const userAccountTabs = [
 
       {/* Tab Bar */}
       <div className="mb-6">
-      <TabBar 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
+        <TabBar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
           tabs={userAccountTabs}
           mobileLabels={mobileTabLabels}
         />
@@ -383,12 +383,12 @@ const userAccountTabs = [
 
         {/* Right Side - 1/4 width */}
         {/* <div className="lg:col-span-1"> */}
-          <div className="md:sticky md:top-6 space-y-4 md:space-y-6">
-            <UserAccountRightPanel
-              user={currentUser}
-              stats={stats}
-            />
-          </div>
+        <div className="md:sticky md:top-6 space-y-4 md:space-y-6">
+          <UserAccountRightPanel
+            user={currentUser}
+            stats={stats}
+          />
+        </div>
         {/* </div> */}
       </div>
     </div>
