@@ -16,6 +16,10 @@ import ProfileSetup from '../components/auth/ProfileSetup'
 import InitAddStation from '../components/auth/InitAddStation'
 import { AuthProvider } from '../contexts/AuthContext'
 
+import AdminDash from '../dashboards/admin/pages/Dash'
+import AdminStaionsPage from '../dashboards/admin/pages/ChargingStations'
+import UserAccountPage from '../dashboards/admin/pages/userPages/userAccount'
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -33,7 +37,11 @@ const router = createBrowserRouter([
         path: 'admin',
         element: <PrivateRoute><AdminRoute><AdminDashboard /></AdminRoute></PrivateRoute>,
         children: [
-          { path: 'users', element: <UsersPage /> }
+          { path: 'users', element: <UsersPage /> },
+          { path: 'dashboard', element: <AdminDash /> },
+          { path: 'stations', element: <AdminStaionsPage/>},
+          { path: 'users/:id', element: <UserAccountPage/>}
+
         ]
       },
       {
