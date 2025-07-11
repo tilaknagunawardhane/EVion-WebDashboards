@@ -20,6 +20,7 @@ import AdminDash from '../dashboards/admin/pages/Dash'
 import AdminStaionsPage from '../dashboards/admin/pages/ChargingStations'
 import UserAccountPage from '../dashboards/admin/pages/userPages/userAccount'
 import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
+import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
 
 const router = createBrowserRouter([
   {
@@ -42,7 +43,8 @@ const router = createBrowserRouter([
           { path: 'dashboard', element: <AdminDash /> },
           { path: 'stations', element: <AdminStaionsPage/>},
           { path: 'users/:id', element: <UserAccountPage/>},
-          { path: 'requests', element: <RequestsPage/>},
+          { path: 'stations/requests', element: <RequestsPage/>},
+          { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
 
         ]
       },
@@ -53,6 +55,7 @@ const router = createBrowserRouter([
           { path: 'dashboards', element: <DashboardPage /> },
           { path: 'stations', element: <StationsPage /> },
           { path: 'settings', element: <SettingsPage /> },
+
         ]
       },
       {

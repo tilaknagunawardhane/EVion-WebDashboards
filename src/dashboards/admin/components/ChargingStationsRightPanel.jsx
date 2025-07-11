@@ -114,7 +114,7 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
             // Add any other custom styles here
           }}
           className='mt-4 w-full'
-          onClick={() => navigate('/admin/requests')}
+          onClick={() => navigate('/admin/stations/requests')}
         >
           View all requests
         </Button>

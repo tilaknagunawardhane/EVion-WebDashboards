@@ -32,6 +32,7 @@ export default function RequestsPage() {
         // New Requests
         {
             id: 1,
+            type: 'station',
             userName: "John Doe",
             userType: "New User",
             status: "NEW",
@@ -43,6 +44,7 @@ export default function RequestsPage() {
         },
         {
             id: 2,
+            type: 'station',
             userName: "Robert Johnson",
             userType: "New User",
             status: "NEW",
@@ -54,6 +56,7 @@ export default function RequestsPage() {
         },
         {
             id: 3,
+            type: 'station',
             userName: "Sarah Wilson",
             userType: "Existing User",
             status: "NEW",
@@ -66,6 +69,7 @@ export default function RequestsPage() {
         // In-Progress Requests
         {
             id: 4,
+            type: 'station',
             userName: "Jane Smith",
             userType: "Existing User",
             status: "IN-PROGRESS",
@@ -77,6 +81,7 @@ export default function RequestsPage() {
         },
         {
             id: 5,
+            type: 'station',
             userName: "Michael Brown",
             userType: "New User",
             status: "IN-PROGRESS",
@@ -88,6 +93,7 @@ export default function RequestsPage() {
         },
         {
             id: 6,
+            type: 'station',
             userName: "David Taylor",
             userType: "New User",
             status: "IN-PROGRESS",
@@ -100,6 +106,7 @@ export default function RequestsPage() {
         // Rejected Requests
         {
             id: 7,
+            type: 'station',
             userName: "Emily Davis",
             userType: "Existing User",
             status: "REJECTED",
@@ -116,6 +123,7 @@ export default function RequestsPage() {
         // New Requests
         {
             id: 1,
+            type: 'connector',
             userName: "Alex Johnson",
             userType: "Existing User",
             status: "NEW",
@@ -128,6 +136,7 @@ export default function RequestsPage() {
         },
         {
             id: 2,
+            type: 'connector',
             userName: "Olivia Martinez",
             userType: "New User",
             status: "NEW",
@@ -140,6 +149,7 @@ export default function RequestsPage() {
         },
         {
             id: 3,
+            type: 'connector',
             userName: "Sophia Garcia",
             userType: "New User",
             status: "NEW",
@@ -153,6 +163,7 @@ export default function RequestsPage() {
         // In-Progress Requests
         {
             id: 4,
+            type: 'connector',
             userName: "Lisa Wong",
             userType: "New User",
             status: "IN-PROGRESS",
@@ -165,6 +176,7 @@ export default function RequestsPage() {
         },
         {
             id: 5,
+            type: 'connector',
             userName: "James Wilson",
             userType: "Existing User",
             status: "IN-PROGRESS",
@@ -178,6 +190,7 @@ export default function RequestsPage() {
         // Rejected Requests
         {
             id: 6,
+            type: 'connector',
             userName: "Thomas Lee",
             userType: "Existing User",
             status: "REJECTED",
@@ -190,6 +203,7 @@ export default function RequestsPage() {
         },
         {
             id: 7,
+            type: 'connector',
             userName: "Daniel Kim",
             userType: "Existing User",
             status: "REJECTED",

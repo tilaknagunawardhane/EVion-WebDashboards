@@ -1,8 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { COLORS, FONTS } from '../../../../constants';
 import UserIcon from '../../../../assets/user_icon.svg';
 
 export default function MainRequestCard({ request }) {
+    const navigate = useNavigate();
+
     // Status color configuration
     const statusColors = {
         'NEW': {
@@ -22,11 +25,20 @@ export default function MainRequestCard({ request }) {
     const currentStatus = request.status || 'NEW';
     const statusColor = statusColors[currentStatus] || statusColors['NEW'];
 
+
+    const handleCardClick = () => {
+        // Add type parameter to navigation
+        navigate(`/admin/stations/requests/${request.type}/${request.id}`);
+    };
+
     return (
-        <div className="rounded-lg bg-white p-4 mb-4 shadow-sm "
+        <div
+            className="rounded-lg bg-white p-4 mb-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
             style={{
                 borderColor: COLORS.stroke
-            }}>
+            }}
+            onClick={handleCardClick}
+        >
             {/* User Info with Icon and Right-aligned New User badge */}
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
@@ -37,15 +49,15 @@ export default function MainRequestCard({ request }) {
                             className="w-5 h-5"
                             style={{
                                 filter: `
-                  brightness(0) 
-                  saturate(100%) 
-                  invert(67%) 
-                  sepia(48%) 
-                  saturate(718%) 
-                  hue-rotate(123deg) 
-                  brightness(95%) 
-                  contrast(101%)
-                `,
+                                    brightness(0) 
+                                    saturate(100%) 
+                                    invert(67%) 
+                                    sepia(48%) 
+                                    saturate(718%) 
+                                    hue-rotate(123deg) 
+                                    brightness(95%) 
+                                    contrast(101%)
+                                `,
                             }}
                         />
                     </div>
