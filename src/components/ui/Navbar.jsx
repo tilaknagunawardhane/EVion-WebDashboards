@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { COLORS } from '../../constants'
+import { COLORS, FONTS } from '../../constants'
 import evionLogo from '../../assets/Logo 2.svg';
 
 export default function Navbar() {
@@ -29,8 +29,8 @@ export default function Navbar() {
                 </span>
                 <button
                   onClick={logout}
-                  className="text-sm font-medium"
-                  style={{ color: COLORS.secondaryText }}
+                  className="text-sm"
+                  style={{ color: COLORS.secondaryText, font : FONTS.weights.normal }}
                 >
                   Sign out
                 </button>
@@ -38,8 +38,8 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/auth"
-                className="text-base font-bold"
-                style={{ color: COLORS.mainTextColor }}
+                className="text-sm"
+                style={{ color: COLORS.mainTextColor, font: FONTS.weights.normal }}
               >
                 Sign in
               </Link>
