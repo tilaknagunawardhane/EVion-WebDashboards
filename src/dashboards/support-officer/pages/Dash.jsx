@@ -4,18 +4,15 @@ import StatCard from '../components/StatCard'
 import StatusCard from '../components/StatusCard'
 import OverviewCard from '../../admin/components/OverviewCard'
 import NotificationsIcon from '../../../assets/notifications.svg'
-import RevenueTrendChart from '../components/RevenueTrendChart'
-import ConnectorStatusChart from '../components/ConnectorStatusChart'
-import ApprovalCard from '../components/ApprovalCard'
-import MapImage from '../../../assets/map-placeholder.png' // Import your map image
-import { Colors } from 'chart.js'
+import ReportTrendChart from '../components/ReportTrendChart'
+import FaultStatusChart from '../components/FaultStatusChart'
+import ActiveUserCard from '../components/ActiveUserCard'
 import ChargingStationComplaintsChart from '../components/ChargingStationComplaintsChart'
 import CommunityPostsChart from '../components/CommunityPostsChart'
-// import UserGrowthChart from '../components/UserGrowthChart'
 
 
 export default function SupportOfficerDashboardPage() {
-    // Dynamic data that will later come from backend
+    
     const dashboardData = {
         stats: {
             stations: { total: 448, pending: 3 },
@@ -89,7 +86,7 @@ export default function SupportOfficerDashboardPage() {
                             Report Trends
                         </h2>
                         <OverviewCard>
-                            <RevenueTrendChart />
+                            <ReportTrendChart />
                         </OverviewCard>
                     </div>
                     
@@ -102,17 +99,17 @@ export default function SupportOfficerDashboardPage() {
                             value={dashboardData.stats.faultReports.total}
                             total={dashboardData.stats.connectors.total}
                         >
-                            <ConnectorStatusChart />
+                            <FaultStatusChart />
                         </StatusCard>
                     </div>
 
-                    {/* Charging Station Complains */}
+                    {/* Charging Station Complaints */}
                     <div className="lg:col-span-1">
                         <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                            Complains
+                            Complaints
                         </h2>
                         <OverviewCard>
-                        <ChargingStationComplaintsChart />
+                            <ChargingStationComplaintsChart />
                         </OverviewCard>
                     </div>
 
@@ -129,63 +126,39 @@ export default function SupportOfficerDashboardPage() {
                             Community Posts
                         </h2>
                         <OverviewCard>
-                        <CommunityPostsChart />
+                            <CommunityPostsChart />
                         </OverviewCard>
                     </div>
 
-
-                    {/* Right Side Section - takes 2/5 width */}
-                    <div className="lg:col-span-2">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {/* Connector Status Section - top left */}
-                            <div className="lg:col-span-1">
-                                <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                                    Charging Session Trend
-                                </h2>
-                                <StatusCard
-                                    value={dashboardData.stats.connectors.faulted}
-                                    total={dashboardData.stats.connectors.total}
-                                >
-                                    <ConnectorStatusChart
-                                        faulted={dashboardData.stats.connectors.faulted}
-                                        operational={dashboardData.stats.connectors.total - dashboardData.stats.connectors.faulted}
-                                    />
-                                </StatusCard>
-                            </div>
-
-                            {/* Approval Cards Section - top right */}
-                            <div className="lg:col-span-1">
-                                <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                                    Most Active Users
-                                </h2>
-                                <ApprovalCard
-                                    name="John Doe"
-                                    posts="5"
-                                    rejected="1"
-                                    bgColor="#FFFFFF"
-                                    textColor={COLORS.mainTextColor}
-                                // borderColor="#B3E0FF"
-                                />
-                                <ApprovalCard
-                                    name="John Doe"
-                                    posts="8"
-                                    rejected="1"
-                                    bgColor={COLORS.bgGreen}
-                                    textColor={COLORS.mainTextColor}
-                                // borderColor="#B3E6B3"
-                                />
-                                <ApprovalCard
-                                    name="John Doe"
-                                    posts="9"
-                                    rejected="2"
-                                    bgColor={COLORS.primary}
-                                    textColor={COLORS.background}
-                                // borderColor="#FFD9B3"
-                                />
-                            </div>
-                        </div>
+                    {/* Most Active Users */}
+                    <div className="lg:col-span-1">
+                        <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
+                            Most Active Users
+                        </h2>
+                        <ActiveUserCard
+                            name="John Doe"
+                            posts="5"
+                            rejected="1"
+                            bgColor={COLORS.border}
+                            textColor={COLORS.mainTextColor}
+                        />
+                        <ActiveUserCard
+                            name="John Doe"
+                            posts="8"
+                            rejected="1"
+                            bgColor={COLORS.bgGreen}
+                            textColor={COLORS.mainTextColor}
+                        />
+                        <ActiveUserCard
+                            name="John Doe"
+                            posts="9"
+                            rejected="2"
+                            bgColor={COLORS.primary}
+                            textColor={COLORS.background}
+                        />
                     </div>
                 </div>
+
             </section>
         </div>
     )

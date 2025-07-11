@@ -15,7 +15,7 @@ ChartJS.register(
   Legend
 );
 
-export default function ConnectorStatusChart() {
+export default function FaultStatusChart() {
   const data = {
     labels: ['New', 'In-Progress'],
     datasets: [

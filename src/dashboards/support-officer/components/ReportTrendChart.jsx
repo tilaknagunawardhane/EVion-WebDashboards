@@ -24,7 +24,7 @@ ChartJS.register(
   Filler
 );
 
-export default function RevenueTrendChart() {
+export default function ReportTrendChart() {
   // Data matching the image with September dates and simpler values
   const chartData = {
     labels: ['1 Sep', '8 Sep', '15 Sep', '22 Sep', '29 Sep'],
@@ -36,9 +36,7 @@ export default function RevenueTrendChart() {
         backgroundColor: `${COLORS.primary}20`,
         tension: 0.4,
         fill: true,
-        pointBackgroundColor: 'white',
-        pointBorderColor: COLORS.primary,
-        pointBorderWidth: 2
+        pointBackgroundColor: COLORS.primary,
       },
       {
         label: 'Closed Stations',
@@ -47,10 +45,7 @@ export default function RevenueTrendChart() {
         backgroundColor: `${COLORS.star}20`,
         tension: 0.4,
         fill: false,
-        borderDash: [5, 5],
-        pointBackgroundColor: 'white',
-        pointBorderColor: COLORS.star,
-        pointBorderWidth: 2
+        pointBackgroundColor: COLORS.star,
       },
       {
         label: 'Power Outage',
@@ -59,10 +54,7 @@ export default function RevenueTrendChart() {
         backgroundColor: `${COLORS.danger}20`,
         tension: 0.4,
         fill: false,
-        borderDash: [5, 5],
-        pointBackgroundColor: 'white',
-        pointBorderColor: COLORS.danger,
-        pointBorderWidth: 2
+        pointBackgroundColor: COLORS.danger,
       },
       {
         label: 'Slots Occupied',
@@ -71,10 +63,7 @@ export default function RevenueTrendChart() {
         backgroundColor: `${COLORS.mainTextColor}20`,
         tension: 0.4,
         fill: false,
-        borderDash: [5, 5],
-        pointBackgroundColor: 'white',
-        pointBorderColor: COLORS.mainTextColor,
-        pointBorderWidth: 2
+        pointBackgroundColor: COLORS.mainTextColor
       }
     ]
   };
@@ -88,7 +77,8 @@ export default function RevenueTrendChart() {
         labels: {
           usePointStyle: true,
           padding: 20,
-          boxWidth: 10
+          boxWidth: 6,
+          boxHeight: 6,
         }
       },
       tooltip: {
@@ -103,18 +93,8 @@ export default function RevenueTrendChart() {
           label: (context) => `${context.dataset.label}: ${context.raw}`
         }
       },
-      // title: {
-      //   display: true,
-      //   text: 'Revenue Trends',
-      //   font: {
-      //     size: 16,
-      //     weight: 'bold'
-      //   },
-      //   padding: {
-      //     bottom: 20
-      //   }
-      // }
     },
+    
     scales: {
       x: {
         grid: {

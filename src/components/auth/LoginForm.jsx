@@ -147,6 +147,10 @@ export default function AdminLogins() {
                 >
                   Sign Up
                 </a>
+
+                <br />
+                <a href="/auth?mode=support-officerlogin"> HEHE </a>
+
               </div>
             </form>
             </div>

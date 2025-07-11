@@ -64,7 +64,7 @@ export default function ChargingStationComplaintsChart() {
         },
       },
       tooltip: {
-        backgroundColor: 'white', // Match RevenueTrendChart
+        backgroundColor: 'white', 
         titleColor: COLORS.mainTextColor,
         bodyColor: COLORS.secondaryText,
         borderColor: COLORS.border,
@@ -131,11 +131,11 @@ export default function ChargingStationComplaintsChart() {
   return (
     <div
       style={{
-        height: '300px', // Match RevenueTrendChart
-        padding: '16px', // Match RevenueTrendChart
-        backgroundColor: 'white', // Match OverviewCard
-        borderRadius: '8px', // Match OverviewCard
-        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)', // Match OverviewCard
+        height: '300px', 
+        padding: '16px', 
+        backgroundColor: 'white', 
+        borderRadius: '8px', 
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
       }}
     >
       <Bar data={data} options={options} />

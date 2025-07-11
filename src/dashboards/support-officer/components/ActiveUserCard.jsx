@@ -3,7 +3,7 @@ import { COLORS } from '../../../constants/colors';
 import { FONTS } from '../../../constants/fonts';
 import ArrowRightIcon from '../../../assets/arrow_right.svg';
 
-export default function ApprovalCard({ 
+export default function ActiveUserCard({ 
   name, 
   posts, 
   rejected,

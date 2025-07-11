@@ -8,6 +8,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
+import { COLORS } from '../../../constants/colors'
 
 // Register Chart.js components
 ChartJS.register(
@@ -65,57 +66,59 @@ const postStatusData = [
 ]
 
 export default function CommunityPostsChart() {
-  const data = {
-    labels: postStatusData.map(item => item.day),
-    datasets: [
-      {
-        label: 'Approved Posts',
-        data: postStatusData.map(item => item.approved),
-        backgroundColor: '#10b981',
-        borderColor: '#059669',
-        borderWidth: 1,
-        borderRadius: 0,
-        borderSkipped: false,
-        maxBarThickness: 30,
-      },
-      {
-        label: 'Discarded Posts',
-        data: postStatusData.map(item => item.discarded),
-        backgroundColor: '#f59e0b',
-        borderColor: '#d97706',
-        borderWidth: 1,
-        borderRadius: 0,
-        borderSkipped: false,
-        maxBarThickness: 30,
-      },
-      {
-        label: 'Flagged Posts',
-        data: postStatusData.map(item => item.flagged),
-        backgroundColor: '#ef4444',
-        borderColor: '#dc2626',
-        borderWidth: 1,
-        borderRadius: 0,
-        borderSkipped: false,
-        maxBarThickness: 30,
-      },
-    ],
-  }
+ const commonDatasetProps = {
+  borderWidth: 1,
+  borderRadius: {
+    topLeft: 4,
+    topRight: 4,
+  },
+  borderSkipped: false,
+  maxBarThickness: 50,
+  categoryPercentage: 0.8,
+  barPercentage: 0.9,
+};
+
+const datasetConfigs = [
+  { label: 'Approved Posts', dataKey: 'approved', color: COLORS.primary },
+  { label: 'Discarded Posts', dataKey: 'discarded', color: COLORS.HighlightText },
+  { label: 'Flagged Posts', dataKey: 'flagged', color: COLORS.danger },
+];
+
+const data = {
+  labels: postStatusData.map(item => item.day),
+  datasets: datasetConfigs.map(config => ({
+    ...commonDatasetProps,
+    label: config.label,
+    data: postStatusData.map(item => item[config.dataKey]),
+    backgroundColor: `${config.color}CC`,
+    borderColor: config.color,
+  })),
+};
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    // aspectRatio: 1.5,
+    layout: {
+      padding: {
+        top: 20,
+        left: 10,
+        right: 10,
+        bottom: 10
+      }
+    },
     plugins: {
       legend: {
         position: 'top',
         labels: {
-          color: '#374151',
+          color: COLORS.mainTextColor,
           font: {
-            size: 12
+            size: 12,
+            weight: '500'
           },
           usePointStyle: true,
           padding: 20,
-          boxWidth: 10
+          boxWidth: 8,
+          boxHeight: 8
         }
       },
       title: {
@@ -123,13 +126,21 @@ export default function CommunityPostsChart() {
       },
       tooltip: {
         backgroundColor: 'white',
-        titleColor: '#374151',
-        bodyColor: '#374151',
-        borderColor: '#e0e0e0',
+        titleColor: COLORS.mainTextColor,
+        bodyColor: COLORS.mainTextColor,
+        borderColor: COLORS.border,
         borderWidth: 1,
-        cornerRadius: 6,
+        cornerRadius: 8,
         mode: 'index',
         intersect: false,
+        padding: 12,
+        titleFont: {
+          size: 14,
+          weight: '600'
+        },
+        bodyFont: {
+          size: 13
+        },
         callbacks: {
           footer: function(context) {
             let total = context.reduce((sum, item) => sum + item.parsed.y, 0);
@@ -140,15 +151,17 @@ export default function CommunityPostsChart() {
     },
     scales: {
       x: {
-        stacked: true,
+        stacked: false,
         grid: {
           display: false,
         },
         ticks: {
-          color: '#666',
+          color: COLORS.secondaryText,
           font: {
-            size: 12
-          }
+            size: 12,
+            weight: '500'
+          },
+          padding: 8
         },
         border: {
           display: false,
@@ -156,25 +169,30 @@ export default function CommunityPostsChart() {
         title: {
           display: true,
           text: 'Days of the Week',
-          color: '#374151',
+          color: COLORS.mainTextColor,
           font: {
-            size: 14,
-            weight: 'bold'
-          }
+            size: 13,
+            weight: '600'
+          },
+          padding: 12
         }
       },
       y: {
-        stacked: true,
+        stacked: false,
         beginAtZero: true,
         grid: {
-          color: '#f0f0f0',
+          color: COLORS.stroke,
           drawBorder: false,
+          lineWidth: 1
         },
         ticks: {
-          color: '#666',
+          color: COLORS.secondaryText,
           font: {
-            size: 12
-          }
+            size: 12,
+            weight: '500'
+          },
+          padding: 8,
+          stepSize: 10
         },
         border: {
           display: false,
@@ -182,13 +200,18 @@ export default function CommunityPostsChart() {
         title: {
           display: true,
           text: 'Number of Posts',
-          color: '#374151',
+          color: COLORS.mainTextColor,
           font: {
-            size: 14,
-            weight: 'bold'
-          }
+            size: 13,
+            weight: '600'
+          },
+          padding: 12
         }
       },
+    },
+    interaction: {
+      mode: 'index',
+      intersect: false,
     },
   }
 
@@ -200,35 +223,35 @@ export default function CommunityPostsChart() {
   const totalFlagged = postStatusData.reduce((sum, item) => sum + item.flagged, 0)
 
   return (
-    <div>
-      {/* <h2 className="text-2xl font-semibold text-gray-800 mb-6">Post Status Tracking by Day</h2> */}
-      
+    <div className="w-full">
       <div style={{ 
-      height: '250px',
-      padding: '16px',
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'
-    }}>
+        height: '280px',
+        // padding: '20px',
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06)',
+        marginBottom: '10px',
+        border: `1px solid ${COLORS.border}`
+      }}>
         <Bar data={data} options={options} />
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-800">{totalPosts}</div>
-          <div>Total Posts</div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+        <div className="text-center p-4 rounded-lg" style={{ backgroundColor: COLORS.background, border: `1px solid ${COLORS.border}` }}>
+          <div className="text-2xl font-bold mb-1" style={{ color: COLORS.mainTextColor }}>{totalPosts}</div>
+          <div className="font-medium" style={{ color: COLORS.secondaryText }}>Total Posts</div>
         </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">{totalApproved}</div>
-          <div>Approved Posts</div>
+        <div className="text-center p-4 rounded-lg" style={{ backgroundColor: COLORS.bgGreen, border: `1px solid ${COLORS.border}` }}>
+          <div className="text-2xl font-bold mb-1" style={{ color: COLORS.primary }}>{totalApproved}</div>
+          <div className="font-medium" style={{ color: COLORS.primary }}>Approved</div>
         </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-yellow-600">{totalDiscarded}</div>
-          <div>Discarded Posts</div>
+        <div className="text-center p-4 rounded-lg" style={{ backgroundColor: '#FDF2E9', border: `1px solid ${COLORS.border}` }}>
+          <div className="text-2xl font-bold mb-1" style={{ color: COLORS.HighlightText }}>{totalDiscarded}</div>
+          <div className="font-medium" style={{ color: COLORS.HighlightText }}>Discarded</div>
         </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-red-600">{totalFlagged}</div>
-          <div>Flagged Posts</div>
+        <div className="text-center p-4 rounded-lg" style={{ backgroundColor: '#FEF1F1', border: `1px solid ${COLORS.border}` }}>
+          <div className="text-2xl font-bold mb-1" style={{ color: COLORS.danger }}>{totalFlagged}</div>
+          <div className="font-medium" style={{ color: COLORS.danger }}>Flagged</div>
         </div>
       </div>
     </div>
