@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
 import UserProfileCard from '../userComponents/UserProfileCard';
 import ChatIcon from '../../../../assets/chat.svg';
 import Button from '../../../../components/ui/Button';
 
+// Modal Component with backdrop blur
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-opacity-30 backdrop-blur-lg" />
+      <div 
+        className="bg-white rounded-xl shadow-lg w-full max-w-md border relative z-10"
+        style={{ borderColor: COLORS.stroke }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export default function ViewRequestRightPanel({ request }) {
+    const [showDiscardModal, setShowDiscardModal] = useState(false);
+    const [discardReason, setDiscardReason] = useState('');
+    const [isTextareaFocused, setIsTextareaFocused] = useState(false);
+
     const user = {
         Name: request.requester,
         'Account Status': request.requesterStatus,
@@ -15,31 +40,21 @@ export default function ViewRequestRightPanel({ request }) {
         'Tax ID': request.taxId
     };
 
+    const handleDiscard = () => {
+        // Handle discard logic here
+        console.log('Discarding with reason:', discardReason);
+        setShowDiscardModal(false);
+        setDiscardReason('');
+    };
+
+    const handleModalClose = () => {
+        setShowDiscardModal(false);
+        setDiscardReason(''); // Clear textarea when modal closes
+    };
+
     const renderActionButtons = () => {
         switch (request.status) {
             case 'NEW':
-                return (
-                    <>
-                        <Button
-                            variant="danger_outline"
-                            size="base"
-                            className="w-full"
-                            style={{
-                                borderColor: COLORS.danger,
-                                color: COLORS.danger
-                            }}
-                        >
-                            Discard
-                        </Button>
-                        <Button
-                            variant="primary"
-                            size="base"
-                            className="w-full"
-                        >
-                            Approve
-                        </Button>
-                    </>
-                );
             case 'IN-PROGRESS':
                 return (
                     <>
@@ -51,6 +66,7 @@ export default function ViewRequestRightPanel({ request }) {
                                 borderColor: COLORS.danger,
                                 color: COLORS.danger
                             }}
+                            onClick={() => setShowDiscardModal(true)}
                         >
                             Discard
                         </Button>
@@ -59,10 +75,9 @@ export default function ViewRequestRightPanel({ request }) {
                             size="base"
                             className="w-full"
                         >
-                            Complete Installation
+                            {request.status === 'NEW' ? 'Approve' : 'Complete Installation'}
                         </Button>
                     </>
-
                 );
             case 'WAITING FOR PAYMENT':
                 return (
@@ -81,8 +96,8 @@ export default function ViewRequestRightPanel({ request }) {
     };
 
     return (
-        <div className="flex flex-col h-full">
-            {/* Scrollable content area */}
+        <div className="flex flex-col h-full relative">
+            {/* Scrollable content area - No need for blur here since modal has its own backdrop */}
             <div className="space-y-4 md:space-y-6 overflow-y-auto flex-1">
                 {/* User Profile Section */}
                 <div className="w-full">
@@ -148,6 +163,72 @@ export default function ViewRequestRightPanel({ request }) {
                     {renderActionButtons()}
                 </div>
             </div>
+
+            {/* Discard Confirmation Modal */}
+            <Modal isOpen={showDiscardModal} onClose={handleModalClose}>
+                <div className="p-6" style={{ maxWidth: '600px' }}>
+                    <h2 className="text-xl font-bold mb-4" style={{ 
+                        color: COLORS.mainTextColor,
+                        fontFamily: FONTS.family.sans
+                    }}>
+                        Discard {request.title.includes('Charger') ? 'Charger' : 'Station'}
+                    </h2>
+                    <p className="mb-4 text-sm" style={{ 
+                        color: COLORS.secondaryText,
+                        fontFamily: FONTS.family.sans
+                    }}>
+                        Do you really want to discard this request to add a new charging {request.title.includes('Charger') ? 'charger' : 'station'}?
+                    </p>
+                    
+                    <div className="mb-6">
+                        <label className="block text-xs mb-2" style={{ 
+                            color: COLORS.secondaryText,
+                            fontFamily: FONTS.family.sans
+                        }}>
+                            Enter the reason to discard
+                        </label>
+                        <textarea
+                            className="w-full p-3 border rounded text-sm transition-colors"
+                            style={{
+                                borderColor: isTextareaFocused ? COLORS.primary : COLORS.stroke,
+                                minHeight: '100px',
+                                fontFamily: FONTS.family.sans,
+                                backgroundColor: COLORS.background,
+                                outline: 'none'
+                            }}
+                            value={discardReason}
+                            onChange={(e) => setDiscardReason(e.target.value)}
+                            onFocus={() => setIsTextareaFocused(true)}
+                            onBlur={() => setIsTextareaFocused(false)}
+                            placeholder="Type your reason here..."
+                        />
+                    </div>
+                    
+                    <div className="flex justify-end gap-3">
+                        <Button
+                            variant="outline"
+                            size="base"
+                            onClick={handleModalClose}
+                            style={{
+                                borderColor: COLORS.stroke,
+                                color: COLORS.mainTextColor,
+                                fontFamily: FONTS.family.sans
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="primary"
+                            size="base"
+                            onClick={handleDiscard}
+                            disabled={!discardReason.trim()}
+                            style={{ fontFamily: FONTS.family.sans }}
+                        >
+                            Confirm
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }
