@@ -53,7 +53,6 @@ export default function UserProfileCard({ user }) {
             statusBgColor: '#ffc107',
             statusTextColor: COLORS.mainTextColor
         }
-        // Add more statuses as needed
     };
 
     // Get current status configuration or default to Active
@@ -71,54 +70,102 @@ export default function UserProfileCard({ user }) {
     );
 
     return (
-        <div className='p-4 rounded-xl' style={{ 
-            backgroundColor: currentStatus.bgColor, 
-            border: `2px solid ${currentStatus.borderColor}` 
-        }}>
-            <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center">
-                            {renderStatusIcon(UserIcon)}
-                        </div>
-                        <div>
-                            <h2 style={{
-                                fontSize: FONTS.sizes.lg,
-                                fontWeight: FONTS.weights.medium,
-                                color: COLORS.mainTextColor,
-                                marginBottom: '4px'
-                            }}>
-                                {user.Name}
-                            </h2>
-                            <span
-                                className="px-4.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-full"
-                                style={{ 
-                                    background: currentStatus.statusBgColor,
-                                    color: currentStatus.statusTextColor
-                                }}
-                            >
-                                {user['Account Status']}
-                            </span>
+        <div className="flex flex-col gap-4">
+            {/* Main Profile Card */}
+            <div className='p-4 rounded-xl' style={{
+                backgroundColor: currentStatus.bgColor,
+                border: `2px solid ${currentStatus.borderColor}`
+            }}>
+                <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center">
+                                {renderStatusIcon(UserIcon)}
+                            </div>
+                            <div>
+                                <h2 style={{
+                                    fontSize: FONTS.sizes.lg,
+                                    fontWeight: FONTS.weights.medium,
+                                    color: COLORS.mainTextColor,
+                                    marginBottom: '4px'
+                                }}>
+                                    {user.Name}
+                                </h2>
+                                <span
+                                    className="px-4.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-full"
+                                    style={{
+                                        background: currentStatus.statusBgColor,
+                                        color: currentStatus.statusTextColor
+                                    }}
+                                >
+                                    {user['Account Status']}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className='flex justify-between'>
-                    <div style={{ 
-                        color: COLORS.secondaryText, 
-                        fontSize: FONTS.sizes.xs, 
-                        fontWeight: FONTS.weights.medium 
-                    }}>
-                        Date Joined:
-                    </div>
-                    <div style={{ 
-                        color: COLORS.mainTextColor, 
-                        fontSize: FONTS.sizes.sm, 
-                        fontWeight: FONTS.weights.medium 
-                    }}>
-                        {user['Date of Registration']}
+                    <div className='flex justify-between'>
+                        <div style={{
+                            color: COLORS.secondaryText,
+                            fontSize: FONTS.sizes.xs,
+                            fontWeight: FONTS.weights.medium
+                        }}>
+                            Date Joined:
+                        </div>
+                        <div style={{
+                            color: COLORS.mainTextColor,
+                            fontSize: FONTS.sizes.sm,
+                            fontWeight: FONTS.weights.medium
+                        }}>
+                            {user['Date of Registration']}
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {/* Blocked User Additional Card - Only shown when status is Blocked */}
+            {user['Account Status'] === 'Blocked' && (
+                <div className='p-4 rounded-xl' style={{
+                    backgroundColor: COLORS.bgRed,
+                    border: `2px solid ${COLORS.danger}`
+                }}>
+                    <div className="flex flex-col gap-3">
+                        <div className='text-center'>
+                            <div style={{
+                                color: COLORS.danger,
+                                fontSize: FONTS.sizes.sm,
+                                fontWeight: FONTS.weights.medium
+                            }}>
+                                Balance
+                            </div>
+                            <div style={{
+                                color: COLORS.danger,
+                                fontSize: FONTS.sizes.xl,
+                                fontWeight: FONTS.weights.semibold
+                            }}>
+                                <span style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.medium }}>-LKR </span>
+                                <span>{user['Account Balance'] || '0.00'}</span>
+                            </div>
+                        </div>
+                        <div className='flex justify-between'>
+                            <div style={{
+                                color: COLORS.secondaryText,
+                                fontSize: FONTS.sizes.xs,
+                                fontWeight: FONTS.weights.medium
+                            }}>
+                                Blocked On:
+                            </div>
+                            <div style={{
+                                color: COLORS.mainTextColor,
+                                fontSize: FONTS.sizes.sm,
+                                fontWeight: FONTS.weights.medium
+                            }}>
+                                {user['Blocked Date'] || 'Not specified'}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

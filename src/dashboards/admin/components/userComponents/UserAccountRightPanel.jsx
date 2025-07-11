@@ -21,6 +21,17 @@ export default function UserAccountRightPanel({ user, stats, requests = [] }) {
       {/* User Profile Card */}
       <UserProfileCard user={user} />
 
+       <div style={{ marginTop: '0px', textAlign: 'center' }} >
+                    <h4 style={{
+                        fontSize: FONTS.sizes.base,
+                        fontWeight: FONTS.weights.medium,
+                        color: COLORS.mainTextColor,
+                        marginBottom: '0px'
+                    }}>
+                        Account Status History
+                    </h4>
+                </div>
+
       {/* User Stats Card */}
       <UserStatsCard stats={stats} />
 

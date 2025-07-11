@@ -296,8 +296,9 @@ export default function UserAccountPage() {
     'Overall Rating for Charging sessions': 4.2,
     'No of complaints': 1,
     'No of posts shared': 3,
-    'Account Status': 'Blocked',
-    flagged: false
+    'Account Status': 'Active',
+    flagged: false,
+    'Account Balance': '1100.00'
   };
 
   return (
