@@ -1,19 +1,20 @@
 import React from 'react';
 import { COLORS, FONTS } from '../../../constants';
 
-export default function TabBar({ activeTab, setActiveTab }) {
-  const tabs = [
-    { id: 'sessions', label: 'Charging Sessions' },
-    { id: 'bookings', label: 'Bookings' },
-    { id: 'payments', label: 'Payments' },
-    { id: 'reports', label: 'Reports' }
-  ];
-
+export default function TabBar({ 
+  activeTab, 
+  setActiveTab, 
+  tabs = [], 
+  mobileLabels = {} 
+}) {
   return (
     <div className="relative">
       {/* Horizontal scroll container for mobile */}
       <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex border-b whitespace-nowrap" style={{ borderColor: COLORS.stroke, minWidth: 'fit-content' }}>
+        <div className="flex border-b whitespace-nowrap" style={{ 
+          borderColor: COLORS.stroke, 
+          minWidth: 'fit-content' 
+        }}>
           {tabs.map(tab => (
             <button
               key={tab.id}
@@ -29,13 +30,10 @@ export default function TabBar({ activeTab, setActiveTab }) {
               }}
               onClick={() => setActiveTab(tab.id)}
             >
-              {/* Short labels for mobile if needed */}
+              {/* Show full label on larger screens, shortened label on mobile if provided */}
               <span className="hidden xs:inline">{tab.label}</span>
               <span className="xs:hidden">
-                {tab.id === 'sessions' ? 'Sessions' : 
-                 tab.id === 'bookings' ? 'Bookings' : 
-                 tab.id === 'payments' ? 'Payments' : 
-                 'Reports'}
+                {mobileLabels[tab.id] || tab.label}
               </span>
               {activeTab === tab.id && (
                 <div 

@@ -5,8 +5,10 @@ import RequestCard from '../components/RequestCard';
 import OverviewCard from '../components/OverviewCard';
 import StationsIcon from '../../../assets/stations.svg'
 import ConnectorsIcon from '../../../assets/connectors.svg'
+import { useNavigate } from 'react-router-dom';
 
 export default function ChargingStationsRightPanel({ stations, requests }) {
+  const navigate = useNavigate();
   // Summary data
   const total = stations?.length || 2;
   const active = stations?.filter(s => s.status === 'Active').length || 1;
@@ -112,6 +114,7 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
             // Add any other custom styles here
           }}
           className='mt-4 w-full'
+          onClick={() => navigate('/admin/requests')}
         >
           View all requests
         </Button>

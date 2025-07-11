@@ -25,7 +25,19 @@ export default function UserAccountPage() {
     { label: 'Users Who have Posted on Community', value: 'userspostcommunity' },
   ];
 
+const userAccountTabs = [
+   { id: 'sessions', label: 'Charging Sessions' },
+    { id: 'bookings', label: 'Bookings' },
+    { id: 'payments', label: 'Payments' },
+    { id: 'reports', label: 'Reports' }
+  ];
 
+  const mobileTabLabels = {
+    sessions: 'Sessions',
+    bookings: 'Bookings',
+    payments: 'Payments',
+    reports: 'Reports'
+  };
 
   const stats = {
     chargingSessions: 25,
@@ -313,7 +325,13 @@ export default function UserAccountPage() {
 
       {/* Tab Bar */}
       <div className="mb-6">
-        <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <TabBar 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          tabs={userAccountTabs}
+          mobileLabels={mobileTabLabels}
+        />
+        {/* <TabBar activeTab={activeTab} setActiveTab={setActiveTab} /> */}
       </div>
 
 
