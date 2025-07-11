@@ -12,6 +12,7 @@ import MapImage from '../../../../assets/map-placeholder.png';
 import Button from '../../../../components/ui/Button';
 import ArrowRightIcon from '../../../../assets/arrow_right.svg';
 import ApprovalCard from '../../components/ApprovalCard';
+import ViewStationRightPanel from '../../components/stationComponents/ViewStationRightPanel';
 
 const ViewStation = () => {
     const [activeTab, setActiveTab] = useState('profile');
@@ -24,7 +25,10 @@ const ViewStation = () => {
     const station = {
         name: "EviGO Charging Station",
         address: "No. 24, Joshep Road, Weilpanna",
-        operator: "Premash! Khemadasa Mawabita",
+        operator: "A P Perera",
+        email: "perera@gmail.com",
+        operatorJoinedDate: "12 Dec 2024",
+        operatorStatus: "Active",
         location: "Bloomfield Cricket and Athletic Club",
         totalEarnings: "LKR 6.45 M",
         earningsChange: "+6.37%",
@@ -209,54 +213,20 @@ const ViewStation = () => {
                                 title="View Status Summary"
                                 bgColor={COLORS.primary}
                                 textColor={COLORS.background}
-                                
+
                             />
 
 
                         </div>
                     </div>
-                    
+
                 </div>
 
                 {/* Right side panel - Only for profile tab */}
                 <div className="lg:col-span-1 space-y-4">
-                    <div className="bg-white rounded-lg shadow-sm p-4">
-                        <h3 className="text-md font-semibold mb-3" style={{ color: COLORS.mainTextColor }}>
-                            View Status Summary
-                        </h3>
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{
-                                    backgroundColor: currentStatus === 'Active' ? COLORS.primary :
-                                        currentStatus === 'Closed' ? COLORS.danger :
-                                            currentStatus === 'Under Maintenance' ? COLORS.HighlightText :
-                                                COLORS.secondaryText
-                                }}></div>
-                                <p className="text-sm" style={{ color: COLORS.secondaryText }}>
-                                    {currentStatus === 'Active' ? 'Operational' :
-                                        currentStatus === 'Closed' ? 'Station Closed' :
-                                            currentStatus === 'Under Maintenance' ? 'Under Maintenance' :
-                                                currentStatus === 'Disabled' ? 'Station Disabled' : 'Station Deleted'}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{
-                                    backgroundColor: station.connectorsActive > 0 ? COLORS.primary : COLORS.danger
-                                }}></div>
-                                <p className="text-sm" style={{ color: COLORS.secondaryText }}>
-                                    {station.connectorsActive} active connectors
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{
-                                    backgroundColor: station.reports > 0 ? COLORS.danger : COLORS.primary
-                                }}></div>
-                                <p className="text-sm" style={{ color: COLORS.secondaryText }}>
-                                    {station.reports > 0 ? `${station.reports} reported issues` : 'No reported issues'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <ViewStationRightPanel
+                        station={station}
+                    />
                 </div>
             </div>
         );
