@@ -10,5 +10,6 @@ export const COLORS = {
     bgGreen: '#E0F3EF',
     border: '#E9E9E9', //light gray for borders
     star: '#F5B223',
-    danger: '#ff3b30' 
+    danger: '#ff3b30',
+    bgRed: '#FAE5E5'
 }
