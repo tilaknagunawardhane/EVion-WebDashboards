@@ -3,7 +3,7 @@ import { COLORS } from '../constants/colors'
 
 export default function Layout({ children, fullWidth = false }) {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: COLORS.background.main }}>
+    <div className="min-h-screen" style={{ backgroundColor: COLORS.background }}>
       <Navbar />
       <main className={fullWidth ? "" : "py-10"}>
         {fullWidth ? (
