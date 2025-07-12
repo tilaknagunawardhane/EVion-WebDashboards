@@ -4,13 +4,14 @@ import { COLORS, FONTS } from '../../../../constants';
 import NotificationsIcon from '../../../../assets/notifications.svg';
 import RequestDetailsWithStation from '../../components/requestComponents/RequestDelailsWithStation';
 import ViewRequestRightPanel from '../../components/requestComponents/ViewRequestRightPanel';
+import AdminPageHeader from '../../components/AdminPageHeader';
 
 export default function ViewRequest() {
     const { type, id } = useParams(); // Get request ID and type from URL
     const location = useLocation();
 
     const pageTitle = type === 'connector' ? 'New Charger' : 'New Charging Station';
-    
+
     // Sample data - replace with actual data fetching
     const request = {
         id: id,
@@ -71,29 +72,7 @@ export default function ViewRequest() {
             backgroundColor: COLORS.background,
         }}>
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                    <h1 className="text-xl md:text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-                        {request.title}
-                    </h1>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <img
-                            src={NotificationsIcon}
-                            alt="Notifications"
-                            style={{
-                                width: '24px',
-                                height: '24px',
-                                cursor: 'pointer'
-                            }}
-                        />
-                        <span className="absolute top-0 right-0 w-2 h-2 rounded-full"
-                            style={{ backgroundColor: COLORS.primary }}></span>
-                    </div>
-                </div>
-            </div>
+            <AdminPageHeader title={`${request.title}`} />
 
             {/* Main Content */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">

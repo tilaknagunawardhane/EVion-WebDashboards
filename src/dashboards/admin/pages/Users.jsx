@@ -6,6 +6,7 @@ import { COLORS, FONTS } from '../../../constants';
 import NotificationsIcon from '../../../assets/notifications.svg';
 import OverviewCard from '../components/OverviewCard';
 import { useNavigate } from 'react-router-dom';
+import AdminPageHeader from '../components/AdminPageHeader';
 
 export default function UsersPage() {
   const navigate = useNavigate();
@@ -145,26 +146,7 @@ export default function UsersPage() {
       backgroundColor: COLORS.background,
     }}>
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-          EV Users Overview
-        </h1>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <img
-              src={NotificationsIcon}
-              alt="Notifications"
-              style={{
-                width: '24px',
-                height: '24px',
-                cursor: 'pointer'
-              }}
-            />
-            <span className="absolute top-0 right-0 w-2 h-2 rounded-full"
-              style={{ backgroundColor: COLORS.primary }}></span>
-          </div>
-        </div>
-      </div>
+      <AdminPageHeader title="EV Users Overview" />
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

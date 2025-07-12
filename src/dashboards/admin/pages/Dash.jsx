@@ -9,7 +9,7 @@ import ConnectorStatusChart from '../../admin/components/ConnectorStatusChart'
 import ApprovalCard from '../../admin/components/ApprovalCard'
 import MapImage from '../../../assets/map-placeholder.png' // Import your map image
 import UserGrowthChart from '../components/UserGrowthChart'
-
+import AdminPageHeader from '../components/AdminPageHeader'
 
 export default function AdminDashboardPage() {
     // Dynamic data that will later come from backend
@@ -38,24 +38,11 @@ export default function AdminDashboardPage() {
     }
 
     return (
-        <div style={{ fontFamily: FONTS.family.sans, padding: '4px' }}>
+        <div style={{ fontFamily: FONTS.family.sans, padding: '24px' }}>
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-                    Platform Overview
-                </h1>
-                <div className="notification-icon">
-                    <img
-                        src={NotificationsIcon}
-                        alt="Notifications"
-                        style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: `brightness(0) saturate(100%) invert(48%) sepia(99%) saturate(1230%) hue-rotate(130deg) brightness(95%) contrast(101%)`
-                        }}
-                    />
-                </div>
-            </div>
+
+            <AdminPageHeader title="Platform Overview"/>
+            
 
             {/* Platform Overview Section */}
             <section className="mb-8">

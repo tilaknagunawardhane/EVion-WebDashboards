@@ -8,6 +8,7 @@ import { COLORS, FONTS } from '../../../../constants';
 import NotificationsIcon from '../../../../assets/notifications.svg';
 import OverviewCard from '../../components/OverviewCard';
 import { useNavigate, useParams } from 'react-router-dom';
+import AdminPageHeader from '../../components/AdminPageHeader';
 
 export default function UserAccountPage() {
   const { id } = useParams();
@@ -297,31 +298,7 @@ export default function UserAccountPage() {
       backgroundColor: COLORS.background,
     }}>
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-            {currentUser.Name}'s Account
-          </h1>
-          {/* <p style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}>
-            User ID: {id} | Registered: {currentUser['Date of Registration']}
-          </p> */}
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <img
-              src={NotificationsIcon}
-              alt="Notifications"
-              style={{
-                width: '24px',
-                height: '24px',
-                cursor: 'pointer'
-              }}
-            />
-            <span className="absolute top-0 right-0 w-2 h-2 rounded-full"
-              style={{ backgroundColor: COLORS.primary }}></span>
-          </div>
-        </div>
-      </div>
+      <AdminPageHeader title={`${currentUser.Name}'s Account`} />
 
       {/* Tab Bar */}
       <div className="mb-6">

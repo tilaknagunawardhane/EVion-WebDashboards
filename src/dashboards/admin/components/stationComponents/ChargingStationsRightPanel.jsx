@@ -1,10 +1,10 @@
 import React from 'react';
-import { COLORS, FONTS } from '../../../constants';
-import Button from '../../../components/ui/Button';
-import RequestCard from '../components/RequestCard';
-import OverviewCard from '../components/OverviewCard';
-import StationsIcon from '../../../assets/stations.svg'
-import ConnectorsIcon from '../../../assets/connectors.svg'
+import { COLORS, FONTS } from '../../../../constants';
+import Button from '../../../../components/ui/Button';
+import RequestCard from '../RequestCard';
+import OverviewCard from '../OverviewCard';
+import StationsIcon from '../../../../assets/stations.svg'
+import ConnectorsIcon from '../../../../assets/connectors.svg'
 import { useNavigate } from 'react-router-dom';
 
 export default function ChargingStationsRightPanel({ stations, requests }) {

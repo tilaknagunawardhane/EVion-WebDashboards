@@ -1,11 +1,12 @@
 import React from 'react';
 import ChargingStationsTopBar from '../components/DataTableTopBar';
 import DataTable from '../components/DataTable'; // Changed import
-import ChargingStationsRightPanel from '../components/ChargingStationsRightPanel';
+import ChargingStationsRightPanel from '../components/stationComponents/ChargingStationsRightPanel';
 import { COLORS, FONTS } from '../../../constants';
 import NotificationsIcon from '../../../assets/notifications.svg';
 import OverviewCard from '../components/OverviewCard';
 import { useNavigate } from 'react-router-dom';
+import AdminPageHeader from '../components/AdminPageHeader'
 
 
 export default function ChargingStations() {
@@ -140,26 +141,7 @@ export default function ChargingStations() {
             padding: '24px',
         }}>
             {/* Header Section */}
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-                    Stations Overview
-                </h1>
-                <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <img
-                            src={NotificationsIcon}
-                            alt="Notifications"
-                            style={{
-                                width: '24px',
-                                height: '24px',
-                                cursor: 'pointer'
-                            }}
-                        />
-                        <span className="absolute top-0 right-0 w-2 h-2 rounded-full"
-                            style={{ backgroundColor: COLORS.primary }}></span>
-                    </div>
-                </div>
-            </div>
+            <AdminPageHeader title="Stations Overview" />
 
             {/* Main Content */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -193,7 +175,7 @@ export default function ChargingStations() {
                                 filter={filter}
                                 sort={sort}
                                 search={search}
-                                onRowClick={(station)=>{
+                                onRowClick={(station) => {
                                     navigate(`/admin/stations/${station.id}`);
                                 }}
                             />
