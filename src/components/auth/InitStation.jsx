@@ -118,15 +118,17 @@ export default function InitStations() {
 
             <div className="flex flex-start justify-between">
                 <h2 className="mb-6" style={{ fontFamily: FONTS.family.sans, fontSize: FONTS.sizes['2xl'], fontWeight: FONTS.weights.normal, color: COLORS.mainTextColor }}>Charging Stations</h2>
+                <div>
                 <Button variant="primary" type="button" onClick={ () => setShowForm(true)}>
                     Add Charging Station
                 </Button>
+                </div>
             </div>
             
             {loading ? (
                 <p className="text-center text-gray-500">Loading stations...</p>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {stations.map((station, idx) => (
                         <StationCard 
                             key={idx}

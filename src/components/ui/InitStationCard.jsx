@@ -172,10 +172,10 @@ export default function StationCard({ station, onEdit, onPay, onRemove }) {
       <div className='flex justify-between mt-6'>
         <button
           className="mt-4 underline"
-          style={{ color: COLORS.primary, fontSize: FONTS.sizes.sm }}
+          style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
           onClick={() => setExpanded(!expanded)}
           >
-          { expanded ? 'Hide Details' : 'View All' }
+          { expanded ? 'Hide Details' : 'More' }
         </button>
 
         {/* {station.status === 'Processing' && (
