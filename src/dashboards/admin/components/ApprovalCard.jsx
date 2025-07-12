@@ -8,11 +8,12 @@ export default function ApprovalCard({
   title, 
   bgColor = 'white', 
   textColor = COLORS.primary, 
-  borderColor = COLORS.border 
+  borderColor = COLORS.border,
+  fullWidth = false 
 }) {
   return (
     <div 
-      className="p-4 rounded-lg mb-4 cursor-pointer hover:shadow-md transition-shadow"
+      className={`p-4 rounded-lg mb-4 cursor-pointer hover:shadow-md transition-shadow ${fullWidth ? 'col-span-full' : ''}`}
       style={{ 
         backgroundColor: bgColor,
         border: `1px solid ${borderColor}`,
@@ -21,14 +22,16 @@ export default function ApprovalCard({
     >
       <div className="flex justify-between items-center">
         <div>
+          {count && (
+            <p 
+              className="text-2xl font-bold mb-1" 
+              style={{ color: textColor }}
+            >
+              {count}
+            </p>
+          )}
           <p 
-            className="text-2xl font-bold mb-1" 
-            style={{ color: textColor }}
-          >
-            {count}
-          </p>
-          <p 
-            className="text-sm" 
+            className={`${count ? 'text-sm' : 'text-base font-medium'}`} 
             style={{ 
               color: textColor,
               fontFamily: FONTS.family.sans 

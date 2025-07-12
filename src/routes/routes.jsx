@@ -20,6 +20,9 @@ import { AuthProvider } from '../contexts/AuthContext'
 import AdminDash from '../dashboards/admin/pages/Dash'
 import AdminStaionsPage from '../dashboards/admin/pages/ChargingStations'
 import UserAccountPage from '../dashboards/admin/pages/userPages/userAccount'
+import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
+import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
+import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
 
 const router = createBrowserRouter([
   {
@@ -42,7 +45,10 @@ const router = createBrowserRouter([
           { path: 'users', element: <UsersPage /> },
           { path: 'dashboard', element: <AdminDash /> },
           { path: 'stations', element: <AdminStaionsPage/>},
-          { path: 'users/:id', element: <UserAccountPage/>}
+          { path: 'users/:id', element: <UserAccountPage/>},
+          { path: 'stations/requests', element: <RequestsPage/>},
+          { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
+          { path: 'stations/:id', element: <ViewStation/>},
 
         ]
       },
@@ -53,6 +59,7 @@ const router = createBrowserRouter([
           { path: 'dashboards', element: <DashboardPage /> },
           { path: 'stations', element: <StationsPage /> },
           { path: 'settings', element: <SettingsPage /> },
+
         ]
       },
       {
