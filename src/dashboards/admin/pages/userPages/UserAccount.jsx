@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import DataTableTopBar from '../../components/DataTableTopBar';
-import DataTable from '../../components/DataTable';
+import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
+import DataTable from '../../../../components/ui/DataTable';
 // import UsersRightPanel from '../../components/UsersRightPanel';
 import UserAccountRightPanel from '../../components/userComponents/userAccountRightPanel';
-import TabBar from '../../components/TabBar';
+import TabBar from '../../../../components/ui/TabBar';
 import { COLORS, FONTS } from '../../../../constants';
 import NotificationsIcon from '../../../../assets/notifications.svg';
 import OverviewCard from '../../components/OverviewCard';

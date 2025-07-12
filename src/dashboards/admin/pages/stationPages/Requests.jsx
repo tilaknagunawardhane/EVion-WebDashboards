@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import TabBar from '../../components/TabBar';
+import TabBar from '../../../../components/ui/TabBar';
 import { COLORS, FONTS } from '../../../../constants';
 import NotificationsIcon from '../../../../assets/notifications.svg';
 import MainRequestCard from '../../components/requestComponents/MainRequestCard';
-import DataTableTopBar from '../../components/DataTableTopBar';
+import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
 import { useNavigate } from 'react-router-dom';
 import AdminPageHeader from '../../components/AdminPageHeader';
 

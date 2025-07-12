@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
-import TabBar from '../../components/TabBar';
-import DataTableTopBar from '../../components/DataTableTopBar';
-import DataTable from '../../components/DataTable';
+import TabBar from '../../../../components/ui/TabBar';
+import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
+import DataTable from '../../../../components/ui/DataTable';
 import StatCard from '../../components/StatCard';
 import StarIcon from '../../../../assets/star-filled.svg';
 import StarOutlineIcon from '../../../../assets/star-outline.svg';

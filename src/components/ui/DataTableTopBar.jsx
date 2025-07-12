@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { COLORS, FONTS } from '../../../constants';
-import SearchIcon from '../../../assets/search_icon.svg';
-import FilterIcon from '../../../assets/filter_icon.svg';
-import SortIcon from '../../../assets/sort_icon.svg';
-import ChevronDown from '../../../assets/chevron_down.svg';
-import ExportIcon from '../../../assets/export_icon.svg';
+import { COLORS, FONTS } from '../../constants';
+import SearchIcon from '../../assets/search_icon.svg';
+import FilterIcon from '../../assets/filter_icon.svg';
+import SortIcon from '../../assets/sort_icon.svg';
+import ChevronDown from '../../assets/chevron_down.svg';
+import ExportIcon from '../../assets/export_icon.svg';
 
 export default function DataTableTopBar({
   search,

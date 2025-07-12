@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import DataTableTopBar from '../components/DataTableTopBar';
-import DataTable from '../components/DataTable';
+import DataTableTopBar from '../../../components/ui/DataTableTopBar';
+import DataTable from '../../../components/ui/DataTable';
 import UsersRightPanel from '../components/UsersRightPanel';
 import { COLORS, FONTS } from '../../../constants';
 import NotificationsIcon from '../../../assets/notifications.svg';

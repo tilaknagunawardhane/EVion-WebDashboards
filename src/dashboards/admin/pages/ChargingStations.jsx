@@ -1,6 +1,6 @@
 import React from 'react';
-import ChargingStationsTopBar from '../components/DataTableTopBar';
-import DataTable from '../components/DataTable'; // Changed import
+import ChargingStationsTopBar from '../../../components/ui/DataTableTopBar';
+import DataTable from '../../../components/ui/DataTable'; // Changed import
 import ChargingStationsRightPanel from '../components/stationComponents/ChargingStationsRightPanel';
 import { COLORS, FONTS } from '../../../constants';
 import NotificationsIcon from '../../../assets/notifications.svg';

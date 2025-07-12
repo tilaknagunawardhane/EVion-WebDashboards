@@ -1,5 +1,5 @@
 import React from 'react';
-import { COLORS, FONTS } from '../../../constants';
+import { COLORS, FONTS } from '../../constants';
 
 export default function TabBar({ 
   activeTab, 

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { COLORS, FONTS } from '../../../constants';
+import { COLORS, FONTS } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 
 const getStatusStyle = (status) => {
