@@ -1,5 +1,6 @@
 import { COLORS, FONTS } from '../../../constants'
 import StationImage from '../../../assets/station_img.png'
+import { useNavigate } from 'react-router-dom';
 
 export default function StationCard({ station }) {
   // Status configuration
@@ -21,7 +22,12 @@ export default function StationCard({ station }) {
     }
   }
 
+  const navigate = useNavigate();
   const status = statusConfig[station.status] || statusConfig.active
+
+  const openProfile = () => {
+    navigate(`/station-owner/stationprofile/${station.id}`);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden border" style={{ borderColor: COLORS.border }}>
@@ -129,6 +135,7 @@ export default function StationCard({ station }) {
         <div className="flex space-x-2">
           <button
             className="px-3 py-1 rounded-md text-sm font-medium"
+            onClick={openProfile}
             style={{
               backgroundColor: COLORS.background,
               color: COLORS.primary,

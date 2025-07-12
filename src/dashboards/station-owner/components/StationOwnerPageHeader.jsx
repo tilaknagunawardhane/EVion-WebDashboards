@@ -9,10 +9,6 @@ const PageHeader = ({ title }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Your exact primary color
-  const primaryColor = '#00b894';
-  const primaryHoverBg = 'rgba(0, 184, 148, 0.1)';
-  
   // Determine active button based on current route
   const getActiveButton = () => {
     if (location.pathname.includes('/chat')) return 'chat';

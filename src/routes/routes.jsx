@@ -24,6 +24,8 @@ import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
 import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
 import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
 
+import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/StationProfile'
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -59,6 +61,7 @@ const router = createBrowserRouter([
           { path: 'dashboards', element: <DashboardPage /> },
           { path: 'stations', element: <StationsPage /> },
           { path: 'settings', element: <SettingsPage /> },
+          { path: 'stationprofile/:id', element: <OwnerViewStation />}
 
         ]
       },

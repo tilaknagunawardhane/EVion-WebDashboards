@@ -62,10 +62,10 @@ export default function DataTableTopBar({
               }}
             >
               <div className="flex items-center gap-2">
-                <img src={FilterIcon} alt="Filter" className="w-5 h-5" />
+                <img src={FilterIcon} alt="Filter" className="w-4 h-4" />
                 <span style={{
                   fontFamily: FONTS.family.sans,
-                  fontSize: FONTS.sizes.sm,
+                  fontSize: FONTS.sizes.xs,
                   color: COLORS.secondaryText,
                   fontWeight: FONTS.weights.medium,
                 }}>
@@ -122,10 +122,10 @@ export default function DataTableTopBar({
               }}
             >
               <div className="flex items-center gap-2">
-                <img src={SortIcon} alt="Sort" className="w-5 h-5" />
+                <img src={SortIcon} alt="Sort" className="w-4 h-4" />
                 <span style={{
                   fontFamily: FONTS.family.sans,
-                  fontSize: FONTS.sizes.sm,
+                  fontSize: FONTS.sizes.xs,
                   color: COLORS.secondaryText,
                   fontWeight: FONTS.weights.medium,
                 }}>
