@@ -1,6 +1,6 @@
 export const FONTS = {
   family: {
-    sans: 'Inter, sans-serif',
+    sans: 'Plus Jakarta Sans, sans-serif',
     mono: 'Menlo, monospace'
   },
   sizes: {
