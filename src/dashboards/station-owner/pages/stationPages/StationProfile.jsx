@@ -105,8 +105,33 @@ const OwnerViewStation = () => {
 
     // Sample data for tables
     const chargersData = [
-        { id: 1, name: 'HyperCharge Dual-Port', type: 'DC Fast Charger', status: 'in-use', power: '150 kW' },
-        { id: 2, name: 'FastCharge DC', type: 'DC Fast Charger', status: 'reserved', power: '60 kW' }
+        { 
+            id: 'EVDC0001', 
+            name: 'HyperCharge Dual-Port', 
+            joined: '2023-01-15', 
+            type: 'DC Fast Charger', 
+            power: '150 kW',
+            connectors: ['CCS1', 'CHAdeMO'],
+            price: '55.00',
+            sessions: '232',
+            revenue: '3,300,500',
+            reports: '0', 
+            status: 'in-use',
+            actions: ['View', 'Disable', 'Delete']  
+        },
+        { 
+            id: 'EVDC0002', 
+            name: 'FastCharge DC', 
+            joined: '2022-11-10', 
+            type: 'DC Fast Charger', 
+            power: '60 kW',
+            connectors: ['CCS2'],
+            price: '55.00',
+            sessions: '560',
+            revenue: '5,000,000',
+            reports: '0',
+            status: 'reserved',  
+        }
     ];
 
     // const sessionsData = [
@@ -115,8 +140,23 @@ const OwnerViewStation = () => {
     // ];
 
     // Table columns configuration
-    const chargersColumns = ['ID', 'Name', 'Type', 'Status', 'Power'];
+    const chargersColumns = ['chargerID', 'Charger Name', 'Joined On', 'Power Type', 'Maximum Power Output(kW)', 'Connectors', 'Unit Price(per kW)', 'Total Sessions', 'Revenue', 'No of Active Reports', 'Charger Status', 'Quick Actions'];
     // const sessionsColumns = ['ID', 'User', 'Duration', 'Energy', 'Cost', 'Date'];
+
+    // const chargersColumns = [
+    //     { key: 'id', label: 'chargerID'}, 
+    //     { key: 'name', label: 'Charger Name'}, 
+    //     { key: 'joined', label: 'Joined On'}, 
+    //     { key: 'type', label: 'Power Type'},
+    //     { key: 'power', label: 'Maximum Power Output(kW)'}, 
+    //     { key: 'connectors', label: 'Connectors', render: (value) => value.join(', ')}, 
+    //     { key: 'price', label: 'Unit Price(per kW)'}, 
+    //     { key: 'sessions', label: 'Total Sessions'}, 
+    //     { key: 'revenue', label: 'Revenue'}, 
+    //     { key: 'reports', label: 'No of Active Reports'}, 
+    //     { key: 'status', label: 'Charger Status'}, 
+    //     { key: 'actions', label: 'Quick Actions'}
+    // ];
 
     // Profile Tab Content
     const ProfileTab = () => {
@@ -261,7 +301,7 @@ const OwnerViewStation = () => {
 
     // Table Tab Content
     const TableTab = ({ title, columns, data }) => (
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="grid grid-cols-1 gap-0 bg-transparent rounded-lg p-0">
             <DataTableTopBar
                 search={search}
                 setSearch={setSearch}
@@ -288,7 +328,8 @@ const OwnerViewStation = () => {
     );
 
     return (
-        <div style={{
+        <div 
+            style={{
             fontFamily: FONTS.family.sans,
             padding: '24px',
             backgroundColor: COLORS.background,
@@ -322,20 +363,20 @@ const OwnerViewStation = () => {
                         data={sessionsData}
                     />
                 )} */}
-                {activeTab === 'transactions' && (
+                {/* {activeTab === 'transactions' && (
                     <TableTab
                         title="Transactions"
                         columns={['ID', 'Amount', 'Type', 'Date', 'Status']}
                         data={[]}
                     />
-                )}
-                {activeTab === 'faults' && (
+                )} */}
+                {/* {activeTab === 'faults' && (
                     <TableTab
                         title="Faults & Complaints"
                         columns={['ID', 'Type', 'Reported', 'Status', 'Actions']}
                         data={[]}
                     />
-                )}
+                )} */}
             </div>
         </div>
     );
