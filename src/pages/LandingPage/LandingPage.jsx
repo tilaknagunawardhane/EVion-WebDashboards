@@ -21,114 +21,105 @@ export default function LandingPage() {
   return (
     <Layout fullWidth={true}>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20 px-6 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 opacity-20">
-          <img
-            src="https://images.unsplash.com/photo-1593941707882-a5bac6861d75?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80"
-          
-           
-          />
-        </div>
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left">
-              <h1
-                className="font-bold mb-4 leading-tight"
-                style={{
-                  fontSize: FONTS.sizes["5xl"],
-                  color: "white",
-                }}
+        <section className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white py-24 px-8 overflow-hidden">
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="text-center lg:text-left">
+            <h1
+              className="font-bold mb-6 leading-tight"
+              style={{
+            fontSize: FONTS.sizes["6xl"],
+            color: "white",
+              }}
+            >
+              Powering the Future of EV Travel in Sri Lanka
+            </h1>
+            <p
+              className="text-3xl mb-8 font-medium"
+              style={{
+            color: COLORS.primary,
+            fontSize: FONTS.sizes["3xl"],
+              }}
+            >
+              Find. Charge. Connect.
+            </p>
+            <p
+              className="max-w-2xl mb-12 text-gray-300"
+              style={{
+            fontSize: FONTS.sizes["2xl"],
+            lineHeight: "1.7",
+              }}
+            >
+              Discover charging stations across Sri Lanka, book your slots,
+              and connect with a growing community of EV enthusiasts.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 mb-16">
+              <button
+            className="group relative inline-flex items-center justify-center rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 overflow-hidden"
+            style={{
+              padding: "1.5rem 3rem",
+              backgroundColor: COLORS.primary,
+              color: "white",
+              fontSize: FONTS.sizes.xl,
+              fontWeight: FONTS.weights.bold,
+            }}
               >
-                Powering the Future of EV Travel in Sri Lanka
-              </h1>
-              <p
-                className="text-2xl mb-6 font-medium"
-                style={{
-                  color: COLORS.primary,
-                  fontSize: FONTS.sizes["2xl"],
-                }}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            <span className="relative flex items-center gap-4">
+              <DevicePhoneMobileIcon className="w-7 h-5" style={{ color: "white" }} />
+              <span>Download Mobile App</span>
+            </span>
+              </button>
+              <Link
+            to="/auth?mode=signup"
+            className="group inline-flex items-center justify-center rounded-2xl shadow-2xl border-2 border-white hover:bg-white hover:text-gray-900 transition-all duration-300"
+            style={{
+              padding: "1.5rem 3rem",
+              backgroundColor: "transparent",
+              color: "white",
+              fontSize: FONTS.sizes.xl,
+              fontWeight: FONTS.weights.bold,
+            }}
               >
-                Find. Charge. Connect.
-              </p>
-              <p
-                className="max-w-xl mb-10 text-gray-300"
-                style={{
-                  fontSize: FONTS.sizes.xl,
-                  lineHeight: "1.6",
-                }}
-              >
-                Discover charging stations across Sri Lanka, book your slots,
-                and connect with a growing community of EV enthusiasts.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <button
-                  className="group relative inline-flex items-center justify-center rounded-xl shadow-xl transform hover:scale-105 transition-all duration-300 overflow-hidden"
-                  style={{
-                    padding: "1.25rem 2.5rem",
-                    backgroundColor: COLORS.primary,
-                    color: "white",
-                    fontSize: FONTS.sizes.lg,
-                    fontWeight: FONTS.weights.bold,
-                  }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                  <span className="relative flex items-center gap-3">
-                    <DevicePhoneMobileIcon className="w-6 h-6 animate-bounce" />
-                    <span>Download Mobile App</span>
-                  </span>
-                </button>
-                <Link
-                  to="/auth?mode=signup"
-                  className="group inline-flex items-center justify-center rounded-xl shadow-xl border-2 border-white hover:bg-white hover:text-gray-900 transition-all duration-300"
-                  style={{
-                    padding: "1.25rem 2.5rem",
-                    backgroundColor: "transparent",
-                    color: "white",
-                    fontSize: FONTS.sizes.lg,
-                    fontWeight: FONTS.weights.bold,
-                  }}
-                >
-                  <span className="flex items-center gap-3">
-                    <BuildingOfficeIcon className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
-                    <span>Become a Charging Partner</span>
-                  </span>
-                </Link>
-              </div>
-            </div>
-            <div className="hidden lg:block">
-              <img
-                src="https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                alt="Modern electric car charging station in Sri Lanka"
-                className="w-full h-auto rounded-xl shadow-2xl"
-              />
+            <span className="flex items-center gap-4">
+              <BuildingOfficeIcon className="w-7 h-7 group-hover:scale-110 transition-transform duration-300" style={{ color: "white" }} />
+              <span>Become a Charging Partner</span>
+            </span>
+              </Link>
             </div>
           </div>
-        </div>
-      </section>
+          <div className="hidden lg:block">
+            <img
+              src="https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+              alt="Modern electric car charging station in Sri Lanka"
+              className="w-full h-auto rounded-2xl shadow-2xl"
+            />
+          </div>
+            </div>
+          </div>
+        </section>
 
-      {/* How It Works Section */}
-      <section
-        className="py-16 px-6"
-        style={{ backgroundColor: COLORS.background }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <h2
-            className="text-center font-bold mb-16"
+        {/* How It Works Section */}
+        <section
+          className="py-20 px-8"
+          style={{ backgroundColor: COLORS.background }}
+        >
+          <div className="max-w-7xl mx-auto">
+            <h2
+            className="text-center font-bold mb-20"
             style={{
-              fontSize: FONTS.sizes["4xl"],
+              fontSize: FONTS.sizes["5xl"],
               color: COLORS.mainTextColor,
             }}
-          >
-            How It Works
-          </h2>
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* EV Users */}
-            <div className="bg-white rounded-xl p-8 shadow-lg">
+            >
+          How It Works
+            </h2>
+            <div className="grid md:grid-cols-2 gap-16">
+          <div className="bg-white rounded-xl p-8 shadow-lg">
               <div className="text-center mb-6">
                 <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg className="w-10 h-10 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                    <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24" style={{ color: COLORS.primary }}>
                       <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
                     </svg>
                   </div>
@@ -223,12 +214,11 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Station Owners */}
             <div className="bg-white rounded-xl p-8 shadow-lg">
               <div className="text-center mb-6">
                 <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
-                    <BuildingOfficeIcon className="w-10 h-10 text-orange-600" />
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                    <BuildingOfficeIcon className="w-10 h-10" style={{ color: COLORS.primary }} />
                   </div>
                 </div>
                 <h3
@@ -245,7 +235,7 @@ export default function LandingPage() {
                 <div className="flex items-start gap-4">
                   <div
                     className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                    style={{ backgroundColor: COLORS.HighlightText }}
+                    style={{ backgroundColor: COLORS.primary }}
                   >
                     1
                   </div>
@@ -264,7 +254,7 @@ export default function LandingPage() {
                 <div className="flex items-start gap-4">
                   <div
                     className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                    style={{ backgroundColor: COLORS.HighlightText }}
+                    style={{ backgroundColor: COLORS.primary }}
                   >
                     2
                   </div>
@@ -283,7 +273,7 @@ export default function LandingPage() {
                 <div className="flex items-start gap-4">
                   <div
                     className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                    style={{ backgroundColor: COLORS.HighlightText }}
+                    style={{ backgroundColor: COLORS.primary }}
                   >
                     3
                   </div>
@@ -302,7 +292,7 @@ export default function LandingPage() {
                 <div className="flex items-start gap-4">
                   <div
                     className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                    style={{ backgroundColor: COLORS.HighlightText }}
+                    style={{ backgroundColor: COLORS.primary }}
                   >
                     4
                   </div>
@@ -342,8 +332,8 @@ export default function LandingPage() {
               style={{ backgroundColor: COLORS.background }}
             >
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
-                  <MapIcon className="w-8 h-8 text-green-600" />
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                  <MapIcon className="w-8 h-8" style={{ color: COLORS.primary }} />
                 </div>
               </div>
               <h3
@@ -365,8 +355,8 @@ export default function LandingPage() {
               style={{ backgroundColor: COLORS.background }}
             >
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <BoltIcon className="w-8 h-8 text-yellow-600" />
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                  <BoltIcon className="w-8 h-8" style={{ color: COLORS.primary }} />
                 </div>
               </div>
               <h3
@@ -388,8 +378,8 @@ export default function LandingPage() {
               style={{ backgroundColor: COLORS.background }}
             >
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
-                  <CalendarDaysIcon className="w-8 h-8 text-blue-600" />
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                  <CalendarDaysIcon className="w-8 h-8" style={{ color: COLORS.primary }} />
                 </div>
               </div>
               <h3
@@ -411,8 +401,8 @@ export default function LandingPage() {
               style={{ backgroundColor: COLORS.background }}
             >
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center">
-                  <ChartBarIcon className="w-8 h-8 text-purple-600" />
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                  <ChartBarIcon className="w-8 h-8" style={{ color: COLORS.primary }} />
                 </div>
               </div>
               <h3
@@ -434,8 +424,8 @@ export default function LandingPage() {
               style={{ backgroundColor: COLORS.background }}
             >
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <UsersIcon className="w-8 h-8 text-indigo-600" />
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                  <UsersIcon className="w-8 h-8" style={{ color: COLORS.primary }} />
                 </div>
               </div>
               <h3
@@ -456,8 +446,8 @@ export default function LandingPage() {
               style={{ backgroundColor: COLORS.background }}
             >
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center">
-                  <TrophyIcon className="w-8 h-8 text-amber-600" />
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                  <TrophyIcon className="w-8 h-8" style={{ color: COLORS.primary }} />
                 </div>
               </div>
               <h3
@@ -502,13 +492,9 @@ export default function LandingPage() {
                 For EV Users
               </h3>
               <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                  </div>
-                  <div>
+                <div className="flex gap-4">
+                  <div className="text-5xl font-bold leading-none self-start" style={{ color: COLORS.primary }}>•</div>
+                  <div className="flex-1">
                     <h4 className="font-semibold mb-1">
                       No More Range Anxiety
                     </h4>
@@ -518,13 +504,9 @@ export default function LandingPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                  </div>
-                  <div>
+                <div className="flex gap-4">
+                  <div className="text-5xl font-bold leading-none self-start" style={{ color: COLORS.primary }}>•</div>
+                  <div className="flex-1">
                     <h4 className="font-semibold mb-1">
                       Real-time Availability & Bookings
                     </h4>
@@ -533,13 +515,9 @@ export default function LandingPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2l2.09 6.26L20 9.27l-5 4.87 1.18 6.88L12 17.77l-4.18 3.25L9 14.14 4 9.27l5.91-1.01L12 2z"/>
-                    </svg>
-                  </div>
-                  <div>
+                <div className="flex gap-4">
+                  <div className="text-5xl font-bold leading-none self-start" style={{ color: COLORS.primary }}>•</div>
+                  <div className="flex-1">
                     <h4 className="font-semibold mb-1">Earn Rewards</h4>
                     <p style={{ color: COLORS.secondaryText }}>
                       Get points for reporting issues, writing reviews, and
@@ -556,32 +534,24 @@ export default function LandingPage() {
                 className="font-bold mb-6 text-center"
                 style={{
                   fontSize: FONTS.sizes["2xl"],
-                  color: COLORS.HighlightText,
+                  color: COLORS.primary,
                 }}
               >
                 For Station Owners
               </h3>
               <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
-                    </svg>
-                  </div>
-                  <div>
+                <div className="flex gap-4">
+                  <div className="text-5xl font-bold leading-none self-start" style={{ color: COLORS.primary }}>•</div>
+                  <div className="flex-1">
                     <h4 className="font-semibold mb-1">Increased Visibility</h4>
                     <p style={{ color: COLORS.secondaryText }}>
                       Reach thousands of EV users across Sri Lanka
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                  </div>
-                  <div>
+                <div className="flex gap-4">
+                  <div className="text-5xl font-bold leading-none self-start" style={{ color: COLORS.primary }}>•</div>
+                  <div className="flex-1">
                     <h4 className="font-semibold mb-1">
                       Automated Revenue Tracking
                     </h4>
@@ -590,11 +560,9 @@ export default function LandingPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <BoltIcon className="w-6 h-6 text-yellow-600" />
-                  </div>
-                  <div>
+                <div className="flex gap-4">
+                  <div className="text-5xl font-bold leading-none self-start" style={{ color: COLORS.primary }}>•</div>
+                  <div className="flex-1">
                     <h4 className="font-semibold mb-1">
                       Hassle-free Management
                     </h4>
@@ -765,17 +733,13 @@ export default function LandingPage() {
             <div className="bg-white p-6 rounded-xl shadow-lg">
               <div className="flex items-center mb-4">
                 <img
-                  src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
-                  alt="User profile"
+                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+                  alt="John Doe profile"
                   className="w-12 h-12 rounded-full object-cover mr-3"
                 />
                 <div>
-                  <div className="flex mb-1 gap-1">
-                    <StarIcon className="w-4 h-4 fill-current" style={{ color: COLORS.star }} />
-                    <StarIcon className="w-4 h-4 fill-current" style={{ color: COLORS.star }} />
-                    <StarIcon className="w-4 h-4 fill-current" style={{ color: COLORS.star }} />
-                    <StarIcon className="w-4 h-4 fill-current" style={{ color: COLORS.star }} />
-                    <StarIcon className="w-4 h-4 fill-current" style={{ color: COLORS.star }} />
+                  <div className="flex mb-1">
+                    <span style={{ color: COLORS.star }}>⭐⭐⭐⭐⭐</span>
                   </div>
                   <p
                     style={{
@@ -783,7 +747,7 @@ export default function LandingPage() {
                       fontSize: FONTS.sizes.sm,
                     }}
                   >
-                    Tesla Owner, Galle
+                    John Doe - Tesla Owner, Galle
                   </p>
                 </div>
               </div>
@@ -913,7 +877,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button
-              className="inline-flex items-center justify-center rounded-lg font-semibold transform hover:scale-105 transition-transform"
+              className="inline-flex items-center justify-center rounded-lg font-semibold transform hover:scale-105 transition-transform gap-3"
               style={{
                 padding: "1rem 2rem",
                 backgroundColor: "white",
@@ -921,11 +885,12 @@ export default function LandingPage() {
                 fontSize: FONTS.sizes.lg,
               }}
             >
-              📱 Download App
+              <DevicePhoneMobileIcon className="w-6 h-6" style={{ color: COLORS.primary }} />
+              <span>Download App</span>
             </button>
             <Link
               to="/auth?mode=signup"
-              className="inline-flex items-center justify-center rounded-lg font-semibold border-2 border-white hover:bg-white transition-colors"
+              className="inline-flex items-center justify-center rounded-lg font-semibold border-2 border-white hover:bg-white transition-colors gap-3"
               style={{
                 padding: "1rem 2rem",
                 backgroundColor: "transparent",
@@ -933,7 +898,8 @@ export default function LandingPage() {
                 fontSize: FONTS.sizes.lg,
               }}
             >
-              🏢 Join as Station Partner
+              <BuildingOfficeIcon className="w-6 h-6" style={{ color: "white" }} />
+              <span>Join as Station Partner</span>
             </Link>
           </div>
         </div>
@@ -957,8 +923,8 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                  <EnvelopeIcon className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                  <EnvelopeIcon className="w-8 h-8" style={{ color: COLORS.primary }} />
                 </div>
               </div>
               <h3
@@ -974,8 +940,8 @@ export default function LandingPage() {
             </div>
             <div>
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <PhoneIcon className="w-8 h-8 text-green-600" />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                  <PhoneIcon className="w-8 h-8" style={{ color: COLORS.primary }} />
                 </div>
               </div>
               <h3
@@ -996,8 +962,8 @@ export default function LandingPage() {
             </div>
             <div>
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                  <ChatBubbleLeftRightIcon className="w-8 h-8 text-purple-600" />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.primary}20` }}>
+                  <ChatBubbleLeftRightIcon className="w-8 h-8" style={{ color: COLORS.primary }} />
                 </div>
               </div>
               <h3
@@ -1057,16 +1023,7 @@ export default function LandingPage() {
                     About Us
                   </a>
                 </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Press
-                  </a>
-                </li>
+               
                 <li>
                   <a href="#" className="hover:text-white transition-colors">
                     Contact
@@ -1100,11 +1057,7 @@ export default function LandingPage() {
                     Privacy Policy
                   </a>
                 </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Cookie Policy
-                  </a>
-                </li>
+               
               </ul>
             </div>
             <div>
@@ -1133,7 +1086,7 @@ export default function LandingPage() {
           </div>
           <div className="border-t border-gray-700 pt-8 text-center">
             <p className="text-gray-400" style={{ fontSize: FONTS.sizes.sm }}>
-              © 2024 EVION. All rights reserved. Made with ❤️ in Sri Lanka.
+              © 2025 EVION. All rights reserved. Made in Sri Lanka.
             </p>
           </div>
         </div>
