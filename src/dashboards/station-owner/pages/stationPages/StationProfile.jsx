@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
+import { useNavigate } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
 import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
 import DataTable from '../../../../components/ui/DataTable';
@@ -31,6 +32,7 @@ const OwnerViewStation = () => {
     const [sort, setSort] = useState(null);
     const [rating] = useState(4.5); // Sample rating
     const [showAll, setShowAll] = useState(false);
+    const navigate = useNavigate();
 
     const initialDisplayCount = 4;
     const imagesToDisplay = showAll ? stationImages : stationImages.slice(0, initialDisplayCount);
@@ -300,7 +302,7 @@ const OwnerViewStation = () => {
     };
 
     // Table Tab Content
-    const TableTab = ({ title, columns, data }) => (
+    const TableTab = ({ title, columns, data, onRowClick }) => (
         <div className="grid grid-cols-1 gap-0 bg-transparent rounded-lg p-0">
             <DataTableTopBar
                 search={search}
@@ -322,7 +324,7 @@ const OwnerViewStation = () => {
                 filter={filter}
                 sort={sort}
                 search={search}
-                onRowClick={(row) => console.log('Row clicked:', row)}
+                onRowClick={onRowClick}
             />
         </div>
     );
@@ -349,11 +351,13 @@ const OwnerViewStation = () => {
             {/* Tab Content */}
             <div className="mt-6">
                 {activeTab === 'profile' && <ProfileTab />}
+
                 {activeTab === 'chargers' && (
                     <TableTab
                         title="Chargers"
                         columns={chargersColumns}
                         data={chargersData}
+                        onRowClick={(charger) => navigate(`/station-owner/stations/chargerprofile/${charger.chargerID}`)}
                     />
                 )}
                 {/* {activeTab === 'sessions' && (

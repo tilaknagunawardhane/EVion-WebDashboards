@@ -26,7 +26,7 @@ export default function StationCard({ station }) {
   const status = statusConfig[station.status] || statusConfig.active
 
   const openProfile = () => {
-    navigate(`/station-owner/stationprofile/${station.id}`);
+    navigate(`/station-owner/stations/stationprofile/${station.id}`);
   };
 
   return (

@@ -56,7 +56,7 @@ export default function ViewStationRightPanel() {
 
                 {/* DC Chargers Section */}
                 <div className="space-y-2">
-                    <h3 className="font-medium" style={{ fontSize: FONTS.sizes.base, color: COLORS.mainTextColor }}>
+                    <h3 className="font-semibold" style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
                         DC Chargers
                     </h3>
                     {dcChargers.map((charger, index) => (
@@ -73,7 +73,7 @@ export default function ViewStationRightPanel() {
 
                 {/* AC Chargers Section */}
                 <div className="space-y-2">
-                    <h3 className="font-medium" style={{ fontSize: FONTS.sizes.base, color: COLORS.mainTextColor }}>
+                    <h3 className="font-semibold" style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
                         AC Chargers
                     </h3>
                     {acChargers.map((charger, index) => (

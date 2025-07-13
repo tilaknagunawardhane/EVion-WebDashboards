@@ -21,7 +21,7 @@ const ConnectorCard = ({
         <div className="p-3 rounded-lg bg-white relative">
             <div className="flex justify-between items-start">
                 <div className="flex-1">
-                    <p className="text-sm font-medium mb-1" style={{ color: COLORS.mainTextColor }}>
+                    <p className="text-sm font-normal mb-1" style={{ color: COLORS.mainTextColor }}>
                         {name}
                     </p>
                     <p className="text-xs mb-5" style={{ color: typeColor }}>
