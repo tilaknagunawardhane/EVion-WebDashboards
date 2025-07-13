@@ -37,14 +37,14 @@ const PageHeader = ({ title }) => {
 
   return (
     <div className="flex justify-between items-center mb-8 w-full">
-      <h1 className="text-xl sm:text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
+      <h1 className="text-xl sm:text-2xl font-semibold" style={{ color: COLORS.mainTextColor }}>
         {title}
       </h1>
       
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Chat Button */}
         <button
-          onClick={() => handleButtonClick('/chat')}
+          onClick={() => handleButtonClick('/admin/chat')}
           className={`p-2 rounded-full transition-all ${
             activeButton === 'chat' ? 'bg-[rgba(0,184,148,0.1)]' : 'hover:bg-[rgba(0,184,148,0.1)]'
           }`}

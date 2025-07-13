@@ -22,6 +22,7 @@ import UserAccountPage from '../dashboards/admin/pages/userPages/userAccount'
 import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
 import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
 import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
+import ChatPage from '../dashboards/admin/pages/Chat'
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,7 @@ const router = createBrowserRouter([
           { path: 'stations/requests', element: <RequestsPage/>},
           { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
           { path: 'stations/:id', element: <ViewStation/>},
+          { path: 'chat', element: <ChatPage/>},
 
         ]
       },
