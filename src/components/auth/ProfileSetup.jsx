@@ -4,6 +4,8 @@ import evionLogo from '../../assets/Logo 2.svg';
 // import stationImage from '../../assets/station2.svg';
 import Button from '../../components/ui/Button';
 import InputField from '../../components/ui/InputField';
+import { Navigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const steps = [
   { id: 1, label: 'Business & Legal Details' },
@@ -43,6 +45,8 @@ const banks = [
 ];
 
 export default function AccountSetup() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     business: '',
@@ -118,6 +122,32 @@ export default function AccountSetup() {
 
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 5000);
+    
+    navigate('/initaddstation', {
+      state: {
+        userData: {
+          name: searchParams.get("name") || "-",
+          email: searchParams.get("email") || "-",
+          sections: [
+            {
+              'Business Name': formData.business,
+              'District': formData.district,
+              'Reg No': formData.reg,
+              'Tax ID': formData.tax,
+            },
+            {
+              'Account Holder': formData.accountholder,
+              'Bank': formData.bank,
+              'Account Number': formData.accountnumber,
+            },
+            {
+              'NIC': formData.idNumber,
+              'NIC Image': formData.nicImage ? 'Uploaded' : 'Not Uploaded',
+            }
+          ]
+        }
+      }
+    });
   };
 
   const renderFormContent = () => {

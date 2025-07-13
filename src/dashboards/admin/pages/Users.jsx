@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import DataTableTopBar from '../components/DataTableTopBar';
-import DataTable from '../components/DataTable';
+import DataTableTopBar from '../../../components/ui/DataTableTopBar';
+import DataTable from '../../../components/ui/DataTable';
 import UsersRightPanel from '../components/UsersRightPanel';
 import { COLORS, FONTS } from '../../../constants';
 import NotificationsIcon from '../../../assets/notifications.svg';
 import OverviewCard from '../components/OverviewCard';
+import { useNavigate } from 'react-router-dom';
+import AdminPageHeader from '../components/AdminPageHeader';
 
 export default function UsersPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState('Date of Registration');
@@ -76,6 +79,7 @@ export default function UsersPage() {
   // More comprehensive sample user data
   const userData = [
     {
+      id: '001',
       Name: 'John Doe',
       Email: 'john@example.com',
       'Contact Number': '+1234567890',
@@ -93,8 +97,8 @@ export default function UsersPage() {
       'Account Status': 'Active',
       'Quick Actions': ['View', 'Disable', 'Delete'],
       flagged: false
-    },
-    {
+    }, {
+      id: '002',
       Name: 'Jane Smith',
       Email: 'jane@example.com',
       'Contact Number': '+1987654321',
@@ -114,6 +118,7 @@ export default function UsersPage() {
       flagged: true
     },
     {
+      id: '003',
       Name: 'Robert Johnson',
       Email: 'robert@example.com',
       'Contact Number': '+1122334455',
@@ -141,26 +146,7 @@ export default function UsersPage() {
       backgroundColor: COLORS.background,
     }}>
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-          EV Users Overview
-        </h1>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <img
-              src={NotificationsIcon}
-              alt="Notifications"
-              style={{
-                width: '24px',
-                height: '24px',
-                cursor: 'pointer'
-              }}
-            />
-            <span className="absolute top-0 right-0 w-2 h-2 rounded-full"
-              style={{ backgroundColor: COLORS.primary }}></span>
-          </div>
-        </div>
-      </div>
+      <AdminPageHeader title="EV Users Overview" />
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -199,6 +185,30 @@ export default function UsersPage() {
                 filter={filter}
                 sort={sort}
                 search={search}
+                onRowClick={(user) => {
+                  // Navigate to user detail page with user ID or email
+                  // This assumes you have a route like '/users/:id'
+                  navigate(`/admin/users/${user.id}`);
+                }}
+                customActions={(user) => (
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="px-2.5 py-1 text-xs font-medium flex items-center gap-1"
+                      style={{ color: COLORS.primary }}
+                      onClick={() => console.log('View user', user.id)}
+
+                    >
+                      View
+                    </button>
+                    <button
+                      className="px-2.5 py-1 text-xs font-medium flex items-center gap-1"
+                      style={{ color: COLORS.danger }}
+                      onClick={() => console.log('Delete user', user.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               />
             </div>
           </OverviewCard>
@@ -207,9 +217,9 @@ export default function UsersPage() {
         {/* Right Side - 1/4 width */}
         <div className="lg:col-span-1">
           <div className="sticky top-6 space-y-6">
-            <UsersRightPanel 
-              users={users.length > 0 ? users : userData} 
-              requests={requests} 
+            <UsersRightPanel
+              users={users.length > 0 ? users : userData}
+              requests={requests}
             />
           </div>
         </div>
