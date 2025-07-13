@@ -17,6 +17,7 @@ import { AuthProvider } from '../contexts/AuthContext'
 
 import AdminDash from '../dashboards/admin/pages/Dash'
 import SupportOfficerDash from '../dashboards/support-officer/pages/Dash'
+import ChargingStationsOverview from '../dashboards/support-officer/pages/ChargingStationsOverview'
 import AdminStaionsPage from '../dashboards/admin/pages/ChargingStations'
 import SupportOfficerRoute from './SupportOfficerRoute'
 
@@ -55,7 +56,8 @@ const router = createBrowserRouter([
         path: 'support-officer',
         element: <PrivateRoute><SupportOfficerRoute><SupportOfficerDashboard /></SupportOfficerRoute></PrivateRoute>,
         children: [
-          {path: 'dashboard', element: <SupportOfficerDash />},
+          { path: 'dashboard', element: <SupportOfficerDash />},
+          { path: 'chargingStations', element:<ChargingStationsOverview />},
           { path: 'tasks', element: <TasksPage /> }
         ]
       }

@@ -23,7 +23,8 @@ export default function SupportOfficerDashboardPage() {
     }
 
     return (
-        <div style={{ fontFamily: FONTS.family.sans, padding: '24px' }}>
+        <div style={{ fontFamily: FONTS.family.sans, padding: '24px', backgroundColor:COLORS.background
+         }}>
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>

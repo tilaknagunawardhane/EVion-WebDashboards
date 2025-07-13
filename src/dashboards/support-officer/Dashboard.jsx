@@ -27,7 +27,7 @@ export default function SupportOfficerDashboard() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/support-officer/charging-staions"
+                  to="/support-officer/dashboard"
                   className="flex items-center px-4 py-2 rounded-md"
                   style={{ color: '#2d3436' }}
                 >
@@ -37,7 +37,7 @@ export default function SupportOfficerDashboard() {
               </li>
               <li>
                 <Link
-                  to="/support-officer/charging-staions"
+                  to="/support-officer/chargingStations"
                   className="flex items-center px-4 py-2 rounded-md"
                   style={{ color: '#2d3436' }}
                 >
