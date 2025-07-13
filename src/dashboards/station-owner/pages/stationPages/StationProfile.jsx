@@ -106,31 +106,46 @@ const OwnerViewStation = () => {
     // Sample data for tables
     const chargersData = [
         { 
-            id: 'EVDC0001', 
-            name: 'HyperCharge Dual-Port', 
-            joined: '2023-01-15', 
-            type: 'DC Fast Charger', 
-            power: '150 kW',
-            connectors: ['CCS1', 'CHAdeMO'],
-            price: '55.00',
-            sessions: '232',
-            revenue: '3,300,500',
-            reports: '0', 
-            status: 'in-use',
-            actions: ['View', 'Disable', 'Delete']  
+            'chargerID': 'EVDC0001', 
+            'Charger Name': 'HyperCharge Dual-Port', 
+            'Joined On': '2023-01-15', 
+            'Power Type': 'DC Fast Charger', 
+            'Maximum Power Output(kW)': '150 kW',
+            'Connectors': ['CCS1', 'CHAdeMO'],
+            'Unit Price(per kW)': '55.00',
+            'Total Sessions': '232',
+            'Revenue': '3,300,500',
+            'No of Active Reports': '0', 
+            'Charger Status': 'Active',
+            'Quick Actions': ['View', 'Disable', 'Delete']  
         },
         { 
-            id: 'EVDC0002', 
-            name: 'FastCharge DC', 
-            joined: '2022-11-10', 
-            type: 'DC Fast Charger', 
-            power: '60 kW',
-            connectors: ['CCS2'],
-            price: '55.00',
-            sessions: '560',
-            revenue: '5,000,000',
-            reports: '0',
-            status: 'reserved',  
+            'chargerID': 'EVDC0002', 
+            'Charger Name': 'FastCharge DC', 
+            'Joined On': '2022-11-10', 
+            'Power Type': 'DC Fast Charger', 
+            'Maximum Power Output(kW)': '60 kW',
+            'Connectors': ['CCS2'],
+            'Unit Price(per kW)': '55.00',
+            'Total Sessions': '560',
+            'Revenue': '5,000,000',
+            'No of Active Reports': '0',
+            'Charger Status': 'disabled', 
+            'Quick Actions': ['View', 'Disable', 'Delete']   
+        },
+        { 
+            'chargerID': 'EVAC0003', 
+            'Charger Name': 'AC Charger 1', 
+            'Joined On': '', 
+            'Power Type': 'AC Charger', 
+            'Maximum Power Output(kW)': '12 kW',
+            'Connectors': ['Type1'],
+            'Unit Price(per kW)': '42.00',
+            'Total Sessions': '',
+            'Revenue': '',
+            'No of Active Reports': '',
+            'Charger Status': 'Pending-Approval', 
+            'Quick Actions': ['View', 'Disable', 'Delete']   
         }
     ];
 
@@ -142,21 +157,6 @@ const OwnerViewStation = () => {
     // Table columns configuration
     const chargersColumns = ['chargerID', 'Charger Name', 'Joined On', 'Power Type', 'Maximum Power Output(kW)', 'Connectors', 'Unit Price(per kW)', 'Total Sessions', 'Revenue', 'No of Active Reports', 'Charger Status', 'Quick Actions'];
     // const sessionsColumns = ['ID', 'User', 'Duration', 'Energy', 'Cost', 'Date'];
-
-    // const chargersColumns = [
-    //     { key: 'id', label: 'chargerID'}, 
-    //     { key: 'name', label: 'Charger Name'}, 
-    //     { key: 'joined', label: 'Joined On'}, 
-    //     { key: 'type', label: 'Power Type'},
-    //     { key: 'power', label: 'Maximum Power Output(kW)'}, 
-    //     { key: 'connectors', label: 'Connectors', render: (value) => value.join(', ')}, 
-    //     { key: 'price', label: 'Unit Price(per kW)'}, 
-    //     { key: 'sessions', label: 'Total Sessions'}, 
-    //     { key: 'revenue', label: 'Revenue'}, 
-    //     { key: 'reports', label: 'No of Active Reports'}, 
-    //     { key: 'status', label: 'Charger Status'}, 
-    //     { key: 'actions', label: 'Quick Actions'}
-    // ];
 
     // Profile Tab Content
     const ProfileTab = () => {

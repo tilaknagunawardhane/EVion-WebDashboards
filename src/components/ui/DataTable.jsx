@@ -20,6 +20,7 @@ const getStatusStyle = (status) => {
     'In Progress': { background: '#fadba9', color: COLORS.mainTextColor },
     'New': { background: '#d0e0ff', color: COLORS.primary },
     'Refunded': { background: '#d0f0fd', color: COLORS.primary },
+    'Pending Approval': { background: COLORS.star, color: COLORS.primary },
     'Default': { background: COLORS.bgGreen, color: COLORS.primary }
   };
   
@@ -44,6 +45,7 @@ const getStatusDotColor = (status) => {
     'In Progress': COLORS.HighlightText,
     'New': COLORS.primary,
     'Refunded': COLORS.primary,
+    'Pending-Approval': COLORS.star,
     'Default': COLORS.primary
   };
   

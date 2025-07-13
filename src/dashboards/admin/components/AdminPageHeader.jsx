@@ -37,7 +37,7 @@ const PageHeader = ({ title }) => {
 
   return (
     <div className="flex justify-between items-center mb-8 w-full bg-white px-8 py-2 shadow-sm rounded-xl">
-      <h1 className="text-sm sm:text-base font-normal" style={{ color: COLORS.mainTextColor }}>
+      <h1 className="text-sm sm:text-base font-medium" style={{ color: COLORS.mainTextColor }}>
         {title}
       </h1>
       
