@@ -192,6 +192,18 @@ const renderQuickActions = (actions, rowData) => {
       ),
       color: COLORS.danger,
       onClick: () => console.log('Delete', rowData)
+    },
+    'View Receipt': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
     }
   };
 

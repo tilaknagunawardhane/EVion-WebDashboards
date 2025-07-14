@@ -142,11 +142,104 @@ const OwnerViewStation = () => {
     };
 
     const sessionsData = [
-        { id: 1, user: 'John Doe', duration: '45 min', energy: '32 kWh', cost: 'LKR 1,250', date: '2023-05-15' },
-        { id: 2, user: 'Jane Smith', duration: '1h 15min', energy: '48 kWh', cost: 'LKR 1,890', date: '2023-05-14' }
+    {
+        SessionID: 'S001',
+        Date: '2025-07-10',
+        'Connector Used': 'Type 2',
+        Vehicle: 'Tesla Model 3',
+        'Started At': '09:00 AM',
+        'Ended At': '10:30 AM',
+        Duration: '1h 30m',
+        'Total Energy Delivered(kWh)': 15.5,
+        'BookingID/Walk-in': 'BKG12345',
+        'Charging Cost(LKR)': 775.00,
+        'Penalties Received': 'None',
+        'Total Payment': 775.00,
+        'Payment Status': 'Paid',
+        'Ratings Given': 5,
+        'Issue Reported?': 'No',
+        'Any actions taken to resolve': 'N/A',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        SessionID: 'S002',
+        Date: '2025-07-10',
+        'Connector Used': 'CCS2',
+        Vehicle: 'Nissan Leaf',
+        'Started At': '11:15 AM',
+        'Ended At': '11:45 AM',
+        Duration: '30m',
+        'Total Energy Delivered(kWh)': 22.0,
+        'BookingID/Walk-in': 'Walk-in',
+        'Charging Cost(LKR)': 1100.00,
+        'Penalties Received': 'None',
+        'Total Payment': 1100.00,
+        'Payment Status': 'Paid',
+        'Ratings Given': 4,
+        'Issue Reported?': 'No',
+        'Any actions taken to resolve': 'N/A',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        SessionID: 'S003',
+        Date: '2025-07-11',
+        'Connector Used': 'CHAdeMO',
+        Vehicle: 'Hyundai Kona EV',
+        'Started At': '02:00 PM',
+        'Ended At': '02:50 PM',
+        Duration: '50m',
+        'Total Energy Delivered(kWh)': 35.0,
+        'BookingID/Walk-in': 'BKG12346',
+        'Charging Cost(LKR)': 1750.00,
+        'Penalties Received': 200.00,
+        'Total Payment': 1950.00,
+        'Payment Status': 'Pending',
+        'Ratings Given': 'N/A',
+        'Issue Reported?': 'Yes - Connector Malfunction',
+        'Any actions taken to resolve': 'Technician dispatched',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        SessionID: 'S004',
+        Date: '2025-07-12',
+        'Connector Used': 'Type 2',
+        Vehicle: 'MG ZS EV',
+        'Started At': '08:30 AM',
+        'Ended At': '12:00 PM',
+        Duration: '3h 30m',
+        'Total Energy Delivered(kWh)': 28.0,
+        'BookingID/Walk-in': 'BKG12347',
+        'Charging Cost(LKR)': 1400.00,
+        'Penalties Received': 'None',
+        'Total Payment': 1400.00,
+        'Payment Status': 'Paid',
+        'Ratings Given': 5,
+        'Issue Reported?': 'No',
+        'Any actions taken to resolve': 'N/A',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        SessionID: 'S005',
+        Date: '2025-07-12',
+        'Connector Used': 'CCS2 DC',
+        Vehicle: 'Porsche Taycan',
+        'Started At': '04:00 PM',
+        'Ended At': '04:20 PM',
+        Duration: '20m',
+        'Total Energy Delivered(kWh)': 40.0,
+        'BookingID/Walk-in': 'Walk-in',
+        'Charging Cost(LKR)': 2000.00,
+        'Penalties Received': 'None',
+        'Total Payment': 2000.00,
+        'Payment Status': 'Paid',
+        'Ratings Given': 'N/A',
+        'Issue Reported?': 'No',
+        'Any actions taken to resolve': 'N/A',
+        'Quick Actions': ['View Receipt']
+    }
     ];
 
-    const sessionsColumns = ['ID', 'User', 'Duration', 'Energy', 'Cost', 'Date'];
+    const sessionsColumns = ['SessionID', 'Date', 'Connector Used', 'Vehicle', 'Started At', 'Ended At', 'Duration', 'Total Energy Delivered(kWh)', 'BookingID/Walk-in', 'Charging Cost(LKR)', 'Penalties Received', 'Total Payment', 'Payment Status', 'Ratings Given', 'Issue Reported?', 'Any actions taken to resolve', 'Quick Actions'];
 
     // Overview Tab Content
     const OverviewTab = () => {
