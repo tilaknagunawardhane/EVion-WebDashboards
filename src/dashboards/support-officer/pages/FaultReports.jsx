@@ -6,6 +6,7 @@ import DataTableTopBar from "../../../components/ui/DataTableTopBar";
 import OverviewCard from "../../admin/components/OverviewCard";
 import PageHeader from "../../admin/components/AdminPageHeader";
 import TabBar from "../../../components/ui/TabBar";
+import FaultReportRightPanel from "../components/FaultReportRightPanel";
 
 export default function FaultReportsPage(){
         const { id } = useParams();
@@ -216,10 +217,21 @@ export default function FaultReportsPage(){
                                     />
                                 </div>
                             </OverviewCard>
-                            
+
                         </div>
-                    </div>  
-                </div>
+                    </div>
+
+                    {/* Right Side - 1/4 width */}
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-6 space-y-6">
+                        <FaultReportRightPanel
+                            // users={users.length > 0 ? users : userData}
+                            // requests={requests}
+                        />
+                        </div>
+                    </div>
+
+                </div>  
             </div>
         )
 }

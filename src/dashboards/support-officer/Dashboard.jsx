@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { useAuth } from '../../contexts/AuthContext'
+// import { useAuth } from '../../contexts/AuthContext'
 import DashboardIcon from '../../assets/dashboard_black_icon.svg'
 import StationIcon from '../../assets/stations.svg'
 import AlertIcon from '../../assets/alert_black_icon.svg'
@@ -37,7 +37,7 @@ export default function SupportOfficerDashboard() {
     
     { 
       name: 'Settings', 
-      path: '/station-owner/settings', 
+      path: '/support-officer/settings', 
       icon: SettingsIcon
     },
     
