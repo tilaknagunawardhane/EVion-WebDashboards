@@ -27,7 +27,6 @@ export default function ChargingStationsOverviewPage(){
     ];
 
     const tabData = {
-        hee: {
             columns: [
             'Station Name',
             'Owner Name',
@@ -66,7 +65,6 @@ export default function ChargingStationsOverviewPage(){
             'Tesla': 1,
             'Status': 'Active',
         },]
-        }
 
     }
 
@@ -110,8 +108,8 @@ export default function ChargingStationsOverviewPage(){
                                 boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
                                 }}>
                                 <DataTable
-                                columns={tabData['hee'].columns}
-                                data={tabData['hee'].data}
+                                columns={tabData.columns}
+                                data={tabData.data}
                                 filter={filter}
                                 sort={sort}
                                 search={search}

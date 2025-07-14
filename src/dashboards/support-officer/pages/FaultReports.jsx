@@ -68,7 +68,7 @@ export default function FaultReportsPage(){
                     'Status': 'Resolved',
                     'Resolved On': '2025-07-03',
                     'Specific Actions Took To Resolve': 'Replaced faulty power module and updated firmware.',
-                    // 'Quick Actions': 'View'
+                    'Quick Actions': ['View']
                 }]
             },
 
@@ -104,7 +104,7 @@ export default function FaultReportsPage(){
                     'Status': 'In Progress',
                     'Resolved On': '',
                     'Specific Actions Took To Resolve': '',
-                    // 'Quick Actions': 'View'
+                    'Quick Actions': ['View']
                 }
                 ]
             },
@@ -147,7 +147,7 @@ export default function FaultReportsPage(){
                     'Status': 'Resolved',
                     'Resolved On': '2025-07-13',
                     'Specific Actions Took To Resolve': 'Reset the connector port and ran diagnostics. Issue cleared.',
-                    // 'Quick Actions': 'View'
+                    'Quick Actions': ['View']
                 }
                 ]
 
