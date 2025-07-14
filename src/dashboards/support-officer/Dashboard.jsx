@@ -47,7 +47,7 @@ export default function SupportOfficerDashboard() {
               </li>
               <li>
                 <Link
-                  to="/support-officer/charging-staions"
+                  to="/support-officer/faultReports"
                   className="flex items-center px-4 py-2 rounded-md"
                   style={{ color: '#2d3436' }}
                 >
