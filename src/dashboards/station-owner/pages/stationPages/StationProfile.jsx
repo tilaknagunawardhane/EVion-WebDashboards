@@ -67,6 +67,7 @@ const OwnerViewStation = () => {
     const tabs = [
         { id: 'profile', label: 'Profile' },
         { id: 'chargers', label: 'Chargers' },
+        { id: 'earnings', label: 'Earnings'},
         { id: 'stats', label: 'Stats'}
     ];
 
@@ -74,9 +75,8 @@ const OwnerViewStation = () => {
     const mobileLabels = {
         profile: 'Profile',
         chargers: 'Chargers',
-        sessions: 'Sessions',
-        transactions: 'Transactions',
-        faults: 'Faults'
+        earnings: 'Earnings',
+        stats: 'Stats'
     };
 
     // Render stars based on rating
