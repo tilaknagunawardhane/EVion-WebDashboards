@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
 import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
 import DataTable from '../../../../components/ui/DataTable';
 import StarIcon from '../../../../assets/star-filled.svg';
 import StarOutlineIcon from '../../../../assets/star-outline.svg';
 import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
-import ChargerBookingViews from '../../components/chargerComponents/ChargerBookingsViewCard'
+import ConnectorView from '../../components/chargerComponents/ConnectorCard'
 
 const OwnerViewStation = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     // Sample station data
     const station = {
@@ -40,6 +40,7 @@ const OwnerViewStation = () => {
         powerSource: "Solar", 
     };
 
+    // Sample charger data
     const charger = { 
         'chargerID': 'EVDC0001', 
         'Charger Name': 'HyperCharge Dual-Port', 
@@ -55,6 +56,70 @@ const OwnerViewStation = () => {
         'Quick Actions': ['View', 'Disable', 'Delete']  
     };
 
+    // Sample connector data
+    const connectorsData = [
+        {
+            connectorName:"CCS1",
+            session:null,
+            bookings: [
+            { dateOffset: 0, startTime: "00:00", endTime: "01:30" },
+            { dateOffset: 0, startTime: "04:30", endTime: "05:00" },
+            { dateOffset: 0, startTime: "09:00", endTime: "11:30" },
+            { dateOffset: 0, startTime: "13:00", endTime: "13:30" },
+            { dateOffset: 0, startTime: "14:00", endTime: "14:30" },
+            { dateOffset: 0, startTime: "15:30", endTime: "17:00" },
+
+            { dateOffset: 1, startTime: "03:00", endTime: "04:30" },
+            { dateOffset: 1, startTime: "08:00", endTime: "09:30" },
+            { dateOffset: 1, startTime: "14:00", endTime: "14:30" },
+            { dateOffset: 1, startTime: "19:30", endTime: "20:00" },
+
+            { dateOffset: 2, startTime: "15:00", endTime: "15:30" },
+            ],   
+        },
+        {
+            connectorName: "CHAdeMO",
+            session: {
+                vehicle: "Nissan Leaf",
+                startDate: "2025-07-14",
+                startTime: "11:00",
+                endTime: "11:30",
+                energy: 12.3,
+                cost: 450,
+                progress: 62,
+            },
+            bookings: [
+            { dateOffset: 0, startTime: "00:00", endTime: "01:30" },
+            { dateOffset: 0, startTime: "04:30", endTime: "05:00" },
+            { dateOffset: 0, startTime: "09:00", endTime: "11:30" },
+            { dateOffset: 0, startTime: "13:00", endTime: "13:30" },
+            { dateOffset: 0, startTime: "14:00", endTime: "14:30" },
+            { dateOffset: 0, startTime: "15:30", endTime: "17:00" },
+
+            { dateOffset: 1, startTime: "03:00", endTime: "04:30" },
+            { dateOffset: 1, startTime: "08:00", endTime: "09:30" },
+            { dateOffset: 1, startTime: "14:00", endTime: "14:30" },
+            { dateOffset: 1, startTime: "19:30", endTime: "20:00" },
+
+            { dateOffset: 2, startTime: "15:00", endTime: "15:30" },
+            ],  
+        }
+    ];
+
+    const timeSlots = [
+    "00:00 - 00:30", "00:30 - 01:00", "01:00 - 01:30", "01:30 - 02:00",
+    "02:00 - 02:30", "02:30 - 03:00", "03:00 - 03:30", "03:30 - 04:00",
+    "04:00 - 04:30", "04:30 - 05:00", "05:00 - 05:30", "05:30 - 06:00",
+    "06:00 - 06:30", "06:30 - 07:00", "07:00 - 07:30", "07:30 - 08:00",
+    "08:00 - 08:30", "08:30 - 09:00", "09:00 - 09:30", "09:30 - 10:00",
+    "10:00 - 10:30", "10:30 - 11:00", "11:00 - 11:30", "11:30 - 12:00",
+    "12:00 - 12:30", "12:30 - 13:00", "13:00 - 13:30", "13:30 - 14:00",
+    "14:00 - 14:30", "14:30 - 15:00", "15:00 - 15:30", "15:30 - 16:00",
+    "16:00 - 16:30", "16:30 - 17:00", "17:00 - 17:30", "17:30 - 18:00",
+    "18:00 - 18:30", "18:30 - 19:00", "19:00 - 19:30", "19:30 - 20:00",
+    "20:00 - 20:30", "20:30 - 21:00", "21:00 - 21:30", "21:30 - 22:00",
+    "22:00 - 22:30", "22:30 - 23:00", "23:00 - 23:30", "23:30 - 24:00",
+    ];
 
     // Tab configuration
     const tabs = [
@@ -150,48 +215,21 @@ const OwnerViewStation = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="space-y-4 bg-white rounded-xl px-8 py-4 ">
-
-                        <ChargerBookingViews
-                            connectorName="CCS2"
-                            session={null}
-                            bookings={[
-                                { startTime: "14:00", endTime: "14:30" },
-                                { startTime: "15:30", endTime: "16:30" }
-                            ]}
-                            timeSlots={[
-                                "00:00 AM - 00:30 AM", "00:30 AM - 01:00 AM",
-                                "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00",
-                                "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"
-                            ]}
+                    {connectorsData.map((connector, idx) => (
+                        <div key={idx} className="space-y-4 bg-white rounded-xl p-8">
+                        <ConnectorView
+                            connectorName={connector.connectorName}
+                            session={connector.session}
+                            bookings={connector.bookings}
+                            timeSlots={timeSlots}
+                            onEdit={() => console.log('Edit', connector.connectorName)}
+                            onDisable={() => console.log('Disable', connector.connectorName)}
+                            onRemove={() => console.log('Remove', connector.connectorName)}
                         />
-
-                    </div>
-
-                    <div className="space-y-4 bg-white rounded-xl p-8">
-                        <ChargerBookingViews
-                            connectorName="CCS2"
-                            session={{
-                                vehicle: "Nissan Leaf",
-                                startDate: "2025-07-13", 
-                                startTime: "11:00",
-                                endTime: "13:30",
-                                energy: 12.3,
-                                cost: 450,
-                                progress: 62,
-                            }}
-                            bookings={[
-                                { startTime: "14:00", endTime: "14:30" },
-                                { startTime: "15:30", endTime: "16:30" }
-                            ]}
-                            timeSlots={[
-                                "00:00 AM - 00:30 AM", "00:30 AM - 01:00 AM",
-                                "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00",
-                                "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"
-                            ]}
-                        />
-                    </div>
+                        </div>
+                    ))}
                 </div>
+
             </div>
         );
     };
