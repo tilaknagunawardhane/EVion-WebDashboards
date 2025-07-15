@@ -151,14 +151,82 @@ const OwnerViewStation = () => {
         }
     ];
 
-    // const sessionsData = [
-    //     { id: 1, user: 'John Doe', duration: '45 min', energy: '32 kWh', cost: 'LKR 1,250', date: '2023-05-15' },
-    //     { id: 2, user: 'Jane Smith', duration: '1h 15min', energy: '48 kWh', cost: 'LKR 1,890', date: '2023-05-14' }
-    // ];
+   const transactionsData = [
+    {
+        TransactionID: 'TRN001',
+        'Date & Time': '2025-07-15 10:35 AM',
+        Charger: 'StationA-Charger01',
+        Connector: 'Type 2 AC',
+        SessionID: 'S001',
+        BookingID: 'BKG12345',
+        'Transaction Type': 'Charging Payment',
+        'Amount(LKR)': 775.00,
+        'Commission(LKR)': 77.50, // 10% commission example
+        'Owner Revenue(LKR)': 697.50, // 775 - 77.50
+        'Payment Status': 'Completed',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        TransactionID: 'TRN002',
+        'Date & Time': '2025-07-15 11:50 AM',
+        Charger: 'StationA-Charger02',
+        Connector: 'CCS2 DC',
+        SessionID: 'S002',
+        BookingID: 'Walk-in',
+        'Transaction Type': 'Charging Payment',
+        'Amount(LKR)': 1100.00,
+        'Commission(LKR)': 110.00,
+        'Owner Revenue(LKR)': 990.00,
+        'Payment Status': 'Completed',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        TransactionID: 'TRN003',
+        'Date & Time': '2025-07-16 02:55 PM',
+        Charger: 'StationB-Charger03',
+        Connector: 'CHAdeMO DC',
+        SessionID: 'S003',
+        BookingID: 'BKG12346',
+        'Transaction Type': 'Charging Payment',
+        'Amount(LKR)': 1750.00,
+        'Commission(LKR)': 175.00,
+        'Owner Revenue(LKR)': 1575.00,
+        'Payment Status': 'Pending',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        TransactionID: 'TRN004',
+        'Date & Time': '2025-07-16 03:00 PM',
+        Charger: 'N/A', // Penalties are not directly tied to a specific charger use for the transaction itself
+        Connector: 'N/A',
+        SessionID: 'S003',
+        BookingID: 'BKG12346',
+        'Transaction Type': 'Penalty Fee',
+        'Amount(LKR)': 200.00,
+        'Commission(LKR)': 20.00, // Commission on penalty might apply
+        'Owner Revenue(LKR)': 180.00,
+        'Payment Status': 'Pending',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        TransactionID: 'TRN005',
+        'Date & Time': '2025-07-17 09:35 AM',
+        Charger: 'N/A',
+        Connector: 'N/A',
+        SessionID: 'N/A',
+        BookingID: 'BKG12348',
+        'Transaction Type': 'Late Cancellation',
+        'Amount(LKR)': 1900.00, // Negative for refund
+        'Commission(LKR)': null, // Reflects commission reversal if applicable
+        'Owner Revenue(LKR)': null,
+        'Payment Status': 'Pending',
+        'Quick Actions': ['View Receipt']
+    }
+    ]; 
 
     // Table columns configuration
     const chargersColumns = ['chargerID', 'Charger Name', 'Joined On', 'Power Type', 'Maximum Power Output(kW)', 'Connectors', 'Unit Price(per kW)', 'Total Sessions', 'Revenue', 'No of Active Reports', 'Charger Status', 'Quick Actions'];
-    // const sessionsColumns = ['ID', 'User', 'Duration', 'Energy', 'Cost', 'Date'];
+    const transactionsColumns = ['TransactionID', 'Date & Time', 'Charger', 'Connector', 'SessionID', 'BookingID', 'Transaction Type', 'Amount(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
 
     // Profile Tab Content
     const ProfileTab = () => {
@@ -360,20 +428,13 @@ const OwnerViewStation = () => {
                         onRowClick={(charger) => navigate(`/station-owner/stations/chargerprofile/${charger.chargerID}`)}
                     />
                 )}
-                {/* {activeTab === 'sessions' && (
-                    <TableTab
-                        title="Charging Sessions"
-                        columns={sessionsColumns}
-                        data={sessionsData}
-                    />
-                )} */}
-                {/* {activeTab === 'transactions' && (
+                {activeTab === 'transactions' && (
                     <TableTab
                         title="Transactions"
-                        columns={['ID', 'Amount', 'Type', 'Date', 'Status']}
-                        data={[]}
+                        columns={transactionsColumns}
+                        data={transactionsData}
                     />
-                )} */}
+                )}
                 {/* {activeTab === 'faults' && (
                     <TableTab
                         title="Faults & Complaints"

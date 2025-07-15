@@ -341,6 +341,8 @@ const OwnerViewStation = () => {
             Connector: 'Type 2',
             'Transaction Type': 'Charging Payment',
             'Amount (LKR)': 775.00,
+            'Commission(LKR)': 75.00,
+            'Owner Revenue(LKR)': 700.00,
             'Payment Status': 'Completed',
             'Quick Actions': ['View Receipt'],
         },
@@ -352,6 +354,8 @@ const OwnerViewStation = () => {
             Connector: 'CCS2',
             'Transaction Type': 'Charging Payment',
             'Amount (LKR)': 1100.00,
+            'Commission(LKR)': 100.00,
+            'Owner Revenue(LKR)': 1000.00,
             'Payment Status': 'Completed',
             'Quick Actions': ['View Receipt'],
         },
@@ -363,6 +367,8 @@ const OwnerViewStation = () => {
             Connector: 'CHAdeMO',
             'Transaction Type': 'Charging Payment',
             'Amount (LKR)': 1750.00,
+            'Commission(LKR)': 25.000,
+            'Owner Revenue(LKR)': 1500.00,
             'Payment Status': 'Pending',
             'Quick Actions': ['View Receipt'],
         },
@@ -374,6 +380,8 @@ const OwnerViewStation = () => {
             Connector: 'N/A', // Penalty doesn't directly use a connector
             'Transaction Type': 'Late Cancellation Fee',
             'Amount (LKR)': 200.00,
+            'Commission(LKR)': null,
+            'Owner Revenue(LKR)': null,
             'Payment Status': 'Pending',
             'Quick Actions': ['View Receipt'],
         },
@@ -384,7 +392,9 @@ const OwnerViewStation = () => {
             'Date & Time': '2025-07-12 09:35 AM',
             Connector: 'N/A',
             'Transaction Type': 'Charging Payment',
-            'Amount (LKR)': 1900.00, // Negative for refund, assuming a fee was kept
+            'Amount (LKR)': 1900.00,
+            'Commission(LKR)': 300.00,
+            'Owner Revenue(LKR)': 1600.00,
             'Payment Status': 'Completed',
             'Quick Actions': ['View Receipt'],
         }
@@ -392,7 +402,7 @@ const OwnerViewStation = () => {
 
     const sessionsColumns = ['SessionID', 'Date', 'Connector Used', 'Vehicle', 'Started At', 'Ended At', 'Duration', 'Total Energy Delivered(kWh)', 'BookingID/Walk-in', 'Charging Cost(LKR)', 'Penalties Received', 'Total Payment', 'Payment Status', 'Ratings Given', 'Issue Reported?', 'Any actions taken to resolve', 'Quick Actions'];
     const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Connector', 'Vehicle', 'Slot Start Time', 'Slot End Time', 'Booking Status', 'Cancellation Time', 'Reason', 'Estimated Energy (kWh)', 'Estimated Charging Cost (LKR)', 'Penalties Charged', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
-    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Connector', 'Transaction Type', 'Amount (LKR)', 'Payment Status', 'Quick Actions']
+    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Connector', 'Transaction Type', 'Amount (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
 
     // Overview Tab Content
     const OverviewTab = () => {
