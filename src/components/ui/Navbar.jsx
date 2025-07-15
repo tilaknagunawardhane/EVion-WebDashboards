@@ -3,7 +3,6 @@ import { useAuth } from '../../contexts/AuthContext'
 import { COLORS } from '../../constants'
 import logo4 from '../../assets/Logo4.png'
 import evionname from '../../assets/Evion logo.png'
-import evionLogo from '../../assets/Logo 2.svg';
 
 export default function Navbar() {
   const { currentUser, logout } = useAuth()
@@ -28,7 +27,9 @@ export default function Navbar() {
               </Link>
             </div>
           </div>
-          <div className="flex items-center">
+          
+          <div className="flex items-center space-x-4">
+            {/* Auth Section */}
             {currentUser ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm font-medium" style={{ color: '#2d3436' }}>
@@ -36,8 +37,11 @@ export default function Navbar() {
                 </span>
                 <button
                   onClick={logout}
-                  className="text-sm font-medium"
-                  style={{ color: COLORS.secondaryText }}
+                  className="text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                  style={{ 
+                    backgroundColor: COLORS.secondaryText,
+                    color: 'white'
+                  }}
                 >
                   Sign out
                 </button>
@@ -45,8 +49,11 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/auth"
-                className="text-base font-bold"
-                style={{ color: COLORS.mainTextColor }}
+                className="text-base font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                style={{ 
+                  backgroundColor: COLORS.primary,
+                  color: 'white'
+                }}
               >
                 Sign in
               </Link>

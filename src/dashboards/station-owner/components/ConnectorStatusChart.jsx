@@ -1,7 +1,6 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
-import { COLORS } from '../../../constants/colors';
-import { FONTS } from '../../../constants/fonts';
+import { COLORS, FONTS } from '../../../constants'; // Changed to match your other files
 import {
   Chart as ChartJS,
   ArcElement,
@@ -48,7 +47,7 @@ export default function ConnectorStatusChart() {
           pointStyle: 'circle',
           color: COLORS.mainTextColor,
           font: {
-            family: FONTS.family.sans,
+            family: FONTS.family?.sans || 'sans-serif',
             size: 12
           }
         }

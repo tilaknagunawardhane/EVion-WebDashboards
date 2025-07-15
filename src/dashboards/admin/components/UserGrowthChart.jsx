@@ -1,6 +1,6 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { COLORS } from '../../../constants/colors';
+import { COLORS } from '../../../constants'; // Changed from colors to constants
 import {
   Chart as ChartJS,
   CategoryScale,

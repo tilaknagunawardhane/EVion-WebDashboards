@@ -747,7 +747,7 @@ export default function LandingPage() {
                       fontSize: FONTS.sizes.sm,
                     }}
                   >
-                    John Doe - Tesla Owner, Galle
+                   Tesla Owner, Galle
                   </p>
                 </div>
               </div>
