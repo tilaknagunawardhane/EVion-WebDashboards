@@ -6,6 +6,7 @@ import OverviewCard from "../../admin/components/OverviewCard";
 import PageHeader from "../../admin/components/AdminPageHeader";
 import TabBar from "../../../components/ui/TabBar";
 import { CommunityPost, Hashtags, DateTime, Header, Content, Replies } from "../components/CommunityPost";
+import CommunityRightPanel from "../components/CommunityRightPanel";
 
 export default function CommunityPage(){
     // const { id } = useParams();
@@ -36,6 +37,10 @@ export default function CommunityPage(){
         src: 'https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=400&h=200&fit=crop&crop=center',
         alt: 'BYD Atto 3 electric vehicle'
       },
+      {
+        src: 'https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=400&h=200&fit=crop&crop=center',
+        alt: 'BYD Atto 3 electric vehicle'
+      },
       null // This will render as placeholder
     ],
     content: `Hi everyone, I recently bought an EV and noticed that the real-world range I'm getting on 
@@ -56,6 +61,19 @@ export default function CommunityPage(){
       }
     ],
     showViewAll: true
+    };
+
+    const currentUser = {
+    id: '001',
+    Name: 'John Doe',
+    'Account Status': 'Active',
+    };
+
+    const stats = {
+    totalPosts: 25,
+    rejectedPosts: 1,
+    flagsReceived: 3,
+    lastPostOn: '6 Jul, 11:53 AM'
     };
 
     return (
@@ -90,14 +108,14 @@ export default function CommunityPage(){
                 </div>
 
                 {/* Right Side - 1/4 width */}
-                {/* <div className="lg:col-span-1">
+                <div className="lg:col-span-1">
                     <div className="sticky top-6 space-y-6">
-                    <FaultReportRightPanel
-                        // users={users.length > 0 ? users : userData}
-                        // requests={requests}
+                    <CommunityRightPanel
+                        user={currentUser}
+                        stats={stats}
                     />
                     </div>
-                </div> */}
+                </div>
 
             </div>  
         </div>
