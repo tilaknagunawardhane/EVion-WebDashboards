@@ -67,7 +67,7 @@ const OwnerViewStation = () => {
     const tabs = [
         { id: 'profile', label: 'Profile' },
         { id: 'chargers', label: 'Chargers' },
-        { id: 'earnings', label: 'Earnings'},
+        { id: 'transactions', label: 'Transactions Related to Station'},
         { id: 'stats', label: 'Stats'}
     ];
 
@@ -75,7 +75,7 @@ const OwnerViewStation = () => {
     const mobileLabels = {
         profile: 'Profile',
         chargers: 'Chargers',
-        earnings: 'Earnings',
+        transactions: 'Transactions Related to Station',
         stats: 'Stats'
     };
 
