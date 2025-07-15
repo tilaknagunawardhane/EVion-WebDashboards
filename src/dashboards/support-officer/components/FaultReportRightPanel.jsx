@@ -5,6 +5,7 @@ import OverviewCard from '../../admin/components/OverviewCard';
 import UserIcon from '../../../assets/user_icon.svg';
 import StationIcon from '../../../assets/stations.svg';
 import { Colors } from 'chart.js';
+import RenderColoredIcon from './RenderColoredIcon';
 
 export default function FaultReportRightPanel({ users = [], requests = [] }) {
     // User statistics data - these should be passed from the main page or calculated
@@ -100,11 +101,11 @@ export default function FaultReportRightPanel({ users = [], requests = [] }) {
         </OverviewCard>
     );
 
-    const newReportsCard = ( iconBackground = COLORS.bgGreen) => (
+    const newReportsCard = ( iconBackground = COLORS.bgGreen, iconColor = COLORS.bgGreen) => (
         <OverviewCard padding="p-4">
             <div className="self-stretch inline-flex justify-start items-start gap-2">
-                <div className="w-10 h-10 flex items-center justify-center rounded-lg" style={{ backgroundColor: iconBackground, opacity: 0.5}}>
-                        <img src={StationIcon} alt="Users" className="w-5 h-5" />
+                <div className="w-10 h-10 flex items-center justify-center rounded-lg" style={{ backgroundColor: iconBackground, }}>
+                        {RenderColoredIcon(StationIcon, iconColor)}
                 </div>
                 <div className="flex-1 inline-flex flex-col justify-center items-start gap-2">
                     <div className="self-stretch justify-start">
@@ -167,9 +168,9 @@ export default function FaultReportRightPanel({ users = [], requests = [] }) {
                     ))}
                 </div>
 
-                {newReportsCard(COLORS.primary)}
-                {newReportsCard(COLORS.star)}
-                {newReportsCard(COLORS.secondaryText)}
+                {newReportsCard(COLORS.bgGreen, 'green')}
+                {newReportsCard(COLORS.lightYellow, 'yellow')}
+                {newReportsCard(COLORS.stroke, 'black')}
 
             </div>
         </div>

@@ -27,6 +27,7 @@ import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
 import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
 import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
 import FaultReportsPage from '../dashboards/support-officer/pages/FaultReports'
+import CommunityPage from '../dashboards/support-officer/pages/Community'
 
 const router = createBrowserRouter([
   {
@@ -73,6 +74,7 @@ const router = createBrowserRouter([
           { path: 'dashboard', element: <SupportOfficerDash />},
           { path: 'chargingStations', element:<ChargingStationsOverview />},
           { path: 'faultReports', element:<FaultReportsPage /> },
+          { path: 'community', element: <CommunityPage />},
           { path: 'tasks', element: <TasksPage /> }
         ]
       }

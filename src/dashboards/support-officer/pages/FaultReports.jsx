@@ -172,7 +172,6 @@ export default function FaultReportsPage(){
                         tabs={faultReportsTabs}
                         mobileLabels={mobileTabLabels}
                     />
-                    {/* <TabBar activeTab={activeTab} setActiveTab={setActiveTab} /> */}
                 </div>
 
                 {/* Main Content */}

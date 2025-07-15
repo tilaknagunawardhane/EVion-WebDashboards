@@ -12,5 +12,6 @@ export const COLORS = {
     star: '#F5B223',
     danger: '#ff3b30',
     lightRed: '#FF5555',
-    bgRed: '#FAE5E5'
+    bgRed: '#FAE5E5',
+    lightYellow: '#fadba9'
 }
