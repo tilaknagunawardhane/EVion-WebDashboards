@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { COLORS, FONTS } from '../../constants';
 import { useNavigate } from 'react-router-dom';
+import ChatIcon from '../../assets/chat.svg';
+import { color } from 'chart.js/helpers';
 
 const getStatusStyle = (status) => {
   const statusMap = {
@@ -19,9 +21,12 @@ const getStatusStyle = (status) => {
     'Cancelled': { background: COLORS.bgRed, color: COLORS.danger },
     'In Progress': { background: '#fadba9', color: COLORS.mainTextColor },
     'New': { background: '#d0e0ff', color: COLORS.primary },
+    'Pending': { background: COLORS.bgYellow, color: COLORS.HighlightText },
     'Refunded': { background: '#d0f0fd', color: COLORS.primary },
-    'Pending Approval': { background: COLORS.star, color: COLORS.primary },
-    'Default': { background: COLORS.bgGreen, color: COLORS.primary }
+    'Pending-Approval': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'Open': { background: COLORS.bgBlue, color: COLORS.chargerFree },
+    'Investigating': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'Default': { background: COLORS.bgGreen, color: COLORS.primary },
   };
   
   return statusMap[status] || statusMap['Default'];
@@ -45,7 +50,10 @@ const getStatusDotColor = (status) => {
     'In Progress': COLORS.HighlightText,
     'New': COLORS.primary,
     'Refunded': COLORS.primary,
-    'Pending-Approval': COLORS.star,
+    'Pending': COLORS.HighlightText,
+    'Pending-Approval': COLORS.HighlightText,
+    'Open': COLORS.chargerFree,
+    'Investigating': COLORS.HighlightText,
     'Default': COLORS.primary
   };
   
@@ -130,7 +138,7 @@ const renderCellContent = (value, column, rowData) => {
   // Handle dates
   if (column.includes('Date') || column.includes('On')) {
     return (
-      <span style={{ color: COLORS.secondaryText }}>
+      <span style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>
         {value}
       </span>
     );
@@ -168,7 +176,7 @@ const renderQuickActions = (actions, rowData) => {
           <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
         </svg>
       ),
-      color: COLORS.HighlightText,
+      color: COLORS.secondaryText,
       onClick: () => console.log('Disable', rowData)
     },
     'Enable': {
@@ -204,6 +212,18 @@ const renderQuickActions = (actions, rowData) => {
       ),
       color: COLORS.primary,
       onClick: () => console.log('View Receipt', rowData)
+    },
+    'Contact Support Officer': {
+      icon: (
+        <img 
+          src={ChatIcon} 
+          alt="Chat" 
+          className="w-5 h-5"
+          style={{ filter: 'brightness(0)', transition: 'filter 0.2s ease' }}
+        />
+      ),
+      color: COLORS.mainTextColor,
+      onClick: () => console.log('Contact Support Officer', rowData)
     }
   };
 

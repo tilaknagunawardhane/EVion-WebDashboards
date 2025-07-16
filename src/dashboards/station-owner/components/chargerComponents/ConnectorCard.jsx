@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
-import ClockIcon from '../../../../assets/export_icon.svg';
-import EnergyIcon from '../../../../assets/export_icon.svg';
-import CostIcon from '../../../../assets/export_icon.svg';
+import ClockIcon from '../../../../assets/session_time.svg';
+import EnergyIcon from '../../../../assets/session_energy.svg';
+import CostIcon from '../../../../assets/session_cost.svg';
 import { FiMoreVertical } from 'react-icons/fi'; 
 
 const ChargingSessionCard = ({ connectorName, session, bookings, timeSlots, onEdit, onRemove, onDisable }) => {

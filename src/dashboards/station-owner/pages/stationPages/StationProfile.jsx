@@ -132,8 +132,8 @@ const OwnerViewStation = () => {
             'Total Sessions': '560',
             'Revenue': '5,000,000',
             'No of Active Reports': '0',
-            'Charger Status': 'disabled', 
-            'Quick Actions': ['View', 'Disable', 'Delete']   
+            'Charger Status': 'Disabled', 
+            'Quick Actions': ['View', 'Enable', 'Delete']   
         },
         { 
             'chargerID': 'EVAC0003', 
