@@ -40,7 +40,7 @@ const PageHeader = ({ title }) => {
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Chat Button */}
         <button
-          onClick={() => handleButtonClick('/chat')}
+          onClick={() => handleButtonClick('/station-owner/chat')}
           className={`p-2 rounded-full transition-all ${
             activeButton === 'chat' ? 'bg-[rgba(0,184,148,0.1)]' : 'hover:bg-[rgba(0,184,148,0.1)]'
           }`}
