@@ -400,9 +400,49 @@ const OwnerViewStation = () => {
         }
     ];
 
+    const faultsData = [
+        {
+            FaultID: 'FLT001',
+            'Date & Time Reported': '2025-07-15 09:15 AM',
+            'Fault Type': 'Charger',
+            Category: 'Charger not working',
+            Description: 'Charger 01 at Station A is completely unresponsive. No power light.',
+            Connector: 'All',
+            Status: 'Investigating',
+            'Last Update On': '2025-07-15 10:00 AM',
+            'Any actions took to resolve': 'Remote diagnostics initiated. Technician scheduled for 2025-07-15 PM.',
+            'Quick Actions': ['Contact Support Officer']
+        },
+        {
+            FaultID: 'FLT003',
+            'Date & Time Reported': '2025-07-16 07:45 AM',
+            'Fault Type': 'Charger',
+            Category: 'Connector broken',
+            Description: 'CCS2 connector on Charger 02 at Station C is physically damaged. Plastic housing cracked.',
+            Connector: 'CCS2 DC',
+            Status: 'Open',
+            'Last Update On': '2025-07-16 08:00 AM',
+            'Any actions took to resolve': 'Connector taken out of service. Replacement part ordered.',
+            'Quick Actions': ['Contact Support Officer']
+        },
+        {
+            FaultID: 'FLT004',
+            'Date & Time Reported': '2025-07-13 11:00 AM',
+            'Fault Type': 'Booking',
+            Category: 'Occupied by other vehicle',
+            Description: 'Customer reported booked slot at Station A was occupied by another vehicle when arrived.',
+            Connector: 'Type 2 AC',
+            Status: 'Closed',
+            'Last Update On': '2025-07-13 01:30 PM',
+            'Any actions took to resolve': 'Contacted customer, verified issue, issued full refund for the booking. Reminder sent to station staff regarding parking rules.',
+            'Quick Actions': ['Contact Support Officer']
+        },
+    ];
+
     const sessionsColumns = ['SessionID', 'Date', 'Connector Used', 'Vehicle', 'Started At', 'Ended At', 'Duration', 'Total Energy Delivered(kWh)', 'BookingID/Walk-in', 'Charging Cost(LKR)', 'Penalties Received', 'Total Payment', 'Payment Status', 'Ratings Given', 'Issue Reported?', 'Any actions taken to resolve', 'Quick Actions'];
     const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Connector', 'Vehicle', 'Slot Start Time', 'Slot End Time', 'Booking Status', 'Cancellation Time', 'Reason', 'Estimated Energy (kWh)', 'Estimated Charging Cost (LKR)', 'Penalties Charged', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
     const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Connector', 'Transaction Type', 'Amount (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
+    const faultsColumns = ['FaultID', 'Date & Time Reported', 'Fault Type', 'Category', 'Description', 'Connector', 'Status', 'Last Update On', 'Any actions took to resolve', 'Quick Actions']
 
     // Overview Tab Content
     const OverviewTab = () => {
@@ -564,13 +604,13 @@ const OwnerViewStation = () => {
                         data={transactionsData}
                     />
                 )}
-                {/* {activeTab === 'faults' && (
+                {activeTab === 'faults' && (
                     <TableTab
                         title="Faults & Complaints"
-                        columns={['ID', 'Type', 'Reported', 'Status', 'Actions']}
-                        data={[]}
+                        columns={faultsColumns}
+                        data={faultsData}
                     />
-                )} */}
+                )}
             </div>
         </div>
     );
