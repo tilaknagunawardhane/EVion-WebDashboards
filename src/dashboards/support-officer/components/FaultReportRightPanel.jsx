@@ -4,18 +4,9 @@ import RequestCard from '../../admin/components/RequestCard';
 import OverviewCard from '../../admin/components/OverviewCard';
 import UserIcon from '../../../assets/user_icon.svg';
 import StationIcon from '../../../assets/stations.svg';
-import { Colors } from 'chart.js';
 import RenderColoredIcon from './RenderColoredIcon';
 
-export default function FaultReportRightPanel({ users = [], requests = [] }) {
-    // User statistics data - these should be passed from the main page or calculated
-    // const totalRegistered = users.length || 5;
-    // const activeUsers = users.filter(u => u.status === 'Active').length || 2;
-    // const blockedUsers = users.filter(u => u.status === 'Blocked').length || 1;
-    // const flaggedUsers = users.filter(u => u.flagged).length || 32;
-
-    // Request data
-    const newRequests = requests.filter(r => r.status === 'new') || [];
+export default function FaultReportRightPanel() {
 
     const renderStatCard = () => (
         <OverviewCard padding="p-4">
@@ -161,12 +152,6 @@ export default function FaultReportRightPanel({ users = [], requests = [] }) {
                 }}>
                     New Reports & Complaints
                 </h4>
-
-                <div className="space-y-3">
-                    {newRequests.slice(0, 3).map((request, index) => (
-                        <RequestCard key={index} request={request} />
-                    ))}
-                </div>
 
                 {newReportsCard(COLORS.bgGreen, 'green')}
                 {newReportsCard(COLORS.lightYellow, 'yellow')}

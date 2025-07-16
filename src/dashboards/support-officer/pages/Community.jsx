@@ -9,11 +9,6 @@ import { CommunityPost, Hashtags, DateTime, Header, Content, Replies } from "../
 import CommunityRightPanel from "../components/CommunityRightPanel";
 
 export default function CommunityPage(){
-    // const { id } = useParams();
-    // const navigate = useNavigate();
-    // const [search, setSearch] = useState('');
-    // const [filter, setFilter] = useState({});
-    // const [sort, setSort] = useState('Date');
     const [activeTab, setActiveTab] = useState('communityDiscussion');
 
     const CommunityTabs = [

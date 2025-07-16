@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { useNavigate, useParams } from 'react-router-dom';
+// import { useNavigate, useParams } from 'react-router-dom';
 import { FONTS, COLORS } from "../../../constants";
 import DataTable from "../../../components/ui/DataTable";
 import DataTableTopBar from "../../../components/ui/DataTableTopBar";
@@ -9,8 +9,8 @@ import TabBar from "../../../components/ui/TabBar";
 import FaultReportRightPanel from "../components/FaultReportRightPanel";
 
 export default function FaultReportsPage(){
-        const { id } = useParams();
-        const navigate = useNavigate();
+        // const { id } = useParams();
+        // const navigate = useNavigate();
         const [search, setSearch] = useState('');
         const [filter, setFilter] = useState({});
         const [sort, setSort] = useState('Date');
@@ -223,10 +223,7 @@ export default function FaultReportsPage(){
                     {/* Right Side - 1/4 width */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-6 space-y-6">
-                        <FaultReportRightPanel
-                            // users={users.length > 0 ? users : userData}
-                            // requests={requests}
-                        />
+                        <FaultReportRightPanel/>
                         </div>
                     </div>
 
