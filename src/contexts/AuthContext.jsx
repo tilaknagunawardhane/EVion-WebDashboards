@@ -11,7 +11,7 @@ export function AuthProvider({ children }) {
     setCurrentUser(userData)
     if (userData.role === 'admin') navigate('/admin/dashboard')
     else if (userData.role === 'station-owner') navigate('/station-owner')
-    else if (userData.role === 'support-officer') navigate('/support-officer')
+    else if (userData.role === 'support-officer') navigate('/support-officer/dashboard')
   }
 
   const logout = () => {

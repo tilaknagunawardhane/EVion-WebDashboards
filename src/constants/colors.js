@@ -15,4 +15,6 @@ export const COLORS = {
     bgYellow: '#FAF0E0',
     chargerFree: "#007BFF",
     bgBlue: '#E0EFFF',
+    lightRed: '#FF5555',
+    lightYellow: '#fadba9',
 }

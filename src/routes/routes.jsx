@@ -18,11 +18,16 @@ import InitStation from '../components/auth/InitStation'
 import { AuthProvider } from '../contexts/AuthContext'
 
 import AdminDash from '../dashboards/admin/pages/Dash'
+import SupportOfficerDash from '../dashboards/support-officer/pages/Dash'
+import ChargingStationsOverview from '../dashboards/support-officer/pages/ChargingStationsOverview'
 import AdminStaionsPage from '../dashboards/admin/pages/ChargingStations'
+import SupportOfficerRoute from './SupportOfficerRoute'
 import UserAccountPage from '../dashboards/admin/pages/userPages/userAccount'
 import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
 import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
 import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
+import FaultReportsPage from '../dashboards/support-officer/pages/FaultReports'
+import CommunityPage from '../dashboards/support-officer/pages/Community'
 
 import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/StationProfile'
 import OwnerViewCharger from '../dashboards/station-owner/pages/chargerPages/ChargerProfile'
@@ -73,8 +78,12 @@ const router = createBrowserRouter([
       },
       {
         path: 'support-officer',
-        element: <PrivateRoute><SupportOfficerDashboard /></PrivateRoute>,
+        element: <PrivateRoute><SupportOfficerRoute><SupportOfficerDashboard /></SupportOfficerRoute></PrivateRoute>,
         children: [
+          { path: 'dashboard', element: <SupportOfficerDash />},
+          { path: 'chargingStations', element:<ChargingStationsOverview />},
+          { path: 'faultReports', element:<FaultReportsPage /> },
+          { path: 'community', element: <CommunityPage />},
           { path: 'tasks', element: <TasksPage /> }
         ]
       }
