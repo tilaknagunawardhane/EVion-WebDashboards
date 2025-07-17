@@ -17,7 +17,9 @@ const getStatusStyle = (status) => {
     'Deleted': { background: COLORS.bgRed, color: COLORS.danger },
     'No-show': { background: COLORS.bgRed, color: COLORS.danger },
     'Cancelled': { background: COLORS.bgRed, color: COLORS.danger },
+    'Pending': { background: COLORS.bgRed, color: COLORS.danger },
     'In Progress': { background: '#fadba9', color: COLORS.mainTextColor },
+    'Walk-in': { background: '#fadba9', color: COLORS.mainTextColor },
     'New': { background: '#d0e0ff', color: COLORS.primary },
     'Refunded': { background: '#d0f0fd', color: COLORS.primary },
     'Default': { background: COLORS.bgGreen, color: COLORS.primary }
@@ -40,8 +42,10 @@ const getStatusDotColor = (status) => {
     'Blocked': COLORS.danger,
     'No-show': COLORS.danger,
     'Cancelled': COLORS.danger,
+    'Pending': COLORS.danger,
     'Under Maintenance': COLORS.HighlightText,
     'In Progress': COLORS.HighlightText,
+    'Walk-in': COLORS.HighlightText,
     'New': COLORS.primary,
     'Refunded': COLORS.primary,
     'Default': COLORS.primary
@@ -77,24 +81,43 @@ const renderCellContent = (value, column, rowData) => {
   }
   
   // Handle booking/enabled cells
-  if (column.toLowerCase().includes('bookings') || column.toLowerCase().includes('enabled')) {
-    const isEnabled = value === 'Enabled' || value === 'Yes';
-    return (
-      <span 
-        className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
-        style={isEnabled ? 
-          { background: COLORS.bgGreen, color: COLORS.primary } : 
-          { background: '#fdc7c7', color: COLORS.danger }
-        }
-      >
+   if (column === 'Bookings') {
+    if (value === 'Enabled' || value === 'Available') {
+      return (
         <span 
-          className="w-1.5 h-1.5 rounded-full" 
-          style={{ background: isEnabled ? COLORS.primary : COLORS.danger }}
-        ></span>
-        {value}
-      </span>
-    );
+          className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
+          style={{ 
+            background: COLORS.bgGreen, 
+            color: COLORS.primary 
+          }}
+        >
+          <span 
+            className="w-1.5 h-1.5 rounded-full" 
+            style={{ background: COLORS.primary }}
+          ></span>
+          {value}
+        </span>
+      );
+    } else if (value === 'Disabled' || value === 'Not Available') {
+      return (
+        <span 
+          className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
+          style={{ 
+            background: '#fdc7c7', 
+            color: COLORS.danger 
+          }}
+        >
+          <span 
+            className="w-1.5 h-1.5 rounded-full" 
+            style={{ background: COLORS.danger }}
+          ></span>
+          {value}
+        </span>
+      );
+    }
   }
+
+  
   
   // Handle action links
   if (column === 'View Receipt' || column === 'Actions') {
