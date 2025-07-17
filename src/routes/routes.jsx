@@ -29,6 +29,11 @@ import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
 import FaultReportsPage from '../dashboards/support-officer/pages/FaultReports'
 import CommunityPage from '../dashboards/support-officer/pages/Community'
 
+import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/StationProfile'
+import OwnerViewCharger from '../dashboards/station-owner/pages/chargerPages/ChargerProfile'
+import FaultAlerts from '../dashboards/station-owner/pages/faultsPages/FaultReports'
+import OwnerChatPage from '../dashboards/station-owner/pages/Chat'
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -64,6 +69,10 @@ const router = createBrowserRouter([
           { path: 'dashboards', element: <DashboardPage /> },
           { path: 'stations', element: <StationsPage /> },
           { path: 'settings', element: <SettingsPage /> },
+          { path: 'stations/stationprofile/:id', element: <OwnerViewStation />},
+          { path: 'stations/chargerprofile/:id', element: <OwnerViewCharger />},
+          { path: 'alerts', element: <FaultAlerts /> },
+          { path: 'chat', element: <OwnerChatPage /> }
 
         ]
       },

@@ -26,6 +26,7 @@ export default function TabBar({
               style={{
                 fontFamily: FONTS.family.sans,
                 fontWeight: FONTS.weights.medium,
+                color: COLORS.mainTextColor,
                 flexShrink: 0 // Prevent tabs from shrinking on small screens
               }}
               onClick={() => setActiveTab(tab.id)}

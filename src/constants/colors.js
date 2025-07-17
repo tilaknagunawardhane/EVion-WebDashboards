@@ -11,7 +11,10 @@ export const COLORS = {
     border: '#E9E9E9', //light gray for borders
     star: '#F5B223',
     danger: '#ff3b30',
-    lightRed: '#FF5555',
     bgRed: '#FAE5E5',
-    lightYellow: '#fadba9'
+    bgYellow: '#FAF0E0',
+    chargerFree: "#007BFF",
+    bgBlue: '#E0EFFF',
+    lightRed: '#FF5555',
+    lightYellow: '#fadba9',
 }
