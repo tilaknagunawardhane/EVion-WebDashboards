@@ -1,5 +1,6 @@
 import { COLORS, FONTS } from '../../../constants'
 import StationImage from '../../../assets/station_img.png'
+import { useNavigate } from 'react-router-dom';
 
 export default function StationCard({ station }) {
   // Status configuration
@@ -21,7 +22,12 @@ export default function StationCard({ station }) {
     }
   }
 
+  const navigate = useNavigate();
   const status = statusConfig[station.status] || statusConfig.active
+
+  const openProfile = () => {
+    navigate(`/station-owner/stations/stationprofile/${station.id}`);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden border" style={{ borderColor: COLORS.border }}>
@@ -103,32 +109,13 @@ export default function StationCard({ station }) {
               {station.location}
             </p>
           </div>
-
-          <div className="flex items-center">
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke={COLORS.secondaryText}
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-            <p className="text-sm" style={{ color: COLORS.secondaryText, fontFamily: FONTS.family.sans }}>
-              {station.power}
-            </p>
-          </div>
         </div>
 
         {/* Actions */}
         <div className="flex space-x-2">
           <button
             className="px-3 py-1 rounded-md text-sm font-medium"
+            onClick={openProfile}
             style={{
               backgroundColor: COLORS.background,
               color: COLORS.primary,

@@ -1,0 +1,450 @@
+import React, { useState } from 'react';
+import { COLORS, FONTS } from '../../../../constants';
+import { useNavigate } from 'react-router-dom';
+import TabBar from '../../../../components/ui/TabBar';
+import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
+import DataTable from '../../../../components/ui/DataTable';
+import StatCard from '../../components/StatCard';
+import StarIcon from '../../../../assets/star-filled.svg';
+import StarOutlineIcon from '../../../../assets/star-outline.svg';
+import NotificationsIcon from '../../../../assets/notifications.svg';
+import OverviewCard from '../../components/OverviewCard';
+import MapImage from '../../../../assets/map-placeholder.png';
+import Button from '../../../../components/ui/Button';
+import ArrowRightIcon from '../../../../assets/arrow_right.svg';
+import ApprovalCard from '../../components/ApprovalCard';
+import ViewStationRightPanel from '../../components/stationComponents/ViewStationRightPanel';
+import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
+
+
+const stationImages = [
+    'https://images.unsplash.com/photo-1703860271509-b50f5679f2a0?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1616361715039-11dde2199a21?q=80&w=1746&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1729229078656-268bae113975?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1710025582119-e133fb11e10a?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1737312272830-f445719b7ed9?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+];
+
+const OwnerViewStation = () => {
+    const [activeTab, setActiveTab] = useState('profile');
+    const [search, setSearch] = useState('');
+    const [filter, setFilter] = useState(null);
+    const [sort, setSort] = useState(null);
+    const [rating] = useState(4.5); // Sample rating
+    const [showAll, setShowAll] = useState(false);
+    const navigate = useNavigate();
+
+    const initialDisplayCount = 4;
+    const imagesToDisplay = showAll ? stationImages : stationImages.slice(0, initialDisplayCount);
+
+
+    // Sample station data
+    const station = {
+        name: "EviGO Charging Station",
+        address: "45 Peradeniya Road, Kandy",
+        operator: "A P Perera",
+        email: "perera@gmail.com",
+        operatorJoinedDate: "12 Dec 2024",
+        operatorStatus: "Active",
+        location: "Bloomfield Cricket and Athletic Club",
+        totalEarnings: "LKR 6.45 M",
+        earningsChange: "+6.37%",
+        totalElectricity: "2560 nWh",
+        electricityChange: "-8.3%",
+        // sessions: "147",
+        // sessionsChange: "+3.87%",
+        reports: "12",
+        status: "Active",
+        noOfConnectors: "7",
+        noOfReports: "17",
+        electricityProvider: "LECO",
+        powerTypes: [ 'AC', 'DC' ],
+        powerSource: "Solar", 
+    };
+
+
+    // Tab configuration
+    const tabs = [
+        { id: 'profile', label: 'Profile' },
+        { id: 'chargers', label: 'Chargers' },
+        { id: 'transactions', label: 'Transactions Related to Station'},
+        { id: 'stats', label: 'Stats'}
+    ];
+
+    // Mobile labels for tabs
+    const mobileLabels = {
+        profile: 'Profile',
+        chargers: 'Chargers',
+        transactions: 'Transactions Related to Station',
+        stats: 'Stats'
+    };
+
+    // Render stars based on rating
+    const renderStars = () => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+
+        for (let i = 1; i <= 5; i++) {
+            if (i <= fullStars) {
+                stars.push(<img key={i} src={StarIcon} alt="Filled star" className="w-4 h-4" />);
+            } else if (i === fullStars + 1 && hasHalfStar) {
+                stars.push(<img key={i} src={StarOutlineIcon} alt="Half star" className="w-4 h-4" />);
+            } else {
+                stars.push(<img key={i} src={StarOutlineIcon} alt="Empty star" className="w-4 h-4" />);
+            }
+        }
+
+        return (
+            <div className="flex items-center mt-1">
+                <div className="flex mr-2">{stars}</div>
+                <span className="text-xs" style={{ color: COLORS.secondaryText }}>
+                    {rating.toFixed(1)}
+                </span>
+            </div>
+        );
+    };
+
+    // Sample data for tables
+    const chargersData = [
+        { 
+            'chargerID': 'EVDC0001', 
+            'Charger Name': 'HyperCharge Dual-Port', 
+            'Joined On': '2023-01-15', 
+            'Power Type': 'DC Fast Charger', 
+            'Maximum Power Output(kW)': '150 kW',
+            'Connectors': ['CCS1', 'CHAdeMO'],
+            'Unit Price(per kW)': '55.00',
+            'Total Sessions': '232',
+            'Revenue': '3,300,500',
+            'No of Active Reports': '0', 
+            'Charger Status': 'Active',
+            'Quick Actions': ['View', 'Disable', 'Delete']  
+        },
+        { 
+            'chargerID': 'EVDC0002', 
+            'Charger Name': 'FastCharge DC', 
+            'Joined On': '2022-11-10', 
+            'Power Type': 'DC Fast Charger', 
+            'Maximum Power Output(kW)': '60 kW',
+            'Connectors': ['CCS2'],
+            'Unit Price(per kW)': '55.00',
+            'Total Sessions': '560',
+            'Revenue': '5,000,000',
+            'No of Active Reports': '0',
+            'Charger Status': 'Disabled', 
+            'Quick Actions': ['View', 'Enable', 'Delete']   
+        },
+        { 
+            'chargerID': 'EVAC0003', 
+            'Charger Name': 'AC Charger 1', 
+            'Joined On': '', 
+            'Power Type': 'AC Charger', 
+            'Maximum Power Output(kW)': '12 kW',
+            'Connectors': ['Type1'],
+            'Unit Price(per kW)': '42.00',
+            'Total Sessions': '',
+            'Revenue': '',
+            'No of Active Reports': '',
+            'Charger Status': 'Pending-Approval', 
+            'Quick Actions': ['View', 'Disable', 'Delete']   
+        }
+    ];
+
+   const transactionsData = [
+    {
+        TransactionID: 'TRN001',
+        'Date & Time': '2025-07-15 10:35 AM',
+        Charger: 'StationA-Charger01',
+        Connector: 'Type 2 AC',
+        SessionID: 'S001',
+        BookingID: 'BKG12345',
+        'Transaction Type': 'Charging Payment',
+        'Amount(LKR)': 775.00,
+        'Commission(LKR)': 77.50, // 10% commission example
+        'Owner Revenue(LKR)': 697.50, // 775 - 77.50
+        'Payment Status': 'Completed',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        TransactionID: 'TRN002',
+        'Date & Time': '2025-07-15 11:50 AM',
+        Charger: 'StationA-Charger02',
+        Connector: 'CCS2 DC',
+        SessionID: 'S002',
+        BookingID: 'Walk-in',
+        'Transaction Type': 'Charging Payment',
+        'Amount(LKR)': 1100.00,
+        'Commission(LKR)': 110.00,
+        'Owner Revenue(LKR)': 990.00,
+        'Payment Status': 'Completed',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        TransactionID: 'TRN003',
+        'Date & Time': '2025-07-16 02:55 PM',
+        Charger: 'StationB-Charger03',
+        Connector: 'CHAdeMO DC',
+        SessionID: 'S003',
+        BookingID: 'BKG12346',
+        'Transaction Type': 'Charging Payment',
+        'Amount(LKR)': 1750.00,
+        'Commission(LKR)': 175.00,
+        'Owner Revenue(LKR)': 1575.00,
+        'Payment Status': 'Pending',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        TransactionID: 'TRN004',
+        'Date & Time': '2025-07-16 03:00 PM',
+        Charger: 'N/A', // Penalties are not directly tied to a specific charger use for the transaction itself
+        Connector: 'N/A',
+        SessionID: 'S003',
+        BookingID: 'BKG12346',
+        'Transaction Type': 'Penalty Fee',
+        'Amount(LKR)': 200.00,
+        'Commission(LKR)': 20.00, // Commission on penalty might apply
+        'Owner Revenue(LKR)': 180.00,
+        'Payment Status': 'Pending',
+        'Quick Actions': ['View Receipt']
+    },
+    {
+        TransactionID: 'TRN005',
+        'Date & Time': '2025-07-17 09:35 AM',
+        Charger: 'N/A',
+        Connector: 'N/A',
+        SessionID: 'N/A',
+        BookingID: 'BKG12348',
+        'Transaction Type': 'Late Cancellation',
+        'Amount(LKR)': 1900.00, // Negative for refund
+        'Commission(LKR)': null, // Reflects commission reversal if applicable
+        'Owner Revenue(LKR)': null,
+        'Payment Status': 'Pending',
+        'Quick Actions': ['View Receipt']
+    }
+    ]; 
+
+    // Table columns configuration
+    const chargersColumns = ['chargerID', 'Charger Name', 'Joined On', 'Power Type', 'Maximum Power Output(kW)', 'Connectors', 'Unit Price(per kW)', 'Total Sessions', 'Revenue', 'No of Active Reports', 'Charger Status', 'Quick Actions'];
+    const transactionsColumns = ['TransactionID', 'Date & Time', 'Charger', 'Connector', 'SessionID', 'BookingID', 'Transaction Type', 'Amount(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
+
+    // Profile Tab Content
+    const ProfileTab = () => {
+        const statusColors = {
+            'Active': {
+                bg: `${COLORS.primary}20`,
+                text: COLORS.primary
+            },
+            'Closed': {
+                bg: `${COLORS.danger}20`,
+                text: COLORS.danger
+            },
+            'Under Maintenance': {
+                bg: `${COLORS.HighlightText}20`,
+                text: COLORS.HighlightText
+            },
+            'Disabled': {
+                bg: `${COLORS.danger}20`,
+                text: COLORS.danger
+            },
+            'Deleted': {
+                bg: `${COLORS.mainTextColor}20`,
+                text: COLORS.mainTextColor
+            }
+        };
+
+        const currentStatus = station.status || 'Active';
+        const statusStyle = statusColors[currentStatus] || statusColors['Active'];
+
+        return (
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {/* Left side - Profile info */}
+                <div className="lg:col-span-3 space-y-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                        style={{ borderColor: COLORS.stroke }}>
+                        <div>
+                            <h1 className="text-xl font-medium" style={{ color: COLORS.mainTextColor }}>
+                                {station.name}
+                            </h1>
+                            <p className="text-sm mt-1" style={{ color: COLORS.secondaryText }}>
+                                {station.address}
+                            </p>
+                            {renderStars()}
+                        </div>
+                        <div className="sm:self-start">
+                            <span className="px-3 py-1 rounded-full text-sm inline-block" style={{
+                                backgroundColor: statusStyle.bg,
+                                color: statusStyle.text
+                            }}>
+                                {currentStatus}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <OverviewCard padding="p-4">
+                            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                <img
+                                    src={MapImage}
+                                    alt="Charging Stations Map"
+                                    className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                                />
+                            </div>
+                        </OverviewCard>
+                    </div>
+
+                    <div className="flex-col gap-4 mt-4 bg-white p-8 rounded-xl">  
+                        <div className="flex flex-wrap gap-4 text-sm">
+                            <div>
+                                <strong
+                                style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
+                                >
+                                Power Types:
+                                </strong>{' '}
+                                {station.powerTypes.join(', ')}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap justify-between gap-4 text-sm mt-2">
+                            <div>
+                                <strong
+                                style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
+                                >
+                                Electricity Provider:
+                                </strong>{' '}
+                                {station.electricityProvider}
+                            </div>
+                            <div>
+                                <strong
+                                style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
+                                >
+                                Power Source:
+                                </strong>{' '}
+                                {station.powerSource}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center">
+                        <p className="underline" style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}>Update Station Details</p>
+                    </div>
+
+                    <div className="flex-col gap-4 mt-8 bg-transparent p-0 rounded-xl">
+                            <h3 className="mb-4" style={{ fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.normal, color: COLORS.mainTextColor }}>Station Gallery</h3>
+      
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {imagesToDisplay.map((src, idx) => (
+                                <img
+                                    key={idx}
+                                    src={src}
+                                    alt={`station ${idx}`}
+                                    className="w-full h-32 object-cover rounded-lg shadow"
+                                />
+                                ))}
+                            </div>
+
+                            {stationImages.length > initialDisplayCount && (
+                                <div className="flex justify-center mt-4 text-right">
+                                    <button
+                                        onClick={() => setShowAll(!showAll)}
+                                        className="underline"
+                                        style={{ color: COLORS.secondaryText, fontWeight: FONTS.weights.normal, fontSize: FONTS.sizes.sm }}
+                                    >
+                                        {showAll ? 'Show Less' : 'View All'}
+                                    </button>
+                                </div>
+                            )}
+                    </div>
+
+
+                </div>
+
+                {/* Right side panel - Only for profile tab */}
+                <div className="lg:col-span-1 space-y-4">
+                    <ViewStationRightPanel
+                        station={station}
+                    />
+                </div>
+            </div>
+        );
+    };
+
+    // Table Tab Content
+    const TableTab = ({ title, columns, data, onRowClick }) => (
+        <div className="grid grid-cols-1 gap-0 bg-transparent rounded-lg p-0">
+            <DataTableTopBar
+                search={search}
+                setSearch={setSearch}
+                filter={filter}
+                setFilter={setFilter}
+                sort={sort}
+                setSort={setSort}
+                filterOptions={[
+                    { value: 'status', label: 'Active' },
+                    { value: 'status', label: 'Inactive' }
+                ]}
+                sortOptions={columns.map(col => ({ value: col, label: col }))}
+                searchPlaceholder={`Search ${title.toLowerCase()}...`}
+            />
+            <DataTable
+                columns={columns}
+                data={data}
+                filter={filter}
+                sort={sort}
+                search={search}
+                onRowClick={onRowClick}
+            />
+        </div>
+    );
+
+    return (
+        <div 
+            style={{
+            fontFamily: FONTS.family.sans,
+            padding: '24px',
+            backgroundColor: COLORS.background,
+        }}>
+
+            <StationOwnerPageHeader title={`${station.name}`} />
+
+
+            {/* Tab Navigation */}
+            <TabBar
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                tabs={tabs}
+                mobileLabels={mobileLabels}
+            />
+
+            {/* Tab Content */}
+            <div className="mt-6">
+                {activeTab === 'profile' && <ProfileTab />}
+
+                {activeTab === 'chargers' && (
+                    <TableTab
+                        title="Chargers"
+                        columns={chargersColumns}
+                        data={chargersData}
+                        onRowClick={(charger) => navigate(`/station-owner/stations/chargerprofile/${charger.chargerID}`)}
+                    />
+                )}
+                {activeTab === 'transactions' && (
+                    <TableTab
+                        title="Transactions"
+                        columns={transactionsColumns}
+                        data={transactionsData}
+                    />
+                )}
+                {/* {activeTab === 'faults' && (
+                    <TableTab
+                        title="Faults & Complaints"
+                        columns={['ID', 'Type', 'Reported', 'Status', 'Actions']}
+                        data={[]}
+                    />
+                )} */}
+            </div>
+        </div>
+    );
+};
+
+export default OwnerViewStation;

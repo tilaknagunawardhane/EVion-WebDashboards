@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { COLORS, FONTS } from '../../constants';
 import { useNavigate } from 'react-router-dom';
+import ChatIcon from '../../assets/chat.svg';
+import { color } from 'chart.js/helpers';
 
 const getStatusStyle = (status) => {
   const statusMap = {
@@ -21,8 +23,12 @@ const getStatusStyle = (status) => {
     'In Progress': { background: '#fadba9', color: COLORS.mainTextColor },
     'Walk-in': { background: '#fadba9', color: COLORS.mainTextColor },
     'New': { background: '#d0e0ff', color: COLORS.primary },
+    'Pending': { background: COLORS.bgYellow, color: COLORS.HighlightText },
     'Refunded': { background: '#d0f0fd', color: COLORS.primary },
-    'Default': { background: COLORS.bgGreen, color: COLORS.primary }
+    'Pending-Approval': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'Open': { background: COLORS.bgBlue, color: COLORS.chargerFree },
+    'Investigating': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'Default': { background: COLORS.bgGreen, color: COLORS.primary },
   };
   
   return statusMap[status] || statusMap['Default'];
@@ -48,6 +54,10 @@ const getStatusDotColor = (status) => {
     'Walk-in': COLORS.HighlightText,
     'New': COLORS.primary,
     'Refunded': COLORS.primary,
+    'Pending': COLORS.HighlightText,
+    'Pending-Approval': COLORS.HighlightText,
+    'Open': COLORS.chargerFree,
+    'Investigating': COLORS.HighlightText,
     'Default': COLORS.primary
   };
   
@@ -151,7 +161,7 @@ const renderCellContent = (value, column, rowData) => {
   // Handle dates
   if (column.includes('Date') || column.includes('On')) {
     return (
-      <span style={{ color: COLORS.secondaryText }}>
+      <span style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>
         {value}
       </span>
     );
@@ -189,7 +199,7 @@ const renderQuickActions = (actions, rowData) => {
           <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
         </svg>
       ),
-      color: COLORS.HighlightText,
+      color: COLORS.secondaryText,
       onClick: () => console.log('Disable', rowData)
     },
     'Enable': {
@@ -213,6 +223,30 @@ const renderQuickActions = (actions, rowData) => {
       ),
       color: COLORS.danger,
       onClick: () => console.log('Delete', rowData)
+    },
+    'View Receipt': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
+    'Contact Support Officer': {
+      icon: (
+        <img 
+          src={ChatIcon} 
+          alt="Chat" 
+          className="w-5 h-5"
+          style={{ filter: 'brightness(0)', transition: 'filter 0.2s ease' }}
+        />
+      ),
+      color: COLORS.mainTextColor,
+      onClick: () => console.log('Contact Support Officer', rowData)
     }
   };
 

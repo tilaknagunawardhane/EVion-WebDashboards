@@ -24,30 +24,30 @@ export default function LoginForm() {
   const handleSignin = (e) => {
     e.preventDefault();
     
-    const newErrors = { email: '', password: '' };
+    // const newErrors = { email: '', password: '' };
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
     let valid = true;
     
-    if (!email.trim()) {
-      newErrors.email = 'Please enter your email';
-      valid = false;
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
-      valid = false;
-    }
+    // if (!email.trim()) {
+    //   newErrors.email = 'Please enter your email';
+    //   valid = false;
+    // } else if (!emailRegex.test(email)) {
+    //   newErrors.email = 'Please enter a valid email address';
+    //   valid = false;
+    // }
 
-    if (!password) {
-      newErrors.password = 'Please enter your password';
-      valid = false;
-    } else if (!passwordRegex.test(password)) {
-      newErrors.password = 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character';
-      valid = false;
-    }
+    // if (!password) {
+    //   newErrors.password = 'Please enter your password';
+    //   valid = false;
+    // } else if (!passwordRegex.test(password)) {
+    //   newErrors.password = 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character';
+    //   valid = false;
+    // }
 
-    setErrors(newErrors);
+    // setErrors(newErrors);
 
     if (!valid) return;
 
@@ -101,7 +101,7 @@ export default function LoginForm() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                // required
                 error={!!errors.email}
                 errorMessage={errors.email}
               />
@@ -111,7 +111,7 @@ export default function LoginForm() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                // required
                 error={!!errors.password}
                 errorMessage={errors.password}
               />
