@@ -109,26 +109,6 @@ export default function StationCard({ station }) {
               {station.location}
             </p>
           </div>
-
-          <div className="flex items-center">
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke={COLORS.secondaryText}
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-            <p className="text-sm" style={{ color: COLORS.secondaryText, fontFamily: FONTS.family.sans }}>
-              {station.power}
-            </p>
-          </div>
         </div>
 
         {/* Actions */}

@@ -41,7 +41,7 @@ const OwnerViewStation = () => {
     // Sample station data
     const station = {
         name: "EviGO Charging Station",
-        address: "No. 24, Joshep Road, Weilpanna",
+        address: "45 Peradeniya Road, Kandy",
         operator: "A P Perera",
         email: "perera@gmail.com",
         operatorJoinedDate: "12 Dec 2024",

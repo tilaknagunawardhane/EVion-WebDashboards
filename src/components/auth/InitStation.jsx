@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Layout from '../../components/Layout'
 import { COLORS, FONTS } from '../../constants'
 import Button from '../ui/Button';
+import { useNavigate } from 'react-router-dom';
 import InputField from '../ui/InputField';
 import { FiEdit, FiMessageCircle } from 'react-icons/fi';
 // import stationImage from '../../assets/cuate.svg'
@@ -15,6 +16,8 @@ export default function InitStations() {
     const [showForm, setShowForm] = useState(false);
     const [stations, setStations] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         setTimeout(() => {
@@ -134,7 +137,7 @@ export default function InitStations() {
                             key={idx}
                             station={station}
                             onEdit={(station) => console.log('Edit:', station)}
-                            onPay={(station) => console.log('Pay:', station)}
+                            onPay={() => navigate(`/station-owner/dashboards`)}
                             onRemove={(station) => console.log('Remove:', station)}
                         />
                     ))}

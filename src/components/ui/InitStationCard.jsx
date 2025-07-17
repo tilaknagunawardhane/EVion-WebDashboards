@@ -3,7 +3,7 @@ import { COLORS, FONTS } from '../../constants';
 import Button from '../ui/Button';
 import { FiMoreVertical } from 'react-icons/fi'; 
 
-export default function StationCard({ station, onEdit, onPay, onRemove }) {
+export default function StationCard({ station, onEdit, onPay, onRemove, onClick }) {
   const [expanded, setExpanded] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef();
@@ -12,6 +12,8 @@ export default function StationCard({ station, onEdit, onPay, onRemove }) {
     'Processing': COLORS.star || '#F59E0B',
     'Approved': COLORS.primary || '#3B82F6',
     'To be Installed': COLORS.mainTextColor || '#10B981',
+    'Active': COLORS.primary,
+    'Closed': COLORS.bgGreen
   };
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove }) {
         backgroundColor: 'white',
         overflow: 'hidden',
       }}
+      onClick={onClick}
     >
 
 

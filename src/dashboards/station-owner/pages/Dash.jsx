@@ -9,6 +9,7 @@ import SessionsIcon from '../../../assets/sessions.svg'
 import ElectricityIcon from '../../../assets/electricity.svg'
 import IncomeIcon from '../../../assets/electricity.svg'
 import EnergyUsageChart from '../components/EnergyUsageChart'
+import StationOwnerPageHeader from '../components/StationOwnerPageHeader'
 
 export default function DashboardPage() {
   const stats = [
@@ -43,41 +44,14 @@ export default function DashboardPage() {
   ]
 
   return (
-    <div style={{ fontFamily: FONTS.family.sans, padding: '24px' }}>
-      {/* Welcome Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1
-            className="text-2xl font-bold"
-            style={{ color: COLORS.mainTextColor }}
-          >
-            Welcome Back!
-          </h1>
-        </div>
-        <div className="text-right">
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            width: '40px',
-            height: '40px',
-            boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'
-          }}>
-            <img
-              src={NotificationsIcon}
-              alt="Notifications"
-              style={{
-                width: '20px',
-                height: '20px',
-
-                filter: `brightness(0) saturate(100%) invert(48%) sepia(99%) saturate(1230%) hue-rotate(130deg) brightness(95%) contrast(101%)`
-              }}
-            />
-          </div>
-        </div>
-      </div>
+    <div
+      style={{
+        fontFamily: FONTS.family.sans,
+        padding: '24px',
+        backgroundColor: COLORS.background,
+      }}
+    >
+      <StationOwnerPageHeader title="Stations Overview" />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
