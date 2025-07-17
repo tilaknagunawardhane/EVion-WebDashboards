@@ -284,7 +284,7 @@ const ChatPage = () => {
     return (
         <div style={{
             fontFamily: FONTS.family.sans,
-            paddingTop: '24px',
+            padding: '24px',
             backgroundColor: COLORS.background,
         }}>
             <AdminPageHeader title="Chats" />
