@@ -26,6 +26,9 @@ import UserAccountPage from '../dashboards/admin/pages/userPages/userAccount'
 import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
 import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
 import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
+
+import ChatPage from '../dashboards/admin/pages/Chat'
+
 import FaultReportsPage from '../dashboards/support-officer/pages/FaultReports'
 import CommunityPage from '../dashboards/support-officer/pages/Community'
 
@@ -33,6 +36,7 @@ import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/Sta
 import OwnerViewCharger from '../dashboards/station-owner/pages/chargerPages/ChargerProfile'
 import FaultAlerts from '../dashboards/station-owner/pages/faultsPages/FaultReports'
 import OwnerChatPage from '../dashboards/station-owner/pages/Chat'
+
 
 const router = createBrowserRouter([
   {
@@ -59,6 +63,7 @@ const router = createBrowserRouter([
           { path: 'stations/requests', element: <RequestsPage/>},
           { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
           { path: 'stations/:id', element: <ViewStation/>},
+          { path: 'chat', element: <ChatPage/>},
 
         ]
       },
