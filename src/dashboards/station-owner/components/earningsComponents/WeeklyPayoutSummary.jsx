@@ -58,7 +58,7 @@ const WeeklyPayoutSummary = ({ data }) => {
           }}
         >
             <div>
-                <h3 className="text-sm font-semibold mb-1">
+                <h3 className="text-sm font-medium mb-1">
                     This Week’s Earnings
                 </h3>
                 <div className="text-2xl font-bold">{data.thisWeek.amount} LKR</div>
