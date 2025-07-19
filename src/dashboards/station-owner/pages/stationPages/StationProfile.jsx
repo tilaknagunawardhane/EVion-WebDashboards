@@ -15,6 +15,7 @@ import ArrowRightIcon from '../../../../assets/arrow_right.svg';
 import ApprovalCard from '../../components/ApprovalCard';
 import ViewStationRightPanel from '../../components/stationComponents/ViewStationRightPanel';
 import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
+import StationSchedule from '../../components/stationComponents/StationSchedule';
 
 
 const stationImages = [
@@ -25,12 +26,38 @@ const stationImages = [
     'https://images.unsplash.com/photo-1737312272830-f445719b7ed9?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 ];
 
+const sampleSchedule = {
+    monday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '08:00', to: '18:00' }] },
+    tuesday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '09:00', to: '17:00' }] },
+    wednesday: { selected: true, open24Hours: true, closed: false, timeBlocks: [] },
+    thursday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '07:00', to: '12:00' }, { from: '14:00', to: '20:00' }] },
+    friday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '10:00', to: '22:00' }] },
+    saturday: { selected: true, open24Hours: false, closed: true, timeBlocks: [] }, // Closed
+    sunday: { selected: false, open24Hours: false, closed: false, timeBlocks: [] }, // Not set
+};
+
+const sampleTemporaryClosure = [
+    {
+        from: new Date('2025-07-20T10:00:00'), // Example: Sunday, July 20, 10:00 AM
+        to: new Date('2025-07-20T14:00:00'),   // Example: Sunday, July 20, 2:00 PM
+        reason: 'Scheduled infrastructure upgrade.'
+    },
+    {
+        from: new Date('2025-07-25T09:00:00'), // Example: Friday, July 25, 9:00 AM
+        to: new Date('2025-07-25T17:00:00'),   // Example: Friday, July 25, 5:00 PM
+        reason: 'Annual safety inspection.'
+    },
+];
+
+
 const OwnerViewStation = () => {
     const [activeTab, setActiveTab] = useState('profile');
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
-    const [rating] = useState(4.5); // Sample rating
+    const [rating] = useState(4.5);
+    const [stationSchedule, setStationSchedule] = React.useState(sampleSchedule);
+    const [stationTemporaryClosures, setStationTemporaryClosures] = React.useState(sampleTemporaryClosure);
     const [showAll, setShowAll] = useState(false);
     const navigate = useNavigate();
 
@@ -66,6 +93,7 @@ const OwnerViewStation = () => {
     // Tab configuration
     const tabs = [
         { id: 'profile', label: 'Profile' },
+        { id: 'schedule', label: 'Schedule' },
         { id: 'chargers', label: 'Chargers' },
         { id: 'transactions', label: 'Transactions Related to Station'},
         { id: 'stats', label: 'Stats'}
@@ -74,6 +102,7 @@ const OwnerViewStation = () => {
     // Mobile labels for tabs
     const mobileLabels = {
         profile: 'Profile',
+        schedule: 'Schedule',
         chargers: 'Chargers',
         transactions: 'Transactions Related to Station',
         stats: 'Stats'
@@ -420,6 +449,12 @@ const OwnerViewStation = () => {
             <div className="mt-6">
                 {activeTab === 'profile' && <ProfileTab />}
 
+
+                {activeTab === 'schedule' && <StationSchedule 
+                    initialSchedule={stationSchedule}
+                    initialTemporaryClosure={stationTemporaryClosures}
+                /> }
+
                 {activeTab === 'chargers' && (
                     <TableTab
                         title="Chargers"
@@ -435,13 +470,6 @@ const OwnerViewStation = () => {
                         data={transactionsData}
                     />
                 )}
-                {/* {activeTab === 'faults' && (
-                    <TableTab
-                        title="Faults & Complaints"
-                        columns={['ID', 'Type', 'Reported', 'Status', 'Actions']}
-                        data={[]}
-                    />
-                )} */}
             </div>
         </div>
     );
