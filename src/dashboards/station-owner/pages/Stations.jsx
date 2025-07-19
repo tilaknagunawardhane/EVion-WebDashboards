@@ -3,7 +3,7 @@ import { COLORS, FONTS } from '../../../constants'
 import { useNavigate } from 'react-router-dom';
 import StationOwnerPageHeader from '../components/StationOwnerPageHeader'
 import Button from '../../../components/ui/Button';
-import StationCard from '../../../components/ui/InitStationCard';
+import StationCard from '../components/stationComponents/StationCard';
 import AddChargingStationForm from '../../../components/ui/AddStationForm';
 
 export default function StationsPage() {
@@ -116,7 +116,7 @@ export default function StationsPage() {
         ];
 
         setStations(mockData);
-        setLoading(false);
+        // setLoading(false);
         }, 10); // simulate 1s fetch
   }, []);
 

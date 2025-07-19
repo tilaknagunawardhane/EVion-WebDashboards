@@ -22,11 +22,6 @@ export default function StationOwnerDashboard() {
       path: '/station-owner/stations', 
       icon: StationsIcon
     },
-    // { 
-    //   name: 'Bookings', 
-    //   path: '/station-owner/bookings', 
-    //   icon: BookingsIcon
-    // },
     { 
       name: 'Earnings', 
       path: '/station-owner/earnings', 

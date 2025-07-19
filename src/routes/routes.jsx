@@ -36,6 +36,7 @@ import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/Sta
 import OwnerViewCharger from '../dashboards/station-owner/pages/chargerPages/ChargerProfile'
 import FaultAlerts from '../dashboards/station-owner/pages/faultsPages/FaultReports'
 import OwnerChatPage from '../dashboards/station-owner/pages/Chat'
+import OwnerEarnings from '../dashboards/station-owner/pages/earningsPages/Earnings'
 
 
 const router = createBrowserRouter([
@@ -77,7 +78,8 @@ const router = createBrowserRouter([
           { path: 'stations/stationprofile/:id', element: <OwnerViewStation />},
           { path: 'stations/chargerprofile/:id', element: <OwnerViewCharger />},
           { path: 'alerts', element: <FaultAlerts /> },
-          { path: 'chat', element: <OwnerChatPage /> }
+          { path: 'chat', element: <OwnerChatPage /> },
+          { path: 'earnings', element: <OwnerEarnings /> },
 
         ]
       },
