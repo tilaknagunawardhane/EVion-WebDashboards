@@ -11,10 +11,6 @@ const elecProviders = [
     'CEB', 'LECO', 'Private'
 ];
 
-const supportedPowerTypes = [
-    'AC', 'DC', 'Both'
-];
-
 const districts = [
     'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 'Hambanthota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Monaragala', 'Mullaitivu', 'Nuwara Eliya'
 ];
@@ -35,7 +31,7 @@ export default function AddChargingStationForm({ onClose, onSubmit }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [numChargers, setNumChargers] = useState(1);
   const [chargers, setChargers] = useState([
-    { name: '', powerType: '', maxPower: '', connectors: [] }
+    { name: '', maxPower: '', connectors: [] }
   ]);
 
   const navigate = useNavigate();
@@ -46,7 +42,6 @@ export default function AddChargingStationForm({ onClose, onSubmit }) {
     district: '',
     city: '',
     electricityProvider: '',
-    powerType: '',
     powerSource: '',
   });
 
@@ -57,7 +52,7 @@ export default function AddChargingStationForm({ onClose, onSubmit }) {
     const count = parseInt(e.target.value, 10);
     setNumChargers(count);
     const newArray = Array.from({ length: count }, (_, i) => chargers[i] || {
-      name: '', powerType: '', maxPower: '', connectors: []
+      name: '', maxPower: '', connectors: []
     });
     setChargers(newArray);
   };
@@ -79,7 +74,6 @@ export default function AddChargingStationForm({ onClose, onSubmit }) {
       name: formData.stationName,
       address: `${formData.addressLine}, ${formData.city}`,
       district: formData.district,
-      powerTypes: formData.powerType === 'Both' ? ['AC', 'DC'] : [formData.powerType],
       electricityProvider: formData.electricityProvider,
       powerSource: formData.powerSource,
       numChargers,
@@ -106,7 +100,6 @@ export default function AddChargingStationForm({ onClose, onSubmit }) {
                     nextStep: () => setCurrentStep(2),
                     districts,
                     elecProviders,
-                    supportedPowerTypes,
                     sources 
                 }} />
           ) : (

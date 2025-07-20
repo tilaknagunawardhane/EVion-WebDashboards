@@ -85,7 +85,6 @@ const OwnerViewStation = () => {
         noOfConnectors: "7",
         noOfReports: "17",
         electricityProvider: "LECO",
-        powerTypes: [ 'AC', 'DC' ],
         powerSource: "Solar", 
     };
 
@@ -323,18 +322,8 @@ const OwnerViewStation = () => {
                     </div>
 
                     <div className="flex-col gap-4 mt-4 bg-white p-8 rounded-xl">  
-                        <div className="flex flex-wrap gap-4 text-sm">
-                            <div>
-                                <strong
-                                style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                                >
-                                Power Types:
-                                </strong>{' '}
-                                {station.powerTypes.join(', ')}
-                            </div>
-                        </div>
 
-                        <div className="flex flex-wrap justify-between gap-4 text-sm mt-2">
+                        <div className="flex flex-wrap justify-between gap-4 text-sm">
                             <div>
                                 <strong
                                 style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
