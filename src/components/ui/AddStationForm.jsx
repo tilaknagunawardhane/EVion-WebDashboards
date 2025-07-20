@@ -190,60 +190,65 @@ export default function AddChargingStationForm({ onClose, onSubmit }) {
 
   const submitStation = async () => {
     if (!validateStepTwo()) {
-      toast.error('Please fix all errors before submitting');
-      return;
+        toast.error('Please fix all errors before submitting');
+        return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const stationData = {
-        station_name: formData.stationName.trim(),
-        address: formData.addressLine.trim(),
-        district: formData.district,
-        city: formData.city.trim(),
-        electricity_provider: formData.electricityProvider || undefined,
-        power_source: formData.powerSource || undefined,
-        chargers: chargers.map(charger => ({
-          charger_name: charger.name.trim(),
-          power_type: charger.powerType,
-          max_power_output: parseFloat(charger.maxPower),
-          connector_types: charger.connectors
-        }))
-      };
+        const stationData = {
+            station_name: formData.stationName.trim(),
+            address: formData.addressLine.trim(),
+            district: formData.district,
+            city: formData.city.trim(),
+            electricity_provider: formData.electricityProvider || undefined,
+            power_source: formData.powerSource || undefined,
+            chargers: chargers.map(charger => ({
+                charger_name: charger.name.trim(),
+                power_type: charger.powerType,
+                max_power_output: parseFloat(charger.maxPower),
+                connector_types: charger.connectors
+            }))
+        };
 
+        const stationOwnerID = localStorage.getItem('userID');
+        const response = await axios.post(
+            `${API_BASE_URL}/api/stations/create-station`,
+            { stationOwnerID, ...stationData },
+            {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        toast.success('Station request submitted successfully!');
+        onSubmit?.(response.data.data);
         
-      const stationOwnerID = localStorage.getItem('userID')
-      const response = await axios.post(
-        `${API_BASE_URL}/api/stations/create-station`,
-        {stationOwnerID,
-        ...stationData},
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-            'Content-Type': 'application/json'
-          }
+        // Navigate based on backend response
+        if (response.data.shouldNavigateToDashboard) {
+            navigate('/station-owner');
+        } else {
+            navigate('/initstation');
         }
-      );
-
-      toast.success('Station request submitted successfully!');
-      onSubmit?.(response.data.data);
-      navigate('/initstation');
-      onClose();
+        
+        onClose();
     } catch (error) {
-      console.error('Error submitting station:', error);
-      const errorMessage = error.response?.data?.message || 
-                         (error.response?.status === 401 ? 'Please login again' : 
-                         'Failed to submit station. Please try again.');
-      toast.error(errorMessage);
-      
-      if (error.response?.status === 401) {
-        navigate('/login');
-      }
+        console.error('Error submitting station:', error);
+        const errorMessage = error.response?.data?.message || 
+                           (error.response?.status === 401 ? 'Please login again' : 
+                           'Failed to submit station. Please try again.');
+        toast.error(errorMessage);
+        
+        if (error.response?.status === 401) {
+            navigate('/login');
+        }
     } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
-  };
+};
 
   const getAvailableConnectors = (powerType) => {
     return powerType ? connectors[powerType] || [] : [];

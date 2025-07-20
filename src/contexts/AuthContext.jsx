@@ -67,7 +67,7 @@ export function AuthProvider({ children }) {
       }
     } catch (err) {
       console.log('verify token error: ', err);
-      // logout();
+      logout();
     } finally {
       setLoading(false);
     }
@@ -203,6 +203,7 @@ export function AuthProvider({ children }) {
     } finally {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userID');
       setCurrentUser(null);
       navigate('/auth?mode=login');
     }

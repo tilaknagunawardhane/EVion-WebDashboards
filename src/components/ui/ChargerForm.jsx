@@ -67,9 +67,8 @@ export default function ChargerForm({
                   <select
                     value={charger.powerType}
                     onChange={(e) => handleChargerChange(index, 'powerType', e.target.value)}
-                    className={`w-full rounded-lg px-4 py-2 border ${
-                      errors.chargers?.[index]?.powerType ? 'border-red-500' : 'border-neutral-200'
-                    }`}
+                    className={`w-full rounded-lg px-4 py-2 border ${errors.chargers?.[index]?.powerType ? 'border-red-500' : 'border-neutral-200'
+                      }`}
                     required
                   >
                     <option value="">Select</option>
@@ -85,10 +84,25 @@ export default function ChargerForm({
                   label="Maximum Power Output (kW)"
                   type="number"
                   value={charger.maxPower}
-                  onChange={(e) => handleChargerChange(index, 'maxPower', e.target.value)}
+                  onChange={(e) => {
+                    // Ensure value stays within bounds
+                    let value = e.target.value;
+                    if (value !== '') {
+                      value = Math.max(1, Math.min(1000, Number(value)));
+                    }
+                    handleChargerChange(index, 'maxPower', value);
+                  }}
                   placeholder="e.g., 22"
                   error={errors.chargers?.[index]?.maxPower}
                   required
+                  min={1}
+                  max={1000}
+                  onBlur={(e) => {
+                    // If field is empty after blur, set to minimum value
+                    if (e.target.value === '') {
+                      handleChargerChange(index, 'maxPower', 1);
+                    }
+                  }}
                 />
 
                 <div>
@@ -100,8 +114,8 @@ export default function ChargerForm({
                   </div>
                   <div className="grid grid-cols-2 gap-3 mt-2">
                     {getAvailableConnectors(charger.powerType).map((connector) => (
-                      <label 
-                        key={connector._id} 
+                      <label
+                        key={connector._id}
                         className="flex items-center space-x-2 text-sm p-2 rounded hover:bg-gray-50"
                         style={{ color: COLORS.mainTextColor }}
                       >
@@ -138,16 +152,16 @@ export default function ChargerForm({
       {/* Fixed button area */}
       <div className="pt-4 mt-auto sticky bottom-0 bg-white border-t border-gray-200">
         <div className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={goBack} 
+          <Button
+            variant="outline"
+            onClick={goBack}
             disabled={isSubmitting}
             className="px-6 py-2"
           >
             Back
           </Button>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={onSubmit}
             disabled={isSubmitting}
             className="px-6 py-2"

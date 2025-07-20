@@ -22,11 +22,11 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
   };
 
   const statusColors = {
-    'Processing': COLORS.star || '#F59E0B',
-    'Approved': COLORS.primary || '#3B82F6',
-    'To be Installed': COLORS.mainTextColor || '#10B981',
-    'Active': COLORS.primary,
-    'Closed': COLORS.bgGreen
+    'processing': COLORS.star || '#F59E0B',
+    'approved': COLORS.primary || '#3B82F6',
+    'to-be-installed': COLORS.mainTextColor || '#10B981',
+    'active': COLORS.primary,
+    'closed': COLORS.bgGreen
   };
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
               className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-50"
               style={{ border: '1px solid #e5e7eb' }}
             >
-              {safeStation.status === 'Processing' && (
+              {safeStation.status === 'processing' && (
                 <button
                   className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                   onClick={() => {
@@ -201,7 +201,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
           {expanded ? 'Hide Details' : 'More'}
         </button>
 
-        {safeStation.status === 'Approved' && (
+        {safeStation.status === 'approved' && (
           <Button variant="primary" onClick={() => onPay?.(safeStation)}>
             Pay Now
           </Button>
