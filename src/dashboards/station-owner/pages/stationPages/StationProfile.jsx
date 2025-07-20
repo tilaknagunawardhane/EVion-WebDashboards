@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'; // Added useEffect
+import React, { useState, useRef } from 'react'; // Added useEffect
 import { COLORS, FONTS } from '../../../../constants';
 import { useNavigate } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';

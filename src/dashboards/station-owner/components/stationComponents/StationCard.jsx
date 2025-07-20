@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
 import Button from '../../../../components/ui/Button';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'; // Import chevron icons
@@ -30,7 +30,7 @@ export default function StationCard({ station, onClick, onPay }) {
 
     // Determine if the card should be expandable
     // Now 'To be installed' should also be expandable
-    const isExpandable = ['Pending Approval', 'To be installed'].includes(station.status);
+    const isExpandable = ['Pending Approval', 'To be installed', 'Approved - Waiting for Payment'].includes(station.status);
 
     return (
         <div
@@ -94,6 +94,24 @@ export default function StationCard({ station, onClick, onPay }) {
                 </div>
             </div>
 
+
+            {/* Bottom Section: Pay Now and Date of Request */}
+            <div className="flex justify-between items-end mt-6">
+                {/* Pay Now Button */}
+                {station.status === 'Approved - Waiting for Payment' && (
+                    <div className="flex w-full justify-start items-end">
+                        <Button 
+                          variant="primary" 
+                          onClick={(e) => { e.stopPropagation(); onPay?.(station); }}
+                        >
+                            Pay Now
+                        </Button>
+                        
+                    </div>
+                )}
+               
+            </div>
+
             {/* Expandable Section */}
             {isExpandable && (
                 <>
@@ -153,27 +171,6 @@ export default function StationCard({ station, onClick, onPay }) {
                 </>
             )}
 
-            {/* Bottom Section: Pay Now and Date of Request */}
-            <div className="flex justify-between items-end mt-6">
-                {/* Pay Now Button */}
-                {station.status === 'Approved - Waiting for Payment' && (
-                    <div className="flex w-full justify-between items-end">
-                        {station.dateOfRequest && ['Pending Approval', 'Approved - Waiting for Payment', 'To be installed'].includes(station.status) && (
-                            <p className="text-right text-xs" style={{ color: COLORS.secondaryText }}>
-                                {station.dateOfRequest} {/* This will now correctly display the full string */}
-                            </p>
-                        )}
-                        <Button 
-                          variant="primary" 
-                          onClick={(e) => { e.stopPropagation(); onPay?.(station); }}
-                        >
-                            Pay Now
-                        </Button>
-                        
-                    </div>
-                )}
-               
-            </div>
         </div>
     );
 }

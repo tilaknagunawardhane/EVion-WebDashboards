@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../../../../components/ui/Button';
 import InputField from '../../../../components/ui/InputField';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { COLORS, FONTS } from '../../../../constants';
 import StepOneForm from '../stationComponents/RStationForm';
 import StepTwoForm from '../stationComponents/RChargerForm';
@@ -26,7 +26,7 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
     { name: '', maxPower: '', connectors: [] }
   ]);
   const [locationData, setLocationData] = useState(null);
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     stationName: '',

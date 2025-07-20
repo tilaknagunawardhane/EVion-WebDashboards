@@ -4,26 +4,31 @@ import { useNavigate } from 'react-router-dom';
 import StationOwnerPageHeader from '../components/StationOwnerPageHeader';
 import Button from '../../../components/ui/Button';
 import StationCard from '../components/stationComponents/StationCard';
-import AddChargingStationForm from '../../../components/ui/AddStationForm';
+import AddChargingStationForm from '../../station-owner/components/stationComponents/RAddStationForm';
 import { FiSearch } from 'react-icons/fi';
 
 export default function StationsPage() {
     const [showForm, setShowForm] = useState(false);
     const [stations, setStations] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+
+    const [stationToEdit, setStationToEdit] = useState(null);
+    const [formMode, setFormMode] = useState('add-station');
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
+        
             const mockData = [
                 {
                     id: 's1',
                     name: 'EviGO Charging Station Station',
                     status: 'Open',
                     address: '45 Peradeniya Road, Kandy',
+                    addressLine: '45 Peradeniya Road', // Added for editing
+                    city: 'Kandy', // Added for editing
+                    district: 'Kandy',
+                    location: { lat: 7.290, lng: 80.634 },
                     electricityProvider: 'LECO',
                     powerSource: 'Solar',
                     chargers: [
@@ -38,6 +43,10 @@ export default function StationsPage() {
                     name: 'EVion Station – Galle',
                     status: 'Open',
                     address: '78 Lighthouse Street, Galle',
+                    addressLine: '78 Lighthouse Street', // Added for editing
+                    city: 'Galle', // Added for editing
+                    district: 'Galle', // Added for editing
+                    location: { lat: 6.033, lng: 80.217 },
                     electricityProvider: 'CEB',
                     powerSource: 'Hybrid',
                     chargers: [
@@ -52,6 +61,10 @@ export default function StationsPage() {
                     name: 'EVion Station – Kandy',
                     status: 'Closed',
                     address: '45 Peradeniya Road, Kandy',
+                    addressLine: '45 Peradeniya Road',
+                    city: 'Kandy',
+                    district: 'Kandy',
+                    location: { lat: 7.291, lng: 80.635 },
                     electricityProvider: 'CEB',
                     powerSource: 'Grid',
                     chargers: [
@@ -64,6 +77,10 @@ export default function StationsPage() {
                     name: 'EVion Station – Nugegoda',
                     status: 'Pending Approval',
                     address: '123 Highlevel Road, Nugegoda',
+                    addressLine: '123 Highlevel Road',
+                    city: 'Nugegoda',
+                    district: 'Colombo',
+                    location: { lat: 6.877, lng: 79.916 },
                     electricityProvider: 'LECO',
                     powerSource: 'Solar',
                     chargers: [
@@ -77,6 +94,10 @@ export default function StationsPage() {
                     name: 'Colombo City Station',
                     status: 'Approved - Waiting for Payment',
                     address: '100 Galle Road, Colombo 3',
+                    addressLine: '100 Galle Road',
+                    city: 'Colombo 3',
+                    district: 'Colombo',
+                    location: { lat: 6.908, lng: 79.859 },
                     electricityProvider: 'CEB',
                     powerSource: 'Grid',
                     chargers: [
@@ -89,6 +110,10 @@ export default function StationsPage() {
                     name: 'Airport Road Station',
                     status: 'Pending Approval',
                     address: '20 Airport Rd, Katunayake',
+                    addressLine: '20 Airport Rd',
+                    city: 'Katunayake',
+                    district: 'Gampaha',
+                    location: { lat: 7.185, lng: 79.870 },
                     electricityProvider: 'LECO',
                     powerSource: 'Grid',
                     chargers: [
@@ -102,6 +127,10 @@ export default function StationsPage() {
                     name: 'Kottawa Install Site',
                     status: 'To be installed',
                     address: 'Kottawa Industrial Zone, Kottawa',
+                    addressLine: 'Kottawa Industrial Zone',
+                    city: 'Kottawa',
+                    district: 'Colombo',
+                    location: { lat: 6.820, lng: 79.957 },
                     electricityProvider: 'LECO',
                     powerSource: 'Grid',
                     chargers: [
@@ -114,6 +143,10 @@ export default function StationsPage() {
                     name: 'Jaffna New Location',
                     status: 'To be installed',
                     address: '15 Main Street, Jaffna',
+                    addressLine: '15 Main Street',
+                    city: 'Jaffna',
+                    district: 'Jaffna',
+                    location: { lat: 9.661, lng: 80.025 },
                     electricityProvider: 'CEB',
                     powerSource: 'Solar',
                     chargers: [
@@ -131,13 +164,24 @@ export default function StationsPage() {
             }));
 
             setStations(stationsWithIds);
-            setLoading(false);
-        }, 500);
+            
     }, []);
+
+    const handleAddStationClick = () => {
+        setStationToEdit(null); // Clear any station being edited
+        setFormMode('add-station'); // Set mode for adding
+        setShowForm(true);
+    };
+
+    const handleEditStation = (station) => {
+        setStationToEdit(station); // Set the station data to pre-fill the form
+        setFormMode('edit-station'); // Set mode for editing
+        setShowForm(true);
+    };
 
     const handleCardClick = (station) => {
         // Only navigate if the status doesn't use the card's click for expansion
-        if (!['Pending Approval', 'To be installed'].includes(station.status)) {
+        if (!['Pending Approval', 'To be installed', 'Approved - Waiting for Payment'].includes(station.status)) {
             navigate(`/station-owner/stations/stationprofile/${station.id}`);
         }
     };
@@ -146,10 +190,15 @@ export default function StationsPage() {
         console.log('Initiating payment for station:', station.name, station.id);
         alert(`Payment for ${station.name} initiated! (This is a mock action)`);
         // In a real app, after successful payment, you'd update the station's status
-        // setStations(prevStations => prevStations.map(s => s.id === station.id ? { ...s, status: 'To be installed' } : s));
+        // For mock, let's change status to 'To be installed'
+        setStations(prevStations =>
+            prevStations.map(s =>
+                s.id === station.id ? { ...s, status: 'To be installed' } : s
+            )
+        );
     };
 
-    const filteredStations = stations.filter(station =>
+    const filteredStations = stations.filter(station => 
         station.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         station.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
         station.status.toLowerCase().includes(searchTerm.toLowerCase())
@@ -194,11 +243,67 @@ export default function StationsPage() {
                             station={station}
                             onClick={() => handleCardClick(station)}
                             onPay={handlePayNow}
+                            onEditStation={handleEditStation}
                         />
                     ))}
                 </div>
             </div>
         );
+    };
+
+    const handleFormSubmit = (submissionData) => {
+        if (submissionData.type === 'add-station') {
+            const newStation = submissionData.station;
+            const newId = `s${stations.length + 1}-${Date.now()}`;
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: 'short', day: '2-digit' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const dateString = now.toLocaleDateString('en-US', dateOptions);
+            const timeString = now.toLocaleTimeString('en-US', timeOptions);
+
+            setStations((prev) => [
+                ...prev,
+                {
+                    id: newId,
+                    status: 'Pending Approval', // New stations start here
+                    dateOfRequest: `${dateString} ${timeString}`,
+                    name: newStation.name || 'Unnamed Station', // Access `name` from newStation
+                    address: newStation.address || 'No Address Provided', // Access `address` from newStation
+                    electricityProvider: newStation.electricityProvider || 'N/A',
+                    powerSource: newStation.powerSource || 'N/A',
+                    chargers: newStation.chargers || [],
+                    location: newStation.location || null,
+                    // Pass individual address components for potential future editing
+                    addressLine: newStation.addressLine,
+                    city: newStation.city,
+                    district: newStation.district,
+                }
+            ]);
+        } else if (submissionData.type === 'edit-station') {
+            const updatedStationData = submissionData.station;
+            setStations(prevStations =>
+                prevStations.map(station =>
+                    station.id === updatedStationData.id
+                        ? {
+                              ...station, // Keep existing properties not explicitly updated
+                              name: updatedStationData.stationName, // Use stationName from formData
+                              addressLine: updatedStationData.addressLine,
+                              city: updatedStationData.city,
+                              district: updatedStationData.district,
+                              electricityProvider: updatedStationData.electricityProvider,
+                              powerSource: updatedStationData.powerSource,
+                              location: updatedStationData.location,
+                              // Reconstruct the combined address for display on the card
+                              address: `${updatedStationData.addressLine}, ${updatedStationData.city}`
+                          }
+                        : station
+                )
+            );
+        }
+        // Handle 'add-charger-to-existing-station' and 'edit-charger' here if needed for this page
+        // For now, let's assume those are handled in StationProfile.jsx or similar.
+        setShowForm(false);
+        setStationToEdit(null); // Clear editing state
     };
 
     return (
@@ -228,35 +333,30 @@ export default function StationsPage() {
                         />
                     </div>
                     <div className="flex w-full justify-end">
-                        <Button variant="primary" type="button" onClick={() => setShowForm(true)}>
+                        <Button variant="primary" type="button" onClick={handleAddStationClick}>
                             Add Charging Station
                         </Button>
                     </div>
                 </div>
 
-                {loading ? (
-                    <div className="text-center py-8" style={{ color: COLORS.mainTextColor }}>
-                        Loading stations...
-                    </div>
-                ) : (
-                    <>
-                        {renderStationSection('Open Stations', categorizedStations['Open'])}
-                        {renderStationSection('Approved - Waiting for Payment', categorizedStations['Approved - Waiting for Payment'])}
-                        {renderStationSection('To be installed', categorizedStations['To be installed'])}
-                        {renderStationSection('Pending Approval', categorizedStations['Pending Approval'])}
-                        {renderStationSection('Closed Stations', categorizedStations['Closed'])}
-                        {categorizedStations['Other'].length > 0 && renderStationSection('Other Stations', categorizedStations['Other'])}
+                
+                <>
+                    {renderStationSection('Open Stations', categorizedStations['Open'])}
+                    {renderStationSection('Approved - Waiting for Payment', categorizedStations['Approved - Waiting for Payment'])}
+                    {renderStationSection('To be installed', categorizedStations['To be installed'])}
+                    {renderStationSection('Pending Approval', categorizedStations['Pending Approval'])}
+                    {renderStationSection('Closed Stations', categorizedStations['Closed'])}
+                    {categorizedStations['Other'].length > 0 && renderStationSection('Other Stations', categorizedStations['Other'])}
 
-                        {stations.length === 0 && (
-                            <div className="text-center py-8" style={{ color: COLORS.secondaryText }}>
-                                No charging stations found. Click "Add Charging Station" to get started!
-                            </div>
-                        )}
-                    </>
-                )}
+                    {stations.length === 0 && (
+                        <div className="text-center py-8" style={{ color: COLORS.secondaryText }}>
+                            No charging stations found. Click "Add Charging Station" to get started!
+                        </div>
+                    )}
+                </>
             </div>
 
-            {showForm && (
+            {/* {showForm && (
                 <AddChargingStationForm
                     onClose={() => setShowForm(false)}
                     onSubmit={(newStation) => {
@@ -272,10 +372,34 @@ export default function StationsPage() {
                                 id: newId,
                                 status: 'Pending Approval', // New stations start here
                                 dateOfRequest: `${dateString} ${timeString}`,
+                                name: newStation.name || 'Unnamed Station', // Provide a default if name is missing
+                                address: newStation.address || 'No Address Provided', // Provide a default
+                                
+                                electricityProvider: newStation.electricityProvider || 'N/A', // Add defaults for other expected fields
+                                powerSource: newStation.powerSource || 'N/A',
+                                chargers: newStation.chargers || [], // Ensure it's an array
+                                
+                                ...newStation,
+                                
+                            
                             }
                         ]);
                         setShowForm(false);
                     }}
+                    mode="add-station"
+                    initialFormData={null}
+                />
+            )} */}
+            {showForm && (
+                <AddChargingStationForm
+                    onClose={() => {
+                         setShowForm(false)
+                         setStationToEdit(null);
+                    }}
+                    onSubmit={handleFormSubmit}
+                    mode={formMode}
+                    initialFormData={stationToEdit} // Ensure this is null for adding a new station
+                    initialChargerData={null}
                 />
             )}
         </div>
