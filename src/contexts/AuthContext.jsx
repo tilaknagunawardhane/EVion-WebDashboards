@@ -114,7 +114,7 @@ export function AuthProvider({ children }) {
         try {
           const stationCheck = await axios.post(
             `${API_BASE_URL}/api/stations/check-stations`,
-            { userId: res.data.user._id }, // Only send userId
+            { userId: res.data.user._id },
             {
               headers: {
                 'Authorization': `Bearer ${res.data.accessToken}`,
@@ -125,15 +125,32 @@ export function AuthProvider({ children }) {
 
           console.log('Station check response:', stationCheck.data);
 
-          if (stationCheck.data.success && stationCheck.data.hasStations) {
-            navigate('/station-owner');
-          } else {
+          if (!stationCheck.data.hasStations) {
+            // Case 1: No stations at all
             navigate('/initaddstation');
+            toast.info('Please add your first charging station', {
+              position: "top-right",
+              autoClose: 3000
+            });
+          } else if (stationCheck.data.hasApprovedStation) {
+            // Case 2: Has at least one approved station
+            navigate('/station-owner');
+            toast.success('Accessing your station dashboard', {
+              position: "top-right",
+              autoClose: 3000
+            });
+          } else {
+            // Case 3: Has stations but none approved
+            navigate('/initstation');
+            toast.warning('Your stations are pending approval', {
+              position: "top-right",
+              autoClose: 4000
+            });
           }
+
         } catch (error) {
           console.error('Station check failed:', error);
 
-          // Show error only if not already shown by interceptor
           if (!error.config._retry) {
             toast.error(
               error.response?.data?.message || 'Failed to verify station status',
@@ -141,8 +158,8 @@ export function AuthProvider({ children }) {
             );
           }
 
-          // Default to init station page
-          // navigate('/initaddstation');
+          // Default navigation when check fails
+          navigate('/initaddstation');
           throw error;
         }
       } else {
