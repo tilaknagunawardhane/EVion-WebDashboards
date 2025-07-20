@@ -61,10 +61,13 @@ export function AuthProvider({ children }) {
       const token = localStorage.getItem('accessToken');
       if (token) {
         const res = await axios.get(`${API_BASE_URL}/api/auth/me`);
-        setCurrentUser(res.data.user);
+        // setCurrentUser(res.data.user.userType);
+        console.log('Current user is ', res.data.user.userType);
+
       }
     } catch (err) {
-      logout();
+      console.log('verify token error: ', err);
+      // logout();
     } finally {
       setLoading(false);
     }
@@ -89,10 +92,12 @@ export function AuthProvider({ children }) {
       }
 
       const res = await axios.post(`${API_BASE_URL}${endpoint}`, { email, password });
-      
+
       localStorage.setItem('accessToken', res.data.accessToken);
       localStorage.setItem('refreshToken', res.data.refreshToken);
-      setCurrentUser(res.data.user);
+      setCurrentUser(userType);
+      console.log('res: ', res);
+      console.log('current user:', userType);
 
       // Show success toast
       toast.success(`Welcome back, ${res.data.user.name || res.data.user.email}!`, {
@@ -101,12 +106,45 @@ export function AuthProvider({ children }) {
       });
 
       // Redirect based on role
-      if (res.data.user.role === 'admin') {
+      if (res.data.userType === 'admin') {
         navigate('/admin/dashboard');
-      } else if (res.data.user.role === 'support-officer') {
+      } else if (res.data.userType === 'support-officer') {
         navigate('/support-officer/dashboard');
-      } else if (res.data.userType === 'stationowner') {
-        navigate('/station-owner/dashboards');
+      } else if (userType === 'station-owner') {
+        try {
+          const stationCheck = await axios.post(
+            `${API_BASE_URL}/api/stations/check-stations`,
+            { userId: res.data.user._id }, // Only send userId
+            {
+              headers: {
+                'Authorization': `Bearer ${res.data.accessToken}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+
+          console.log('Station check response:', stationCheck.data);
+
+          if (stationCheck.data.success && stationCheck.data.hasStations) {
+            navigate('/station-owner');
+          } else {
+            navigate('/initaddstation');
+          }
+        } catch (error) {
+          console.error('Station check failed:', error);
+
+          // Show error only if not already shown by interceptor
+          if (!error.config._retry) {
+            toast.error(
+              error.response?.data?.message || 'Failed to verify station status',
+              { position: "top-right", autoClose: 5000 }
+            );
+          }
+
+          // Default to init station page
+          // navigate('/initaddstation');
+          throw error;
+        }
       } else {
         navigate('/');
       }
@@ -114,10 +152,13 @@ export function AuthProvider({ children }) {
       return res.data.user;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 5000,
-      });
+      toast.error(
+        error.response?.data?.message || 'Failed to check station status',
+        {
+          position: "top-right",
+          autoClose: 5000,
+        }
+      );
       throw errorMessage;
     }
   };
@@ -129,7 +170,7 @@ export function AuthProvider({ children }) {
     else if (userData.role === 'support-officer') navigate('/support-officer/dashboard')
   }
 
- const logout = async () => {
+  const logout = async () => {
     try {
       await axios.post(`${API_BASE_URL}/api/auth/logout`);
       toast.info('You have been logged out', {
@@ -148,7 +189,7 @@ export function AuthProvider({ children }) {
       navigate('/auth?mode=login');
     }
   };
-  
+
   useEffect(() => {
     verifyToken();
   }, []);
