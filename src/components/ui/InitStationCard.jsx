@@ -11,7 +11,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
   // Safe defaults for station data
   const safeStation = {
     name: '',
-    status: 'Processing',
+    status: 'processing',
     address: '',
     powerTypes: [],
     electricityProvider: '',
@@ -86,7 +86,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
                 <button
                   className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                   onClick={() => {
-                    onEdit?.(safeStation);
+                    onEdit?.(station);
                     setShowMenu(false);
                   }}
                 >

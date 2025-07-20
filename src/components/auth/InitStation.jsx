@@ -15,6 +15,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function InitStations() {
     const [showForm, setShowForm] = useState(false);
+    const [editingStation, setEditingStation] = useState(null);
     const [stations, setStations] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -104,7 +105,7 @@ export default function InitStations() {
                             <StationCard
                                 key={station._id}
                                 station={station}
-                                onEdit={(station) => navigate(`/stations/edit/${station._id}`)}
+                                onEdit={setEditingStation}
                                 onPay={() => navigate(`/payment/${station._id}`)}
                                 onRemove={(station) => handleRemoveStation(station._id)}
                             />
@@ -130,6 +131,21 @@ export default function InitStations() {
                     onSubmit={(newStation) => {
                         setStations((prev) => [...prev, newStation]);
                         toast.success('Station added successfully');
+                    }}
+                />
+            )}
+
+            {editingStation && (
+                <AddChargingStationForm
+                    isEdit={true}
+                    stationToEdit={editingStation}
+                    stationId={editingStation._id}
+                    onClose={() => setEditingStation(null)}
+                    onSubmit={(updatedStation) => {
+                        setStations(stations.map(station =>
+                            station._id === updatedStation._id ? updatedStation : station
+                        ));
+                        toast.success('Station updated successfully');
                     }}
                 />
             )}
