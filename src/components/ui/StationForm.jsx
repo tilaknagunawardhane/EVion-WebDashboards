@@ -10,14 +10,12 @@ export default function StepOneForm({
   districts,
   elecProviders,
   supportedPowerTypes,
-  sources
+  sources,
+  errors
 }) {
   return (
     <div>
-      <h2
-        className="text-2xl font-normal mb-6"
-        style={{ color: COLORS.mainTextColor }}
-      >
+      <h2 className="text-2xl font-normal mb-6" style={{ color: COLORS.mainTextColor }}>
         Charging Station Details
       </h2>
 
@@ -27,41 +25,41 @@ export default function StepOneForm({
           placeholder="Enter station name"
           value={formData.stationName}
           onChange={handleChange('stationName')}
+          error={errors.stationName}
           required
         />
 
-        {/* District Dropdown */}
         <div className="w-full">
-          <div className="flex items-center gap-0 mb-0">
-            <label
-              className="block"
-              style={{
-                color: COLORS.mainTextColor,
-                fontSize: FONTS.sizes.xs,
-                fontWeight: FONTS.weights.normal,
-              }}
-            >
+          <div className="flex items-center gap-0 mb-1">
+            <label className="block" style={{
+              color: COLORS.mainTextColor,
+              fontSize: FONTS.sizes.xs,
+              fontWeight: FONTS.weights.normal,
+            }}>
               District
             </label>
             <span style={{ color: COLORS.danger }}>*</span>
           </div>
-
           <select
             value={formData.district}
             onChange={handleChange('district')}
+            className={`w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-1 ${
+              errors.district ? 'border-red-500' : 'border-neutral-200 focus:border-primary'
+            }`}
             required
-            className="w-full rounded-lg border border-neutral-200 px-4 py-3 focus:outline-none focus:ring-1 focus:border-primary"
           >
             <option value="">Select District</option>
-            {districts.map((d) => (
-              <option key={d} value={d}>
-                {d}
+            {districts.map((district) => (
+              <option key={district._id} value={district._id}>
+                {district.name}
               </option>
             ))}
           </select>
+          {errors.district && (
+            <p className="mt-1 text-sm text-red-600">{errors.district}</p>
+          )}
         </div>
 
-        {/* Address Line & City */}
         <div className="flex gap-2">
           <InputField
             label="Address Line"
@@ -74,51 +72,18 @@ export default function StepOneForm({
             placeholder="Enter city"
             value={formData.city}
             onChange={handleChange('city')}
+            error={errors.city}
             required
           />
         </div>
 
-        {/* Supported Power Types */}
-        <div className="w-full">
-          <div className="flex items-center gap-1 mb-0">
-            <label
-              className="block mb-2"
-              style={{
-                color: COLORS.mainTextColor,
-                fontSize: FONTS.sizes.xs,
-                fontWeight: FONTS.weights.normal,
-              }}
-            >
-              Supported Power Types
-            </label>
-            <span style={{ color: COLORS.danger }}>*</span>
-          </div>
-          <select
-            value={formData.supportedPowerTypes}
-            onChange={handleChange('powerType')}
-            required
-            className="w-full rounded-lg border border-neutral-200 px-4 py-3 focus:outline-none focus:ring-1 focus:border-primary"
-          >
-            <option value="">Select Power Type</option>
-            {supportedPowerTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Electricity Provider & Power Source */}
         <div className="flex gap-2">
           <div className="w-full">
-            <label
-              className="block mb-2"
-              style={{
-                color: COLORS.mainTextColor,
-                fontSize: FONTS.sizes.xs,
-                fontWeight: FONTS.weights.normal,
-              }}
-            >
+            <label className="block mb-1" style={{
+              color: COLORS.mainTextColor,
+              fontSize: FONTS.sizes.xs,
+              fontWeight: FONTS.weights.normal,
+            }}>
               Electricity Provider
             </label>
             <select
@@ -136,14 +101,11 @@ export default function StepOneForm({
           </div>
 
           <div className="w-full">
-            <label
-              className="block mb-2"
-              style={{
-                color: COLORS.mainTextColor,
-                fontSize: FONTS.sizes.xs,
-                fontWeight: FONTS.weights.normal,
-              }}
-            >
+            <label className="block mb-1" style={{
+              color: COLORS.mainTextColor,
+              fontSize: FONTS.sizes.xs,
+              fontWeight: FONTS.weights.normal,
+            }}>
               Power Source Type
             </label>
             <select
@@ -163,7 +125,7 @@ export default function StepOneForm({
       </div>
 
       <div className="mt-8 flex justify-end">
-        <Button variant="primary" type="button" onClick={nextStep}>
+        <Button variant="primary" onClick={nextStep}>
           Next
         </Button>
       </div>

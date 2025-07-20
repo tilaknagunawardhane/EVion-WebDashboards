@@ -95,6 +95,7 @@ export function AuthProvider({ children }) {
 
       localStorage.setItem('accessToken', res.data.accessToken);
       localStorage.setItem('refreshToken', res.data.refreshToken);
+      localStorage.setItem('userID', res.data.user._id);
       setCurrentUser(userType);
       console.log('res: ', res);
       console.log('current user:', userType);
