@@ -11,7 +11,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function LoginForm() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { loginA } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -24,35 +24,35 @@ export default function LoginForm() {
   const handleSignin = (e) => {
     e.preventDefault();
     
-    // const newErrors = { email: '', password: '' };
+    const newErrors = { email: '', password: '' };
 
-    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
     let valid = true;
     
-    // if (!email.trim()) {
-    //   newErrors.email = 'Please enter your email';
-    //   valid = false;
-    // } else if (!emailRegex.test(email)) {
-    //   newErrors.email = 'Please enter a valid email address';
-    //   valid = false;
-    // }
+    if (!email.trim()) {
+      newErrors.email = 'Please enter your email';
+      valid = false;
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = 'Please enter a valid email address';
+      valid = false;
+    }
 
-    // if (!password) {
-    //   newErrors.password = 'Please enter your password';
-    //   valid = false;
-    // } else if (!passwordRegex.test(password)) {
-    //   newErrors.password = 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character';
-    //   valid = false;
-    // }
+    if (!password) {
+      newErrors.password = 'Please enter your password';
+      valid = false;
+    } else if (!passwordRegex.test(password)) {
+      newErrors.password = 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character';
+      valid = false;
+    }
 
-    // setErrors(newErrors);
+    setErrors(newErrors);
 
     if (!valid) return;
 
-    const userData = { email, role: 'admin' }; // Adjust role based on your logic
-    login(userData);
+    // const userData = { email, role: 'admin' }; // Adjust role based on your logic
+    loginA(email, password, 'admin');
   };
 
 //   const handleForgotPassword = () => {

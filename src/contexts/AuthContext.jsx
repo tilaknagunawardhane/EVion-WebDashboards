@@ -107,7 +107,10 @@ export function AuthProvider({ children }) {
       });
 
       // Redirect based on role
-      if (res.data.userType === 'admin') {
+      if (userType === 'admin') {
+        // console.log('.... Is it here??', currentUser);
+        // const currentUser = 'admin'
+
         navigate('/admin/dashboard');
       } else if (res.data.userType === 'support-officer') {
         navigate('/support-officer/dashboard');
@@ -164,7 +167,8 @@ export function AuthProvider({ children }) {
           throw error;
         }
       } else {
-        navigate('/');
+        // console.log('.... Came here');
+        // navigate('/');
       }
 
       return res.data.user;
@@ -216,7 +220,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       currentUser, login, logout, loading, loginA,
-      isAdmin: currentUser?.role === 'admin',
+      isAdmin: currentUser?.userType === 'admin',
       isSupportOfficer: currentUser?.role === 'support-officer',
       isStationOwner: currentUser?.userType === 'stationowner'
     }}>

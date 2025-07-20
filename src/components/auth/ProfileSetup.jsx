@@ -203,6 +203,7 @@ export default function AccountSetup() {
       if (response.data.accessToken && response.data.refreshToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
+        localStorage.setItem('userID', response.data.user._id);
       }
 
       // Redirect to dashboard or next step
