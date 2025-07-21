@@ -34,11 +34,6 @@ export default function AdminDashboard() {
       path: '/admin/transactions', 
       icon: EarningsIcon
     },
-    { 
-      name: 'Reports', 
-      path: '/admin/reports', 
-      icon: ReportsIcon
-    },
   ]
 
   const bottomNavItems = [
