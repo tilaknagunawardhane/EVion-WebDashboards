@@ -89,7 +89,7 @@ export default function UserAccountPage() {
         'Ending Bat. Level',
         'Energy Delivered',
         'Energy Cost',
-        'Status',
+        'Category',
         'Booking Fee',
         'Charged Penalties',
         'Total Fee',
@@ -115,15 +115,15 @@ export default function UserAccountPage() {
           'Ending Bat. Level': '85%',
           'Energy Delivered': '24.5 kWh',
           'Energy Cost': '$7.35',
-          'Status': 'Booked',
+          'Category': 'Reservation',
           'Booking Fee': '$2.00',
           'Charged Penalties': '$0.00',
           'Total Fee': '$9.35',
           'Payment Status': 'Paid',
           'Rating Given': '4.5',
-          'Complaints': 'None',
-          'Resolve Status': '-',
-          'Refunds': '$0.00'
+          'Complaints': '',
+          'Resolve Status': '',
+          'Refunds': ''
         },
         // Add more session data as needed
       ]
@@ -176,12 +176,12 @@ export default function UserAccountPage() {
           'Booking Fee': '$1.50',
           'Status': 'Attended',
           'Reason to cancel': '-',
-          'Charged Penalties': '$0.00',
+          'Charged Penalties': '',
           'Total Fee': '$6.96',
           'Rating Given': '5.0',
-          'Complaints': 'None',
-          'Resolve Status': '-',
-          'Refunds': '$0.00',
+          'Complaints': '',
+          'Resolve Status': '',
+          'Refunds': '',
           'View Receipt': <a href="#" style={{ color: COLORS.primary }}>View</a>
         },
         // Add more booking data as needed
@@ -219,10 +219,10 @@ export default function UserAccountPage() {
           'Energy Delivered': '15.8 kWh',
           'Energy Cost': '$4.74',
           'Booking Fee': '$1.00',
-          'Penalties': '$0.00',
+          'Penalties': '',
           'Total Fee': '$5.74',
-          'Complaint ID': '-',
-          'Refunds': '$0.00',
+          'Complaint ID': '',
+          'Refunds': '',
           'View Receipt': <a href="#" style={{ color: COLORS.primary }}>View</a>
         },
         // Add more payment data as needed
@@ -336,13 +336,9 @@ export default function UserAccountPage() {
             />
           </div>
 
-          <OverviewCard padding='p-6'>
+          <OverviewCard padding='p-0'>
             {/* Tab Content */}
-            <div className="bg-white rounded-sm shadow-sm overflow-hidden"
-              style={{
-                border: `1px solid ${COLORS.border}`,
-                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
-              }}>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <DataTable
                 columns={tabData[activeTab].columns}
                 data={tabData[activeTab].data}

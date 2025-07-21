@@ -21,7 +21,7 @@ const OwnerViewStation = () => {
         'Associated Station': 'Station A - Colombo Central',
         'Associated Charger': 'Charger01',
         Connector: 'All', // Or a specific connector if only one is affected
-        Status: 'Investigating',
+        Status: 'In Progress',
         'Last Update On': '2025-07-15 10:00 AM',
         'Any actions took to resolve': 'Remote diagnostics initiated. Technician scheduled for 2025-07-15 PM.',
         'Quick Actions': ['Contact Support Officer']
@@ -77,7 +77,7 @@ const OwnerViewStation = () => {
         'Associated Station': 'Station D - Jaffna',
         'Associated Charger': 'Charger04',
         Connector: 'Type 2 AC',
-        Status: 'Investigating',
+        Status: 'In Progress',
         'Last Update On': '2025-07-16 02:00 PM',
         'Any actions took to resolve': 'Monitoring charger performance remotely. Logs being reviewed for anomalies.',
         'Quick Actions': ['Contact Support Officer']

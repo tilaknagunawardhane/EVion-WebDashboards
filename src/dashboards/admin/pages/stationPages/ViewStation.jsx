@@ -94,7 +94,7 @@ const ViewStation = () => {
             connectors: 2,
             connectorTypes: ['CCS2', 'CHAdeMO'],
             bookings: 'Available',
-            currentState: 'In Use',
+            currentState: 'Active',
             lastUpdate: '2023-05-20 14:30'
         },
         {
@@ -105,7 +105,7 @@ const ViewStation = () => {
             connectors: 1,
             connectorTypes: ['CCS2'],
             bookings: 'Not Available',
-            currentState: 'Free',
+            currentState: 'Active',
             lastUpdate: '2023-05-20 15:45'
         },
         {
@@ -158,13 +158,13 @@ const ViewStation = () => {
             vehicle: 'Tesla Model 3',
             energyDelivered: '32 kWh',
             energyCost: 'LKR 1,250',
-            status: 'Booked',
+            category: 'Reservation',
             penalties: 'LKR 0',
             totalFee: 'LKR 1,250',
             paymentStatus: 'Paid',
             rating: 4,
-            complaints: 'None',
-            resolveStatus: 'N/A',
+            complaints: '',
+            resolveStatus: '',
             refunds: 'LKR 0'
         },
         {
@@ -180,13 +180,13 @@ const ViewStation = () => {
             vehicle: 'BYD Atto 3',
             energyDelivered: '48 kWh',
             energyCost: 'LKR 1,890',
-            status: 'Walk-in',
+            category: 'Walk-in',
             penalties: 'LKR 0',
             totalFee: 'LKR 1,890',
             paymentStatus: 'Paid',
             rating: 5,
-            complaints: 'None',
-            resolveStatus: 'N/A',
+            complaints: '',
+            resolveStatus: '',
             refunds: 'LKR 0'
         },
         {
@@ -202,7 +202,7 @@ const ViewStation = () => {
             vehicle: 'MG ZS EV',
             energyDelivered: '28 kWh',
             energyCost: 'LKR 1,100',
-            status: 'Booked (late arrival)',
+            category: 'Reservation - Late Arrival',
             penalties: 'LKR 200',
             totalFee: 'LKR 1,300',
             paymentStatus: 'Paid',
@@ -224,13 +224,13 @@ const ViewStation = () => {
             vehicle: 'Nissan Leaf',
             energyDelivered: '25 kWh',
             energyCost: 'LKR 980',
-            status: 'Booked',
+            category: 'Reservation',
             penalties: 'LKR 0',
             totalFee: 'LKR 980',
             paymentStatus: 'Pending',
             rating: 0,
-            complaints: 'None',
-            resolveStatus: 'N/A',
+            complaints: '',
+            resolveStatus: '',
             refunds: 'LKR 0'
         },
         {
@@ -246,7 +246,7 @@ const ViewStation = () => {
             vehicle: 'BYD Han',
             energyDelivered: '42 kWh',
             energyCost: 'LKR 1,650',
-            status: 'Walk-in',
+            category: 'Walk-in',
             penalties: 'LKR 0',
             totalFee: 'LKR 1,650',
             paymentStatus: 'Refunded',
@@ -293,7 +293,7 @@ const ViewStation = () => {
         },
         'Removed': {
             bg: `${COLORS.secondaryText}20`,
-            text: COLORS.secondaryText
+            text: COLORS.danger
         },
         'Paid': {
             bg: `${COLORS.success}20`,
@@ -425,7 +425,7 @@ const ViewStation = () => {
             'No of Connectors',
             'Supported Connectors',
             'Bookings',
-            'Current State',
+            'Current Status',
             'Last Status Update',
             'Actions'
         ];
@@ -438,7 +438,7 @@ const ViewStation = () => {
             'No of Connectors': charger.connectors,
             'Supported Connectors': charger.connectorTypes.join(', '),
             'Bookings': charger.bookings,
-            'Current State': charger.currentState,
+            'Current Status': charger.currentState,
             'Last Status Update': charger.lastUpdate,
             'Actions': 'View History'
         }));
@@ -458,21 +458,18 @@ const ViewStation = () => {
                             filterOptions={[
                                 { value: 'Charger Type', label: 'DC' },
                                 { value: 'Charger Type', label: 'AC' },
-                                { value: 'Current State', label: 'In Use' },
-                                { value: 'Current State', label: 'Free' },
-                                { value: 'Current State', label: 'Faulty' }
+                                { value: 'Current Status', label: 'Active' },
+                                { value: 'Current Status', label: 'Faulty' }
                             ]}
                             sortOptions={columns.map(col => ({ value: col, label: col }))}
                             searchPlaceholder="Search chargers..."
                         />
                     </div>
-                    <OverviewCard padding='p-6 w-full'>
+                    <OverviewCard padding='p-0 w-full'>
                         {/* Table container with constrained width */}
                         <div className="w-full overflow-hidden">
                             <div className="bg-white rounded-sm shadow-sm w-full"
                                 style={{
-                                    border: `1px solid ${COLORS.border}`,
-                                    boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)',
                                     width: '100%',
                                     maxWidth: '100%',
                                     tableLayout: 'fixed'
@@ -509,7 +506,7 @@ const ViewStation = () => {
             'Vehicle',
             'Energy Delivered',
             'Energy Cost',
-            'Status',
+            'Category',
             'Penalties',
             'Total Fee',
             'Payment Status',
@@ -533,7 +530,7 @@ const ViewStation = () => {
             'Vehicle': session.vehicle,
             'Energy Delivered': session.energyDelivered,
             'Energy Cost': session.energyCost,
-            'Status': session.status,
+            'Category': session.category,
             'Penalties': session.penalties,
             'Total Fee': session.totalFee,
             'Payment Status': session.paymentStatus,
@@ -557,7 +554,7 @@ const ViewStation = () => {
                             sort={sort}
                             setSort={setSort}
                             filterOptions={[
-                                { value: 'Status', label: 'Booked' },
+                                { value: 'Status', label: 'Reservation' },
                                 { value: 'Status', label: 'Walk-in' },
                                 { value: 'Payment Status', label: 'Paid' },
                                 { value: 'Payment Status', label: 'Pending' },
@@ -568,13 +565,9 @@ const ViewStation = () => {
                             searchPlaceholder="Search sessions..."
                         />
                     </div>
-                    <OverviewCard padding='p-6'>
+                    <OverviewCard padding='p-0'>
                         {/* Sessions Table */}
-                        <div className="bg-white rounded-sm shadow-sm overflow-hidden"
-                            style={{
-                                border: `1px solid ${COLORS.border}`,
-                                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
-                            }}>
+                        <div className="bg-white rounded-sm shadow-sm overflow-hidden">
                             <DataTable
                                 columns={columns}
                                 data={processedSessionsData}

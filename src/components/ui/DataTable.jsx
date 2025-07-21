@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { COLORS, FONTS } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 import ChatIcon from '../../assets/chat.svg';
-import { color } from 'chart.js/helpers';
 
 const getStatusStyle = (status) => {
   const statusMap = {
@@ -13,23 +12,29 @@ const getStatusStyle = (status) => {
     'Attended': { background: COLORS.bgGreen, color: COLORS.primary },
     'Paid': { background: COLORS.bgGreen, color: COLORS.primary },
     'Resolved': { background: COLORS.bgGreen, color: COLORS.primary },
+    'New': { background: COLORS.bgGreen, color: COLORS.primary },
+
     'Closed': { background: COLORS.bgRed, color: COLORS.danger },
     'Unpaid': { background: COLORS.bgRed, color: COLORS.danger },
-    'Under Maintenance': { background: '#fadba9', color: COLORS.mainTextColor },
     'Disabled': { background: COLORS.bgRed, color: COLORS.danger },
     'Blocked': { background: COLORS.bgRed, color: COLORS.danger },
-    'Deleted': { background: COLORS.bgRed, color: COLORS.danger },
     'No-show': { background: COLORS.bgRed, color: COLORS.danger },
     'Cancelled': { background: COLORS.bgRed, color: COLORS.danger },
-    'In Progress': { background: '#fadba9', color: COLORS.mainTextColor },
-    'Walk-in': { background: '#fadba9', color: COLORS.mainTextColor },
-    'New': { background: '#d0e0ff', color: COLORS.primary },
+    'Refunded': { background: COLORS.bgRed, color: COLORS.danger },
+    'Faulty': { background: COLORS.bgRed, color: COLORS.danger },
+
+    'Under Maintenance': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'In Progress': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'Walk-in': { background: COLORS.bgYellow, color: COLORS.HighlightText },
     'Pending': { background: COLORS.bgYellow, color: COLORS.HighlightText },
-    'Refunded': { background: '#d0f0fd', color: COLORS.primary },
     'Pending-Approval': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+
+    'Deleted': { background: COLORS.background, color: COLORS.secondaryText },
+    'Removed': { background: COLORS.background, color: COLORS.secondaryText },
+  
     'Open': { background: COLORS.bgBlue, color: COLORS.chargerFree },
-    'Investigating': { background: COLORS.bgYellow, color: COLORS.HighlightText },
-    'Default': { background: COLORS.bgGreen, color: COLORS.primary },
+    
+    'Default': { background: COLORS.background, color: COLORS.secondaryText },
   };
   
   return statusMap[status] || statusMap['Default'];
@@ -43,6 +48,9 @@ const getStatusDotColor = (status) => {
     'Attended': COLORS.primary,
     'Paid': COLORS.primary,
     'Resolved': COLORS.primary,
+    'New': COLORS.primary,
+    'Success': COLORS.primary,
+
     'Closed': COLORS.danger,
     'Disabled': COLORS.danger,
     'Deleted': COLORS.danger,
@@ -50,16 +58,20 @@ const getStatusDotColor = (status) => {
     'No-show': COLORS.danger,
     'Unpaid': COLORS.danger,
     'Cancelled': COLORS.danger,
+    'Refunded': COLORS.danger,
+    'Faulty': COLORS.danger,
+
     'Under Maintenance': COLORS.HighlightText,
     'In Progress': COLORS.HighlightText,
     'Walk-in': COLORS.HighlightText,
-    'New': COLORS.primary,
-    'Refunded': COLORS.primary,
     'Pending': COLORS.HighlightText,
     'Pending-Approval': COLORS.HighlightText,
+
     'Open': COLORS.chargerFree,
-    'Investigating': COLORS.HighlightText,
-    'Default': COLORS.primary
+    
+    'Removed': COLORS.secondaryText,
+
+    'Default': COLORS.secondaryText
   };
   
   return statusColorMap[status] || statusColorMap['Default'];
@@ -79,7 +91,7 @@ const renderCellContent = (value, column, rowData) => {
   if (column.toLowerCase().includes('status')) {
     return (
       <span 
-        className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
+        className="px-2.5 py-1 text-xs font-normal inline-flex items-center gap-1 rounded-md"
         style={getStatusStyle(value)}
       >
         <span 
@@ -114,7 +126,7 @@ const renderCellContent = (value, column, rowData) => {
         <span 
           className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
           style={{ 
-            background: '#fdc7c7', 
+            background: COLORS.bgRed, 
             color: COLORS.danger 
           }}
         >

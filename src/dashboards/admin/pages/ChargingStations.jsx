@@ -162,13 +162,9 @@ export default function ChargingStations() {
                         />
                     </div>
 
-                    <OverviewCard padding='p-6'>
+                    <OverviewCard padding='p-0'>
                         {/* Stations Table */}
-                        <div className="bg-white rounded-sm shadow-sm overflow-hidden"
-                            style={{
-                                border: `1px solid ${COLORS.border}`,
-                                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
-                            }}>
+                        <div className="bg-transparent overflow-hidden">
                             <DataTable
                                 columns={stationColumns}
                                 data={stations.length > 0 ? stations : stationData}
