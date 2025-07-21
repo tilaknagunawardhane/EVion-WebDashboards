@@ -20,7 +20,7 @@ import {
 export default function LandingPage() {
   return (
     <Layout fullWidth={true}>
-      {/* Hero Section */}
+      
         <section className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white py-24 px-8 overflow-hidden">
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -28,9 +28,10 @@ export default function LandingPage() {
             <h1
               className="font-bold mb-6 leading-tight"
               style={{
-            fontSize: FONTS.sizes["6xl"],
-            color: "white",
-              }}
+              fontSize: "2.5rem", // Even larger for desktop
+              color: "white",
+              lineHeight: "1.1"
+            }}
             >
               Powering the Future of EV Travel in Sri Lanka
             </h1>
