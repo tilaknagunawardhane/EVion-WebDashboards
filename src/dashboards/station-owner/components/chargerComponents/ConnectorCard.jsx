@@ -1,27 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { COLORS, FONTS } from '../../../../constants';
 import ClockIcon from '../../../../assets/session_time.svg';
 import EnergyIcon from '../../../../assets/session_energy.svg';
 import CostIcon from '../../../../assets/session_cost.svg';
-import { FiMoreVertical } from 'react-icons/fi'; 
 
-const ChargingSessionCard = ({ connectorName, session, bookings, timeSlots, onEdit, onRemove, onDisable }) => {
-
-  const [isOn, setIsOn] = useState(true);
-  const [showMenu, setShowMenu] = useState(false);
-  const menuRef = useRef();
+const ChargingSessionCard = ({ connectorName, session, bookings, timeSlots  }) => {
 
   const duration = session ? getDuration(session.startDate, session.startTime) : 'Not charging';
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   function isWithinSlot(slotStr, startTimeStr, endTimeStr) {
     if (!startTimeStr || !endTimeStr || !slotStr) return false;
@@ -57,47 +42,6 @@ const ChargingSessionCard = ({ connectorName, session, bookings, timeSlots, onEd
         <h3 className="text-base font-semibold mb-2" style={{ color: COLORS.mainTextColor }}>
           {connectorName}
         </h3>
-      
-        <div className="relative" ref={menuRef}>
-          <button onClick={() => setShowMenu(!showMenu)}>
-            <FiMoreVertical size={20} color={COLORS.mainTextColor} />
-          </button>
-
-          {showMenu && (
-            <div
-              className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-50"
-              style={{ border: '1px solid #e5e7eb' }}
-            >
-              <button
-                className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                onClick={() => {
-                  onEdit;
-                  setShowMenu(false);
-                }}
-              >
-                Edit
-              </button>
-              <button
-                className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
-                onClick={() => {
-                  onDisable;
-                  setShowMenu(false);
-                }}
-              >
-                Disable
-              </button>
-              <button
-                className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
-                onClick={() => {
-                  onRemove;
-                  setShowMenu(false);
-                }}
-              >
-                Remove
-              </button>
-            </div>
-          )}
-        </div>
       </div>
       
       {session ? (
@@ -186,19 +130,6 @@ const ChargingSessionCard = ({ connectorName, session, bookings, timeSlots, onEd
         <h3 className="text-base font-medium justify-between" style={{ color: COLORS.mainTextColor }}>
           Booking Schedule
         </h3>
-
-        <div
-          onClick={() => setIsOn(!isOn)}
-          className={`w-11 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-            isOn ? 'bg-green-500' : 'bg-gray-400'
-          }`}
-        >
-          <div
-            className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-              isOn ? 'translate-x-5' : 'translate-x-0'
-            }`}
-          />
-        </div>
       </div>
 
       {/* Scrollable Booking Grid for 3 Days */}

@@ -47,7 +47,7 @@ export default function ChargerForm({
                 chargerSpecificErrors.name = 'Charger Name is required.';
                 allChargersValid = false;
             }
-            if (!charger.powerType) {
+            if (!charger.powerType && formMode !== 'edit-charger') {
                 chargerSpecificErrors.powerType = 'Power Type is required.';
                 allChargersValid = false;
             }
@@ -56,7 +56,7 @@ export default function ChargerForm({
                 chargerSpecificErrors.maxPower = 'Power Output is required and must be a positive number.';
                 allChargersValid = false;
             }
-            if (charger.connectors.length === 0) {
+            if (charger.connectors.length === 0 && formMode !== 'edit-charger') {
                 chargerSpecificErrors.connectors = 'At least one Connector Type is required.';
                 allChargersValid = false;
             }
@@ -72,6 +72,8 @@ export default function ChargerForm({
             onSubmit(); // Proceed to submit if all validations pass
         }
     };
+
+    const isDisabled = formMode === 'edit-charger';
 
   return (
     <div>
@@ -129,16 +131,17 @@ export default function ChargerForm({
                         value={charger.powerType}
                         onChange={(e) => handleChargerChange(index, 'powerType', e.target.value)}
                         className={`w-full rounded-lg px-4 py-2 border focus:outline-none focus:ring-1 ${
-                                            chargerErrors[index]?.powerType ? 'border-red-500' : 'border-neutral-200 focus:border-primary'
-                                        }`}
-                                        style={{
-                                            fontSize: FONTS.sizes.sm,
-                                            color: COLORS.mainTextColor,
-                                            borderWidth: '1px',
-                                            borderColor: chargerErrors[index]?.powerType ? COLORS.danger : COLORS.stroke,
-                                            backgroundColor: COLORS.background,
-                                        }}
+                            chargerErrors[index]?.powerType ? 'border-red-500' : 'border-neutral-200 focus:border-primary'
+                        }`}
+                        style={{
+                            fontSize: FONTS.sizes.sm,
+                            color: COLORS.mainTextColor,
+                            borderWidth: '1px',
+                            borderColor: chargerErrors[index]?.powerType ? COLORS.danger : COLORS.stroke,
+                            backgroundColor: COLORS.background,
+                        }}
                         required
+                        disabled={isDisabled}
                       >
                         <option value="">Select</option>
                         {powerTypes.map((type) => (
@@ -203,6 +206,7 @@ export default function ChargerForm({
                                 }}
                                 className="ml-0"
                                 style={{ accentColor: COLORS.primary }}
+                                disabled={isDisabled}
                               />
                               <span>{connector}</span>
                             </label>
