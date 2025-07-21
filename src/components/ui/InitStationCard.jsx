@@ -109,18 +109,8 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
       </span>
 
       <div className="flex-col gap-0 mt-8">  
-        <div className="flex flex-wrap gap-4 text-sm mt-2">
-          <div>
-            <strong
-              style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}
-            >
-              Power Types:
-            </strong>{' '}
-            {station.powerTypes.join(', ')}
-          </div>
-        </div>
 
-        <div className="flex flex-wrap justify-between gap-4 text-sm mt-2">
+        <div className="flex flex-wrap justify-between gap-4 text-sm">
           <div>
             <strong
               style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}

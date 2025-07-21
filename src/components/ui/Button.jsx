@@ -25,7 +25,7 @@ export default function Button({
     },
     secondary: {
       backgroundColor: COLORS.bgGreen,
-      color: COLORS.mainTextColor,
+      color: COLORS.primary,
     },
     danger: {
       backgroundColor: COLORS.danger,
@@ -33,7 +33,7 @@ export default function Button({
     },
     outline: {
       // backgroundColor: COLORS.background,
-      color: COLORS.mainTextColor,
+      color: COLORS.secondaryText,
       border: `1px solid ${COLORS.stroke}`,
     },
     danger_outline: {

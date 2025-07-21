@@ -15,10 +15,16 @@ const ConnectorCard = ({
     type,
     connectors,
     connectorStateColors,
-    typeColor = COLORS.secondaryText
+    typeColor = COLORS.secondaryText,
+    onClick
 }) => {
     return (
-        <div className="p-3 rounded-lg bg-white relative">
+        <div 
+            className="p-3 rounded-lg bg-white relative cursor-pointer
+                        transition-all duration-300 ease-in-out
+                       hover:shadow-md hover:bg-white" 
+            onClick={onClick}
+        >
             <div className="flex justify-between items-start">
                 <div className="flex-1">
                     <p className="text-sm font-normal mb-1" style={{ color: COLORS.mainTextColor }}>
@@ -62,17 +68,6 @@ const ConnectorCard = ({
                             );
                         })}
                     </div>
-                </div>
-                <div className="absolute right-4 top-4">
-                    <img
-                        src={ArrowRightIcon}
-                        alt=""
-                        style={{ 
-                            width: '15px', 
-                            height: '15px',
-                            filter: `invert(48%) sepia(13%) saturate(320%) hue-rotate(174deg) brightness(90%) contrast(90%)`
-                        }}
-                    />
                 </div>
             </div>
         </div>

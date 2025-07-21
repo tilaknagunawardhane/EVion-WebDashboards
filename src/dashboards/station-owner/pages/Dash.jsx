@@ -1,15 +1,18 @@
 import { COLORS } from '../../../constants/colors'
 import { FONTS } from '../../../constants/fonts'
 import StatCard from '../components/StatCard'
-import StatusCard from '../components/StatusCard'
-import NotificationsIcon from '../../../assets/notifications.svg'
 import StationsIcon from '../../../assets/stations.svg'
 import ConnectorsIcon from '../../../assets/connectors.svg'
 import SessionsIcon from '../../../assets/sessions.svg'
 import ElectricityIcon from '../../../assets/electricity.svg'
 import IncomeIcon from '../../../assets/electricity.svg'
-import EnergyUsageChart from '../components/EnergyUsageChart'
 import StationOwnerPageHeader from '../components/StationOwnerPageHeader'
+import OverviewChart from '../components/dashboardComponents/OverviewChart'
+import ConnectorStatusChart from '../components/dashboardComponents/ConnectorStatusChart'
+import StackedSessionsChart from '../components/dashboardComponents/StackedSessionCard'
+import MapCard from '../components/dashboardComponents/MapWithPopup'
+import FaultReportsStatusCard from '../components/dashboardComponents/FaultReportsStatusChart'
+import FourWeeksEarnings from '../components/dashboardComponents/FourWeeksEarnings'
 
 export default function DashboardPage() {
   const stats = [
@@ -54,7 +57,7 @@ export default function DashboardPage() {
       <StationOwnerPageHeader title="Stations Overview" />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 space-x-4 mb-4">
         {stats.map((stat, index) => (
           <StatCard
             key={index}
@@ -67,79 +70,38 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="md:col-span-3">
-          <div
-            className="p-6 rounded-xl"
-            style={{
-              backgroundColor: 'white',
-              border: `1px solid ${COLORS.border}`,
-              boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'
-            }}
-          >
-            <h3
-              style={{
-                color: COLORS.mainTextColor,
-                fontSize: FONTS.sizes.lg,
-                fontWeight: FONTS.weights.semibold,
-                marginBottom: '16px'
-              }}
-            >
-              Overview
-            </h3>
-            <div className="h-64 rounded-lg" style={{
-              backgroundColor: COLORS.background,
-              border: `1px dashed ${COLORS.border}`,
-              padding: '16px'
-            }}>
-              <EnergyUsageChart />
-            </div>
-          </div>
+      {/* Status Overview 1 */}
+      <div className="flex flex-col lg:flex-row gap-4 w-full mb-4">
+        <div className="w-full lg:w-2/5">
+          <MapCard />
+        </div>
+        <div className="w-full lg:w-3/5">
+          <OverviewChart />
         </div>
 
-        <StatusCard
-          title="Connector Status"
-          style={{
-            backgroundColor: 'white',
-            border: `1px solid ${COLORS.border}`,
-            borderRadius: '12px',
-            padding: '24px',
-            boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'
-          }}
-        />
       </div>
 
-      {/* Bottom Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[
-          { title: 'Fault Alerts', content: 'No active alerts' },
-          { title: 'Settings', content: 'Account configuration' },
-          { title: 'Help Center', content: 'Contact support' }
-        ].map((item, index) => (
-          <div
-            key={index}
-            className="p-6 rounded-xl"
-            style={{
-              backgroundColor: 'white',
-              border: `1px solid ${COLORS.border}`,
-              boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'
-            }}
-          >
-            <h3
-              style={{
-                color: COLORS.mainTextColor,
-                fontSize: FONTS.sizes.lg,
-                fontWeight: FONTS.weights.semibold,
-                marginBottom: '8px'
-              }}
-            >
-              {item.title}
-            </h3>
-            <p style={{ color: COLORS.secondaryText }}>{item.content}</p>
-          </div>
-        ))}
+      {/* Status Overview 2 */}
+      <div className="flex flex-col lg:flex-row gap-4 w-full">
+
+        <div className="w-full lg:w-2/5">
+          <StackedSessionsChart />
+        </div>
+
+        <div className="w-full lg:w-1/5">
+          <ConnectorStatusChart />
+        </div>
+
+        <div className="w-full lg:w-1/5">
+          <FaultReportsStatusCard />
+        </div>
+
+        <div className="w-full lg:w-1/5">
+          <FourWeeksEarnings />
+        </div>
+
       </div>
     </div>
   )
+
 }

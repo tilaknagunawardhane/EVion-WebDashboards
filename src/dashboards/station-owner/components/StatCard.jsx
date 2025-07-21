@@ -1,7 +1,7 @@
 import { COLORS } from '../../../constants/colors'
 import { FONTS } from '../../../constants/fonts'
 
-export default function StatCard({ title, value, activeSessions, icon }) {
+export default function StatCard({ title, value, icon }) {
   return (
     <div 
       className="p-4 rounded-lg flex flex-col"
@@ -12,12 +12,12 @@ export default function StatCard({ title, value, activeSessions, icon }) {
       }}
     >
       {/* Title Row */}
-      <div className="flex items-center mb-4">
-        <div style={{ marginRight: 12 }}>
+      <div className="flex items-center mb-2">
+        <div style={{ marginRight: 4 }}>
           {icon}
         </div>
         <h3 
-          className="text-base font-medium"
+          className="text-sm font-medium"
           style={{ 
             color: COLORS.mainTextColor,
             fontFamily: FONTS.family.sans
@@ -29,7 +29,7 @@ export default function StatCard({ title, value, activeSessions, icon }) {
 
       {/* Main Value */}
       <p 
-        className="text-2xl font-medium mb-2"
+        className="text-xl font-medium"
         style={{ 
           color: COLORS.mainTextColor,
           fontFamily: FONTS.family.sans
@@ -37,25 +37,6 @@ export default function StatCard({ title, value, activeSessions, icon }) {
       >
         {value}
       </p>
-
-      {/* Active Sessions */}
-      {activeSessions && (
-        <div className="flex items-center">
-          <div 
-            className="w-2 h-2 rounded-full mr-2"
-            style={{ backgroundColor: COLORS.primary }}
-          ></div>
-          <span 
-            className="text-sm"
-            style={{ 
-              color: COLORS.secondaryText,
-              fontFamily: FONTS.family.sans
-            }}
-          >
-            {activeSessions} Active Sessions
-          </span>
-        </div>
-      )}
     </div>
   )
 }

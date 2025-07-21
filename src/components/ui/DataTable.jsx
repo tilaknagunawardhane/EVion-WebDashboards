@@ -6,6 +6,7 @@ import { color } from 'chart.js/helpers';
 
 const getStatusStyle = (status) => {
   const statusMap = {
+    'Success': { background: COLORS.bgGreen, color: COLORS.primary }, 
     'Active': { background: COLORS.bgGreen, color: COLORS.primary },
     'Completed': { background: COLORS.bgGreen, color: COLORS.primary },
     'Confirmed': { background: COLORS.bgGreen, color: COLORS.primary },
@@ -13,13 +14,13 @@ const getStatusStyle = (status) => {
     'Paid': { background: COLORS.bgGreen, color: COLORS.primary },
     'Resolved': { background: COLORS.bgGreen, color: COLORS.primary },
     'Closed': { background: COLORS.bgRed, color: COLORS.danger },
+    'Unpaid': { background: COLORS.bgRed, color: COLORS.danger },
     'Under Maintenance': { background: '#fadba9', color: COLORS.mainTextColor },
     'Disabled': { background: COLORS.bgRed, color: COLORS.danger },
     'Blocked': { background: COLORS.bgRed, color: COLORS.danger },
     'Deleted': { background: COLORS.bgRed, color: COLORS.danger },
     'No-show': { background: COLORS.bgRed, color: COLORS.danger },
     'Cancelled': { background: COLORS.bgRed, color: COLORS.danger },
-    'Pending': { background: COLORS.bgRed, color: COLORS.danger },
     'In Progress': { background: '#fadba9', color: COLORS.mainTextColor },
     'Walk-in': { background: '#fadba9', color: COLORS.mainTextColor },
     'New': { background: '#d0e0ff', color: COLORS.primary },
@@ -47,8 +48,8 @@ const getStatusDotColor = (status) => {
     'Deleted': COLORS.danger,
     'Blocked': COLORS.danger,
     'No-show': COLORS.danger,
+    'Unpaid': COLORS.danger,
     'Cancelled': COLORS.danger,
-    'Pending': COLORS.danger,
     'Under Maintenance': COLORS.HighlightText,
     'In Progress': COLORS.HighlightText,
     'Walk-in': COLORS.HighlightText,
@@ -130,7 +131,7 @@ const renderCellContent = (value, column, rowData) => {
   
   
   // Handle action links
-  if (column === 'View Receipt' || column === 'Actions') {
+  if (column === 'View Receipt' || column === 'Download Receipt' || column === 'Actions') {
     return (
       <a 
         href="#" 
@@ -142,6 +143,29 @@ const renderCellContent = (value, column, rowData) => {
           color: COLORS.primary,
           textDecoration: 'underline',
           fontWeight: FONTS.weights.medium
+        }}
+      >
+        {value}
+      </a>
+    );
+  }
+
+  if (column === 'Revenue Breakdown') {
+    return (
+      <a 
+        href="#" 
+        onClick={(e) => {
+          e.stopPropagation();
+          // if (onBreakdownClick) {
+          //   onBreakdownClick(row);
+          // }
+        }}
+        className="underline"
+        style={{ 
+          color: COLORS.primary,
+          textDecoration: 'underline',
+          fontWeight: FONTS.weights.normal,
+          fontSize:FONTS.sizes.xs
         }}
       >
         {value}

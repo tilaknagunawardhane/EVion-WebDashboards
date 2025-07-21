@@ -9,7 +9,6 @@ export default function StepOneForm({
   nextStep,
   districts,
   elecProviders,
-  supportedPowerTypes,
   sources
 }) {
   return (
@@ -79,7 +78,7 @@ export default function StepOneForm({
         </div>
 
         {/* Supported Power Types */}
-        <div className="w-full">
+        {/* <div className="w-full">
           <div className="flex items-center gap-1 mb-0">
             <label
               className="block mb-2"
@@ -106,7 +105,7 @@ export default function StepOneForm({
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         {/* Electricity Provider & Power Source */}
         <div className="flex gap-2">

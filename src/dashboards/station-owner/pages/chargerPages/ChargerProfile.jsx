@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
 import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
 import DataTable from '../../../../components/ui/DataTable';
 import StarIcon from '../../../../assets/star-filled.svg';
 import StarOutlineIcon from '../../../../assets/star-outline.svg';
 import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
-import ConnectorView from '../../components/chargerComponents/ConnectorCard'
+import ConnectorView from '../../components/chargerComponents/ConnectorCard';
+import { FiMoreVertical } from 'react-icons/fi';
+import AddChargingStationForm from '../../components/stationComponents/RAddStationForm'; 
 
-const OwnerViewStation = () => {
+const OwnerViewCharger = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
+
+    const [showChargerForm, setShowChargerForm] = useState(false);
+    const [formMode, setFormMode] = useState('edit-charger');
+    const [initialChargerData, setInitialChargerData] = useState(null);
+
+    
 
     // Sample station data
     const station = {
@@ -444,41 +452,92 @@ const OwnerViewStation = () => {
     const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Connector', 'Transaction Type', 'Amount (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
     const faultsColumns = ['FaultID', 'Date & Time Reported', 'Fault Type', 'Category', 'Description', 'Connector', 'Status', 'Last Update On', 'Any actions took to resolve', 'Quick Actions']
 
+    const handleEditCharger = () => {
+        console.log('Edit Charger clicked');
+        setFormMode('edit-charger');
+        // Map the charger data to the expected format for RAddStationForm's initialChargerData
+        setInitialChargerData({
+            id: charger.chargerID, // Pass the ID if your form needs it for update API calls
+            name: charger['Charger Name'],
+            maxPower: charger['Maximum Power Output(kW)'].replace(' kW', ''), // Remove ' kW' and parse if needed
+            powerType: charger['Power Type'].split(' ')[0], // Extract 'DC' or 'AC'
+            connectorTypes: charger['Connectors'], // Use connectorTypes for consistency with RAddStationForm
+        });
+        setShowChargerForm(true);
+        setShowChargerMenu(false); // Close the dropdown menu
+    };
+
+    // Function to handle form submission from RAddStationForm
+    const handleFormSubmit = (data) => {
+        console.log("Form submitted with data:", data);
+        // Implement your logic to update the charger data in your backend
+        // For now, just close the form
+        setShowChargerForm(false);
+    };
+
+    // Function to close the form
+    const handleCloseForm = () => {
+        setShowChargerForm(false);
+        setInitialChargerData(null); // Clear initial data when closing
+    };
+
     // Overview Tab Content
     const OverviewTab = () => {
-        // const statusColors = {
-        //     'Active': {
-        //         bg: `${COLORS.primary}20`,
-        //         text: COLORS.primary
-        //     },
-        //     'Closed': {
-        //         bg: `${COLORS.danger}20`,
-        //         text: COLORS.danger
-        //     },
-        //     'Under Maintenance': {
-        //         bg: `${COLORS.HighlightText}20`,
-        //         text: COLORS.HighlightText
-        //     },
-        //     'Disabled': {
-        //         bg: `${COLORS.danger}20`,
-        //         text: COLORS.danger
-        //     },
-        //     'Deleted': {
-        //         bg: `${COLORS.mainTextColor}20`,
-        //         text: COLORS.mainTextColor
-        //     }
-        // };
+        const [showChargerMenu, setShowChargerMenu] = useState(false);
+        const chargerMenuRef = useRef();
 
-        // const currentStatus = charger.status || 'Active';
-        // const statusStyle = statusColors[currentStatus] || statusColors['Active'];
+        useEffect(() => {
+            const handleClickOutside = (e) => {
+                if (chargerMenuRef.current && !chargerMenuRef.current.contains(e.target)) {
+                    setShowChargerMenu(false);
+                }
+            };
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }, []);
+
+        const handleRemoveCharger = () => {
+            const confirmRemove = window.confirm("Are you sure you want to remove this charger?");
+            if (confirmRemove) {
+                console.log('Remove Charger confirmed');
+                navigate('/station-owner/stations/stationprofile/s1');
+                // Logic to remove the charger
+            }
+            setShowChargerMenu(false);
+        };
 
         return (
             <div className="w-full bg-transparent rounded-xl">
 
                 <div className="flex-col space-y-2 bg-white px-8 py-6 rounded-xl mb-4">  
-                    <div className="flex flex-wrap gap-4 text-sm">
+                    <div className="flex justify-between items-center w-full">
                         <div style={{ fontWeight: FONTS.weights.medium, color: COLORS.mainTextColor, fontSize: FONTS.sizes.xl }}>
                             {charger['Charger Name']}
+                        </div>
+                        <div className="relative" ref={chargerMenuRef}>
+                            <button onClick={() => setShowChargerMenu(!showChargerMenu)}>
+                                <FiMoreVertical size={20} color={COLORS.mainTextColor} />
+                            </button>
+
+                            {showChargerMenu && (
+                                <div
+                                    className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-50"
+                                    style={{ border: '1px solid #e5e7eb' }}
+                                >
+                                    <button
+                                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                                        onClick={handleEditCharger}
+                                    >
+                                        Edit Charger
+                                    </button>
+                                    <button
+                                        className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                                        onClick={handleRemoveCharger}
+                                    >
+                                        Remove Charger
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -518,9 +577,9 @@ const OwnerViewStation = () => {
                             session={connector.session}
                             bookings={connector.bookings}
                             timeSlots={timeSlots}
-                            onEdit={() => console.log('Edit', connector.connectorName)}
-                            onDisable={() => console.log('Disable', connector.connectorName)}
-                            onRemove={() => console.log('Remove', connector.connectorName)}
+                            // onEdit={() => console.log('Edit', connector.connectorName)}
+                            // onDisable={() => console.log('Disable', connector.connectorName)}
+                            // onRemove={() => console.log('Remove', connector.connectorName)}
                         />
                         </div>
                     ))}
@@ -612,8 +671,16 @@ const OwnerViewStation = () => {
                     />
                 )}
             </div>
+            {showChargerForm && (
+                <AddChargingStationForm
+                    onClose={handleCloseForm}
+                    onSubmit={handleFormSubmit}
+                    mode={formMode}
+                    initialChargerData={initialChargerData}
+                />
+            )}
         </div>
     );
 };
 
-export default OwnerViewStation;
+export default OwnerViewCharger;
