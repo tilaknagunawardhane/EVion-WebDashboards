@@ -26,7 +26,8 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
     'approved': COLORS.primary || '#3B82F6',
     'to-be-installed': COLORS.mainTextColor || '#10B981',
     'active': COLORS.primary,
-    'closed': COLORS.bgGreen
+    'closed': COLORS.bgGreen,
+    'rejected': COLORS.bgRed
   };
 
   useEffect(() => {
