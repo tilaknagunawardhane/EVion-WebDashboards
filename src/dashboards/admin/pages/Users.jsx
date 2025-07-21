@@ -172,13 +172,9 @@ export default function UsersPage() {
             />
           </div>
 
-          <OverviewCard padding='p-6'>
+          <OverviewCard padding='p-0'>
             {/* Users Table */}
-            <div className="bg-white rounded-sm shadow-sm overflow-hidden"
-              style={{
-                border: `1px solid ${COLORS.border}`,
-                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
-              }}>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <DataTable
                 columns={userColumns}
                 data={users.length > 0 ? users : userData}

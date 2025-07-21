@@ -3,8 +3,16 @@ import { COLORS, FONTS } from '../../../../constants';
 import UserProfileCard from '../userComponents/UserProfileCard';
 import ChatIcon from '../../../../assets/chat.svg';
 import ConnectorCard from './ConnectorCard';
+import { useNavigate } from 'react-router-dom';
+
+const primaryColorFilter = `
+brightness(0)
+invert(1)
+`;
 
 export default function ViewStationRightPanel({ station }) {
+    const navigate = useNavigate();
+
     const user = {
         Name: station.operator,
         'Account Status': station.operatorStatus,
@@ -36,7 +44,7 @@ export default function ViewStationRightPanel({ station }) {
 
     return (
         <div
-            className="rounded-xl border bg-white min-h-[300px] p-3 flex flex-col gap-6 shadow-sm"
+            className="rounded-xl border bg-white p-3 flex flex-col gap-6 h-[calc(100vh-200px)] overflow-y-auto"
             style={{
                 borderColor: COLORS.stroke,
                 background: COLORS.background,
@@ -52,23 +60,30 @@ export default function ViewStationRightPanel({ station }) {
 
                 {/* Email with Chat Icon */}
                 <div className="flex items-center justify-center gap-2">
-                    <a
-                        href={`mailto:${station.email}`}
-                        className="flex items-center gap-1 hover:underline"
-                        style={{
-                            color: COLORS.primary,
-                            fontSize: FONTS.sizes.sm,
-                            cursor: 'pointer',
-                            textDecoration: 'none'
-                        }}
-                    >
-                        {station.email}
+                    <div className="underline">
+                        <a
+                            href={`mailto:${station.email}`}
+                            className="flex items-center gap-1 text-primary underline"
+                            style={{
+                                color: COLORS.primary,
+                                fontSize: FONTS.sizes.sm,
+                                cursor: 'pointer',
+                                textDecoration: 'none'
+                            }}
+                        >
+                            {station.email}
+                        </a>
+                    </div>
+
+                    <div  className="rounded-full p-3" style={{cursor: 'pointer', backgroundColor: COLORS.primary}} onClick={() => navigate(`/admin/chat/`)}>
                         <img
                             src={ChatIcon}
                             alt="Chat icon"
-                            className="w-5 h-5"
+                            style={{ filter: primaryColorFilter }}
+                            className="w-4 h-4"
                         />
-                    </a>
+                    </div>
+                    
                 </div>
 
                 {/* DC Chargers Section */}

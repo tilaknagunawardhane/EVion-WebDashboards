@@ -25,7 +25,7 @@ export default function AdminDashboard() {
       icon: StationsIcon
     },
     { 
-      name: 'Users', 
+      name: 'EV Users', 
       path: '/admin/users', 
       icon: UserIcon
     },

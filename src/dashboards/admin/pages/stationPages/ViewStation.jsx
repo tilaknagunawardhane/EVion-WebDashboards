@@ -359,7 +359,7 @@ const ViewStation = () => {
                     {/* Operator Info */}
                     <div>
                         {/* Stats Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                             <StatCard
                                 title="Total Earnings"
                                 value={station.totalEarnings}
@@ -468,7 +468,7 @@ const ViewStation = () => {
                     <OverviewCard padding='p-0 w-full'>
                         {/* Table container with constrained width */}
                         <div className="w-full overflow-hidden">
-                            <div className="bg-white rounded-sm shadow-sm w-full"
+                            <div className="bg-white rounded-lg shadow-sm w-full"
                                 style={{
                                     width: '100%',
                                     maxWidth: '100%',
@@ -567,7 +567,7 @@ const ViewStation = () => {
                     </div>
                     <OverviewCard padding='p-0'>
                         {/* Sessions Table */}
-                        <div className="bg-white rounded-sm shadow-sm overflow-hidden">
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                             <DataTable
                                 columns={columns}
                                 data={processedSessionsData}

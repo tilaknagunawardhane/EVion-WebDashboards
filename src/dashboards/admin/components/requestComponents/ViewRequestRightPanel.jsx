@@ -3,6 +3,13 @@ import { COLORS, FONTS } from '../../../../constants';
 import UserProfileCard from '../userComponents/UserProfileCard';
 import ChatIcon from '../../../../assets/chat.svg';
 import Button from '../../../../components/ui/Button';
+import { useNavigate } from 'react-router-dom';
+import { Pointer } from 'lucide-react';
+
+const primaryColorFilter = `
+brightness(0)
+invert(1)
+`;
 
 // Modal Component with backdrop blur
 const Modal = ({ isOpen, onClose, children }) => {
@@ -25,10 +32,12 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-export default function ViewRequestRightPanel({ request }) {
+export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
     const [showDiscardModal, setShowDiscardModal] = useState(false);
     const [discardReason, setDiscardReason] = useState('');
     const [isTextareaFocused, setIsTextareaFocused] = useState(false);
+
+    const navigate = useNavigate();
 
     const user = {
         Name: request.requester,
@@ -45,11 +54,20 @@ export default function ViewRequestRightPanel({ request }) {
         console.log('Discarding with reason:', discardReason);
         setShowDiscardModal(false);
         setDiscardReason('');
+        navigate('/admin/stations/requests')
     };
 
     const handleModalClose = () => {
         setShowDiscardModal(false);
         setDiscardReason(''); // Clear textarea when modal closes
+    };
+
+    const handleStatusUpdate = () => {
+        if (request.status === 'NEW') {
+            onStatusUpdate('IN-PROGRESS');
+        } else if (request.status === 'IN-PROGRESS') {
+            onStatusUpdate('WAITING FOR PAYMENT');
+        }
     };
 
     const renderActionButtons = () => {
@@ -74,6 +92,7 @@ export default function ViewRequestRightPanel({ request }) {
                             variant="primary"
                             size="base"
                             className="w-full"
+                            onClick={handleStatusUpdate}
                         >
                             {request.status === 'NEW' ? 'Approve' : 'Complete Installation'}
                         </Button>
@@ -81,11 +100,12 @@ export default function ViewRequestRightPanel({ request }) {
                 );
             case 'WAITING FOR PAYMENT':
                 return (
-                    <div className="text-center py-2 px-4 rounded-md"
+                    <div className="text-center py-2 px-4 rounded-md bg-transparent"
                         style={{
-                            backgroundColor: `${COLORS.primary}20`,
+                            backgroundColor: COLORS.bgGreen,
                             color: COLORS.primary,
-                            fontWeight: FONTS.weights.medium
+                            fontWeight: FONTS.weights.medium,
+                            fontSize: FONTS.sizes.sm
                         }}>
                         APPROVED
                     </div>
@@ -96,9 +116,9 @@ export default function ViewRequestRightPanel({ request }) {
     };
 
     return (
-        <div className="flex flex-col h-full relative">
+        <div className="flex flex-col h-[calc(100vh-140px)] overflow-y-auto relative">
             {/* Scrollable content area - No need for blur here since modal has its own backdrop */}
-            <div className="space-y-4 md:space-y-6 overflow-y-auto flex-1">
+            <div className="space-y-4 md:space-y-6 flex-1">
                 {/* User Profile Section */}
                 <div className="w-full">
                     <UserProfileCard user={user} />
@@ -106,23 +126,30 @@ export default function ViewRequestRightPanel({ request }) {
 
                 {/* Email with Chat Icon */}
                 <div className="flex items-center justify-center gap-2">
-                    <a
-                        href={`mailto:${request.email}`}
-                        className="flex items-center gap-1 text-primary hover:underline"
-                        style={{
-                            color: COLORS.primary,
-                            fontSize: FONTS.sizes.sm,
-                            cursor: 'pointer',
-                            textDecoration: 'none'
-                        }}
-                    >
-                        {request.email}
+                    <div className="underline">
+                        <a
+                            href={`mailto:${request.email}`}
+                            className="flex items-center gap-1 text-primary underline"
+                            style={{
+                                color: COLORS.primary,
+                                fontSize: FONTS.sizes.sm,
+                                cursor: 'pointer',
+                                textDecoration: 'none'
+                            }}
+                        >
+                            {request.email}
+                        </a>
+                    </div>
+
+                    <div  className="rounded-full p-3" style={{cursor: 'pointer', backgroundColor: COLORS.primary}} onClick={() => navigate(`/admin/chat/`)}>
                         <img
                             src={ChatIcon}
                             alt="Chat icon"
-                            className="w-5 h-5"
+                            style={{ filter: primaryColorFilter }}
+                            className="w-4 h-4"
                         />
-                    </a>
+                    </div>
+                    
                 </div>
 
                 {/* Operator Info Section */}
@@ -159,7 +186,7 @@ export default function ViewRequestRightPanel({ request }) {
             <div className="sticky bottom-0 bg-white pt-4 pb-2" style={{
                 backgroundColor: COLORS.background
             }}>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                     {renderActionButtons()}
                 </div>
             </div>
@@ -174,7 +201,7 @@ export default function ViewRequestRightPanel({ request }) {
                         Discard {request.title.includes('Charger') ? 'Charger' : 'Station'}
                     </h2>
                     <p className="mb-4 text-sm" style={{ 
-                        color: COLORS.secondaryText,
+                        color: COLORS.mainTextColor,
                         fontFamily: FONTS.family.sans
                     }}>
                         Do you really want to discard this request to add a new charging {request.title.includes('Charger') ? 'charger' : 'station'}?
@@ -183,17 +210,18 @@ export default function ViewRequestRightPanel({ request }) {
                     <div className="mb-6">
                         <label className="block text-xs mb-2" style={{ 
                             color: COLORS.secondaryText,
-                            fontFamily: FONTS.family.sans
+                            fontFamily: FONTS.family.sans,
+                            fontWeight: FONTS.weights.normal
                         }}>
                             Enter the reason to discard
                         </label>
                         <textarea
                             className="w-full p-3 border rounded text-sm transition-colors"
                             style={{
-                                borderColor: isTextareaFocused ? COLORS.primary : COLORS.stroke,
+                                borderColor: isTextareaFocused ? COLORS.danger : COLORS.stroke,
                                 minHeight: '100px',
                                 fontFamily: FONTS.family.sans,
-                                backgroundColor: COLORS.background,
+                                backgroundColor: isTextareaFocused ? COLORS.bgRed : COLORS.background,
                                 outline: 'none'
                             }}
                             value={discardReason}

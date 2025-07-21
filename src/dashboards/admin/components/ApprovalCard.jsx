@@ -13,7 +13,7 @@ export default function ApprovalCard({
 }) {
   return (
     <div 
-      className={`p-4 rounded-lg mb-4 cursor-pointer hover:shadow-md transition-shadow ${fullWidth ? 'col-span-full' : ''}`}
+      className={`p-4 rounded-lg mb-4 cursor-pointer h-full hover:shadow-md transition-shadow ${fullWidth ? 'col-span-full' : ''}`}
       style={{ 
         backgroundColor: bgColor,
         border: `1px solid ${borderColor}`,

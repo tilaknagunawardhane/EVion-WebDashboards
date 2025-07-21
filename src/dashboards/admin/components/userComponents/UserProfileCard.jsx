@@ -75,7 +75,7 @@ export default function UserProfileCard({ user }) {
             {/* Main Profile Card */}
             <div className='p-2 xs:p-3 sm:p-4 rounded-md xs:rounded-lg sm:rounded-xl w-full' style={{
                 backgroundColor: currentStatus.bgColor,
-                border: `2px solid ${currentStatus.borderColor}`
+                border: `1px solid ${currentStatus.borderColor}`
             }}>
                 <div className="flex flex-col gap-2 xs:gap-3 sm:gap-4 w-full">
                     <div className="flex items-center justify-between w-full">
