@@ -11,7 +11,6 @@ const getStatusStyle = (status) => {
     'Confirmed': { background: COLORS.bgGreen, color: COLORS.primary },
     'Attended': { background: COLORS.bgGreen, color: COLORS.primary },
     'Paid': { background: COLORS.bgGreen, color: COLORS.primary },
-    'Resolved': { background: COLORS.bgGreen, color: COLORS.primary },
     'New': { background: COLORS.bgGreen, color: COLORS.primary },
     'Open': { background: COLORS.bgGreen, color: COLORS.primary },
 
@@ -32,6 +31,7 @@ const getStatusStyle = (status) => {
 
     'Deleted': { background: COLORS.background, color: COLORS.secondaryText },
     'Removed': { background: COLORS.background, color: COLORS.secondaryText },
+    'Resolved': { background: COLORS.background, color: COLORS.secondaryText },
     
     'Default': { background: COLORS.background, color: COLORS.secondaryText },
   };
@@ -46,7 +46,6 @@ const getStatusDotColor = (status) => {
     'Confirmed': COLORS.primary,
     'Attended': COLORS.primary,
     'Paid': COLORS.primary,
-    'Resolved': COLORS.primary,
     'New': COLORS.primary,
     'Success': COLORS.primary,
     'Open': COLORS.primary,
@@ -68,6 +67,7 @@ const getStatusDotColor = (status) => {
     'Pending-Approval': COLORS.HighlightText,
     
     'Removed': COLORS.secondaryText,
+    'Resolved': COLORS.secondaryText,
 
     'Default': COLORS.secondaryText
   };

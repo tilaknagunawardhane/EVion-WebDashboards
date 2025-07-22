@@ -26,6 +26,7 @@ import UserAccountPage from '../dashboards/admin/pages/userPages/userAccount'
 import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
 import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
 import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
+import AdminViewCharger from '../dashboards/admin/pages/stationPages/ViewCharger'
 
 import ChatPage from '../dashboards/admin/pages/Chat'
 
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
           { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
           { path: 'stations/:id', element: <ViewStation/>},
           { path: 'chat', element: <ChatPage/>},
+          { path: 'stations/chargerprofile/:id', element: <AdminViewCharger /> }
 
         ]
       },

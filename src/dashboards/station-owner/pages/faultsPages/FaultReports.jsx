@@ -49,7 +49,7 @@ const OwnerViewStation = () => {
         'Associated Station': 'Station C - Galle Road',
         'Associated Charger': 'Charger02',
         Connector: 'CCS2 DC',
-        Status: 'Open',
+        Status: 'New',
         'Last Update On': '2025-07-16 08:00 AM',
         'Any actions took to resolve': 'Connector taken out of service. Replacement part ordered.',
         'Quick Actions': ['Contact Support Officer']
@@ -63,7 +63,7 @@ const OwnerViewStation = () => {
         'Associated Station': 'Station A - Colombo Central',
         'Associated Charger': 'Charger03',
         Connector: 'Type 2 AC',
-        Status: 'Closed',
+        Status: 'Resolved',
         'Last Update On': '2025-07-13 01:30 PM',
         'Any actions took to resolve': 'Contacted customer, verified issue, issued full refund for the booking. Reminder sent to station staff regarding parking rules.',
         'Quick Actions': ['Contact Support Officer']
@@ -86,6 +86,54 @@ const OwnerViewStation = () => {
     
     const faultAlertsColumns = ['FaultID', 'Date & Time Reported', 'Fault Type', 'Category', 'Description', 'Associated Station', 'Associated Charger', 'Connector', 'Status', 'Last Update On', 'Any actions took to resolve', 'Quick Actions']
 
+    const filterOptions = [
+        { 
+            group: 'Status', 
+            options: [
+                { value: 'New', label: 'New' },
+                { value: 'In Progress', label: 'In Progress' },
+                { value: 'Resolved', label: 'Resolved' }
+            ] 
+        },
+        { 
+            group: 'Fault Type', 
+            options: [
+                { value: 'Charger', label: 'Charger' },
+                { value: 'Station', label: 'Station' },
+                { value: 'Booking', label: 'Booking' }
+            ] 
+        }
+    ];
+
+    // Function to apply filters to data
+    const filterData = (data, filter) => {
+        if (!filter) return data;
+        
+        return data.filter(item => {
+            // Check if the item matches the selected filter
+            if (filter.group === 'Status') {
+                return item.Status === filter.value;
+            } else if (filter.group === 'Fault Type') {
+                return item['Fault Type'] === filter.value;
+            }
+            return true;
+        });
+    };
+
+    // Function to apply search to data
+    const searchData = (data, searchTerm) => {
+        if (!searchTerm) return data;
+        
+        const lowerSearch = searchTerm.toLowerCase();
+        return data.filter(item => 
+            Object.values(item).some(
+                val => val.toString().toLowerCase().includes(lowerSearch)
+        ));
+    };
+
+    // Get filtered and searched data
+    const processedData = searchData(filterData(faultAlertsData, filter), search);
+
     // Table Tab Content
     const TableTab = ({ title, columns, data, onRowClick }) => (
         <div className="grid grid-cols-1 gap-0 bg-transparent rounded-lg p-0">
@@ -96,19 +144,13 @@ const OwnerViewStation = () => {
                 setFilter={setFilter}
                 sort={sort}
                 setSort={setSort}
-                filterOptions={[
-                    { value: 'Status', label: 'Open' },
-                    { value: 'Fault Type', label: 'Charger'},
-                ]}
+                filterOptions={filterOptions.flatMap(group => group.options)}
                 sortOptions={columns.map(col => ({ value: col, label: col }))}
                 searchPlaceholder={`Search ${title.toLowerCase()}...`}
             />
             <DataTable
                 columns={columns}
                 data={data}
-                filter={filter}
-                sort={sort}
-                search={search}
                 onRowClick={onRowClick}
             />
         </div>
@@ -127,7 +169,7 @@ const OwnerViewStation = () => {
             <TableTab
                 title="Fault Alerts"
                 columns={faultAlertsColumns}
-                data={faultAlertsData}
+                data={processedData}
             />
 
         </div>
