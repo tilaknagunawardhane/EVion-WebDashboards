@@ -22,6 +22,7 @@ const getStatusStyle = (status) => {
     'Cancelled': { background: COLORS.bgRed, color: COLORS.danger },
     'Refunded': { background: COLORS.bgRed, color: COLORS.danger },
     'Faulty': { background: COLORS.bgRed, color: COLORS.danger },
+    'Overdue': { background: COLORS.bgRed, color: COLORS.danger },
 
     'Under Maintenance': { background: COLORS.bgYellow, color: COLORS.HighlightText },
     'In Progress': { background: COLORS.bgYellow, color: COLORS.HighlightText },
@@ -59,6 +60,7 @@ const getStatusDotColor = (status) => {
     'Cancelled': COLORS.danger,
     'Refunded': COLORS.danger,
     'Faulty': COLORS.danger,
+    'Overdue': COLORS.danger,
 
     'Under Maintenance': COLORS.HighlightText,
     'In Progress': COLORS.HighlightText,
@@ -281,7 +283,43 @@ const renderQuickActions = (actions, rowData) => {
       ),
       color: COLORS.mainTextColor,
       onClick: () => console.log('Contact Support Officer', rowData)
-    }
+    },
+    'View Account Details': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
+    'Make Payment': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
+    'Resend': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
   };
 
   return (

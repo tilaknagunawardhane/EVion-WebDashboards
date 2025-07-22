@@ -30,8 +30,8 @@ export default function AdminDashboard() {
       icon: UserIcon
     },
     { 
-      name: 'Transactions', 
-      path: '/admin/transactions', 
+      name: 'Payments', 
+      path: '/admin/payments', 
       icon: EarningsIcon
     },
   ]
