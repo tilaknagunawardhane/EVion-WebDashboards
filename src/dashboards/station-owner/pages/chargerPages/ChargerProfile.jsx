@@ -136,7 +136,7 @@ const OwnerViewCharger = () => {
         { id: 'bookings', label: 'Bookings'},
         { id: 'transactions', label: 'Transactions Related to Charger'},
         { id: 'faults', label: 'Faults'},
-        { id: 'stats', label: 'Stats'},
+        // { id: 'stats', label: 'Stats'},
     ];
 
     // Mobile labels for tabs
@@ -146,7 +146,7 @@ const OwnerViewCharger = () => {
         bookings: 'Bookings',
         transactions: 'Transactions Related to Charger',
         faults: 'Faults',
-        stats: 'Stats',
+        // stats: 'Stats',
     };
 
     const sessionsData = [
@@ -161,12 +161,12 @@ const OwnerViewCharger = () => {
         'Total Energy Delivered(kWh)': 15.5,
         'BookingID/Walk-in': 'BKG12345',
         'Charging Cost(LKR)': 775.00,
-        'Penalties Received': 'None',
+        'Penalties Received': '',
         'Total Payment': 775.00,
         'Payment Status': 'Paid',
         'Ratings Given': 5,
         'Issue Reported?': 'No',
-        'Any actions taken to resolve': 'N/A',
+        'Any actions taken to resolve': '',
         'Quick Actions': ['View Receipt']
     },
     {
@@ -178,14 +178,14 @@ const OwnerViewCharger = () => {
         'Ended At': '11:45 AM',
         Duration: '30m',
         'Total Energy Delivered(kWh)': 22.0,
-        'BookingID/Walk-in': 'Walk-in',
+        'BookingID/Walk-in': '',
         'Charging Cost(LKR)': 1100.00,
-        'Penalties Received': 'None',
+        'Penalties Received': '',
         'Total Payment': 1100.00,
         'Payment Status': 'Paid',
         'Ratings Given': 4,
         'Issue Reported?': 'No',
-        'Any actions taken to resolve': 'N/A',
+        'Any actions taken to resolve': '',
         'Quick Actions': ['View Receipt']
     },
     {
@@ -202,9 +202,9 @@ const OwnerViewCharger = () => {
         'Penalties Received': 200.00,
         'Total Payment': 1950.00,
         'Payment Status': 'Pending',
-        'Ratings Given': 'N/A',
+        'Ratings Given': '',
         'Issue Reported?': 'Yes - Connector Malfunction',
-        'Any actions taken to resolve': 'Technician dispatched',
+        'Any actions taken to resolve': 'Disabled Charger',
         'Quick Actions': ['View Receipt']
     },
     {
@@ -218,12 +218,12 @@ const OwnerViewCharger = () => {
         'Total Energy Delivered(kWh)': 28.0,
         'BookingID/Walk-in': 'BKG12347',
         'Charging Cost(LKR)': 1400.00,
-        'Penalties Received': 'None',
+        'Penalties Received': '',
         'Total Payment': 1400.00,
         'Payment Status': 'Paid',
         'Ratings Given': 5,
         'Issue Reported?': 'No',
-        'Any actions taken to resolve': 'N/A',
+        'Any actions taken to resolve': '',
         'Quick Actions': ['View Receipt']
     },
     {
@@ -235,14 +235,14 @@ const OwnerViewCharger = () => {
         'Ended At': '04:20 PM',
         Duration: '20m',
         'Total Energy Delivered(kWh)': 40.0,
-        'BookingID/Walk-in': 'Walk-in',
+        'BookingID/Walk-in': '',
         'Charging Cost(LKR)': 2000.00,
-        'Penalties Received': 'None',
+        'Penalties Received': '',
         'Total Payment': 2000.00,
         'Payment Status': 'Paid',
-        'Ratings Given': 'N/A',
+        'Ratings Given': '',
         'Issue Reported?': 'No',
-        'Any actions taken to resolve': 'N/A',
+        'Any actions taken to resolve': '',
         'Quick Actions': ['View Receipt']
     }
     ];
@@ -252,19 +252,18 @@ const OwnerViewCharger = () => {
             BookingID: 'BKG12345',
             SessionID: 'S001',
             'Booking Date': '2025-07-09',
-            Connector: 'Type 2 AC',
-            Vehicle: 'Tesla Model 3',
-            'Slot Start Time': '09:00 AM',
-            'Slot End Time': '10:30 AM',
+            'Booked Slot': '08:00 AM -08:30 AM',
+            'Charging Started': '08:00 AM',
+            'Charging Ended': '08:30 AM',
             'Booking Status': 'Completed',
-            'Cancellation Time': 'N/A',
-            Reason: 'N/A',
-            'Estimated Energy (kWh)': 15.0,
-            'Estimated Charging Cost (LKR)': 750.00,
-            'Penalties Charged': 'None',
+            'Cancellation Time': '',
+            Reason: '',
+            'Energy (kWh)': 15.0,
+            'Charging Cost (LKR)': 750.00,
+            'Penalties Charged': '',
             'Payment Status': 'Paid',
             'Reported Issue?': 'No',
-            'Any actions taken to resolve': 'N/A'
+            'Any actions taken to resolve': ''
         },
         {
             BookingID: 'BKG12346',
@@ -272,17 +271,18 @@ const OwnerViewCharger = () => {
             'Booking Date': '2025-07-10',
             Connector: 'CHAdeMO DC',
             Vehicle: 'Hyundai Kona EV',
-            'Slot Start Time': '02:00 PM',
-            'Slot End Time': '02:45 PM',
+            'Booked Slot': '14:00 PM - 15:00 PM',
+            'Charging Started': '14:06 PM',
+            'Charging Ended': '14:45 PM',
             'Booking Status': 'Completed',
-            'Cancellation Time': 'N/A',
-            Reason: 'N/A',
-            'Estimated Energy (kWh)': 30.0,
-            'Estimated Charging Cost (LKR)': 1500.00,
-            'Penalties Charged': 'Overstay Fee',
+            'Cancellation Time': '',
+            Reason: '',
+            'Energy (kWh)': 30.0,
+            'Charging Cost (LKR)': 1500.00,
+            'Penalties Charged': 300.00,
             'Payment Status': 'Pending',
             'Reported Issue?': 'Yes - Connector Malfunction',
-            'Any actions taken to resolve': 'Technician dispatched, Customer contacted'
+            'Any actions taken to resolve': 'Customer contacted'
         },
         {
             BookingID: 'BKG12347',
@@ -290,53 +290,56 @@ const OwnerViewCharger = () => {
             'Booking Date': '2025-07-11',
             Connector: 'Type 2 AC',
             Vehicle: 'MG ZS EV',
-            'Slot Start Time': '08:30 AM',
-            'Slot End Time': '12:00 PM',
+            'Booked Slot': '14:00 PM - 15:00 PM',
+            'Charging Started': '14:06 PM',
+            'Charging Ended': '14:45 PM',
             'Booking Status': 'Completed',
-            'Cancellation Time': 'N/A',
-            Reason: 'N/A',
-            'Estimated Energy (kWh)': 25.0,
-            'Estimated Charging Cost (LKR)': 1250.00,
-            'Penalties Charged': 'None',
+            'Cancellation Time': '',
+            Reason: '',
+            'Energy (kWh)': 25.0,
+            'Charging Cost (LKR)': 1250.00,
+            'Penalties Charged': '',
             'Payment Status': 'Paid',
             'Reported Issue?': 'No',
-            'Any actions taken to resolve': 'N/A'
+            'Any actions taken to resolve': ''
         },
         {
             BookingID: 'BKG12348',
-            SessionID: 'N/A', // No associated session, likely cancelled
+            SessionID: '', // No associated session, likely cancelled
             'Booking Date': '2025-07-12',
             Connector: 'CCS2 DC',
             Vehicle: 'BMW iX',
-            'Slot Start Time': '10:00 AM',
-            'Slot End Time': '11:00 AM',
+            'Booked Slot': '08:00 AM -08:30 AM',
+            'Charging Started': '08:00 AM',
+            'Charging Ended': '08:30 AM',
             'Booking Status': 'Cancelled',
             'Cancellation Time': '2025-07-12 09:30 AM',
             Reason: 'Change of plans',
-            'Estimated Energy (kWh)': 40.0,
-            'Estimated Charging Cost (LKR)': 2000.00,
-            'Penalties Charged': 'Cancellation Fee',
+            'Energy (kWh)': 40.0,
+            'Charging Cost (LKR)': 2000.00,
+            'Penalties Charged': 500.00,
             'Payment Status': 'Refunded',
             'Reported Issue?': 'No',
-            'Any actions taken to resolve': 'N/A'
+            'Any actions taken to resolve': ''
         },
         {
             BookingID: 'BKG12349',
-            SessionID: 'N/A', // No associated session, future booking
+            SessionID: '', // No associated session, future booking
             'Booking Date': '2025-07-14',
             Connector: 'Type 2 AC',
             Vehicle: 'Kia EV6',
-            'Slot Start Time': '03:00 PM',
-            'Slot End Time': '04:30 PM',
-            'Booking Status': 'Confirmed',
-            'Cancellation Time': 'N/A',
-            Reason: 'N/A',
-            'Estimated Energy (kWh)': 20.0,
-            'Estimated Charging Cost (LKR)': 1000.00,
-            'Penalties Charged': 'None',
+            'Booked Slot': '14:00 PM - 15:00 PM',
+            'Charging Started': '14:06 PM',
+            'Charging Ended': '14:45 PM',
+            'Booking Status': 'Cancelled',
+            'Cancellation Time': '',
+            Reason: '',
+            'Energy (kWh)': 20.0,
+            'Charging Cost (LKR)': '',
+            'Penalties Charged': '',
             'Payment Status': 'Pending',
             'Reported Issue?': 'No',
-            'Any actions taken to resolve': 'N/A'
+            'Any actions taken to resolve': ''
         }
     ];
 
@@ -348,7 +351,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-10 10:35 AM',
             Connector: 'Type 2',
             'Transaction Type': 'Charging Payment',
-            'Amount (LKR)': 775.00,
+            'Total Earning(LKR)': 775.00,
             'Commission(LKR)': 75.00,
             'Owner Revenue(LKR)': 700.00,
             'Payment Status': 'Completed',
@@ -357,11 +360,11 @@ const OwnerViewCharger = () => {
         {
             TransactionID: 'TRN002',
             SessionID: 'S002',
-            BookingID: 'Walk-in', // No booking ID for walk-in
+            BookingID: '', // No booking ID for walk-in
             'Date & Time': '2025-07-10 11:50 AM',
             Connector: 'CCS2',
             'Transaction Type': 'Charging Payment',
-            'Amount (LKR)': 1100.00,
+            'Total Earning(LKR)': 1100.00,
             'Commission(LKR)': 100.00,
             'Owner Revenue(LKR)': 1000.00,
             'Payment Status': 'Completed',
@@ -374,7 +377,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-11 02:55 PM',
             Connector: 'CHAdeMO',
             'Transaction Type': 'Charging Payment',
-            'Amount (LKR)': 1750.00,
+            'Total Earning(LKR)': 1750.00,
             'Commission(LKR)': 25.000,
             'Owner Revenue(LKR)': 1500.00,
             'Payment Status': 'Pending',
@@ -385,9 +388,9 @@ const OwnerViewCharger = () => {
             SessionID: 'S003', // Related to the same session as TRN003
             BookingID: 'BKG12346',
             'Date & Time': '2025-07-11 03:00 PM',
-            Connector: 'N/A', // Penalty doesn't directly use a connector
+            Connector: '', // Penalty doesn't directly use a connector
             'Transaction Type': 'Late Cancellation Fee',
-            'Amount (LKR)': 200.00,
+            'Total Earning(LKR)': 200.00,
             'Commission(LKR)': null,
             'Owner Revenue(LKR)': null,
             'Payment Status': 'Pending',
@@ -395,12 +398,12 @@ const OwnerViewCharger = () => {
         },
         {
             TransactionID: 'TRN005',
-            SessionID: 'N/A', // Cancellation doesn't have an active session
+            SessionID: '', // Cancellation doesn't have an active session
             BookingID: 'BKG12348',
             'Date & Time': '2025-07-12 09:35 AM',
-            Connector: 'N/A',
+            Connector: '',
             'Transaction Type': 'Charging Payment',
-            'Amount (LKR)': 1900.00,
+            'Total Earning(LKR)': 1900.00,
             'Commission(LKR)': 300.00,
             'Owner Revenue(LKR)': 1600.00,
             'Payment Status': 'Completed',
@@ -418,7 +421,7 @@ const OwnerViewCharger = () => {
             Connector: 'All',
             Status: 'Investigating',
             'Last Update On': '2025-07-15 10:00 AM',
-            'Any actions took to resolve': 'Remote diagnostics initiated. Technician scheduled for 2025-07-15 PM.',
+            'Any actions took to resolve': 'Remote diagnostics initiated.',
             'Quick Actions': ['Contact Support Officer']
         },
         {
@@ -448,8 +451,8 @@ const OwnerViewCharger = () => {
     ];
 
     const sessionsColumns = ['SessionID', 'Date', 'Connector Used', 'Vehicle', 'Started At', 'Ended At', 'Duration', 'Total Energy Delivered(kWh)', 'BookingID/Walk-in', 'Charging Cost(LKR)', 'Penalties Received', 'Total Payment', 'Payment Status', 'Ratings Given', 'Issue Reported?', 'Any actions taken to resolve', 'Quick Actions'];
-    const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Connector', 'Vehicle', 'Slot Start Time', 'Slot End Time', 'Booking Status', 'Cancellation Time', 'Reason', 'Estimated Energy (kWh)', 'Estimated Charging Cost (LKR)', 'Penalties Charged', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
-    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Connector', 'Transaction Type', 'Amount (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
+    const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Booked Slot', 'Charging Started', 'Charging Ended', 'Booking Status', 'Cancellation Time', 'Reason', 'Charging Cost (LKR)', 'Penalties Charged', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
+    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Transaction Type', 'Total Earning(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
     const faultsColumns = ['FaultID', 'Date & Time Reported', 'Fault Type', 'Category', 'Description', 'Connector', 'Status', 'Last Update On', 'Any actions took to resolve', 'Quick Actions']
 
     const handleEditCharger = () => {

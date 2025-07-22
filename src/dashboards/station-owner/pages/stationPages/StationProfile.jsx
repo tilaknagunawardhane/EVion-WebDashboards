@@ -163,7 +163,7 @@ const OwnerViewStation = () => {
         { id: 'schedule', label: 'Schedule' },
         { id: 'chargers', label: 'Chargers' },
         { id: 'transactions', label: 'Transactions Related to Station' },
-        { id: 'stats', label: 'Stats' }
+        // { id: 'stats', label: 'Stats' }
     ];
 
     // Mobile labels for tabs
@@ -172,7 +172,7 @@ const OwnerViewStation = () => {
         schedule: 'Schedule',
         chargers: 'Chargers',
         transactions: 'Transactions Related to Station',
-        stats: 'Stats'
+        // stats: 'Stats'
     };
 
     // Render stars based on rating
@@ -240,7 +240,6 @@ const OwnerViewStation = () => {
             'Revenue': '3,300,500',
             'No of Active Reports': '0',
             'Charger Status': 'Active',
-            'Quick Actions': ['View', 'Disable', 'Delete']
         },
         {
             'chargerID': 'EVDC0002',
@@ -254,7 +253,6 @@ const OwnerViewStation = () => {
             'Revenue': '5,000,000',
             'No of Active Reports': '0',
             'Charger Status': 'Disabled',
-            'Quick Actions': ['View', 'Enable', 'Delete']
         },
         {
             'chargerID': 'EVAC0003',
@@ -268,7 +266,6 @@ const OwnerViewStation = () => {
             'Revenue': '',
             'No of Active Reports': '',
             'Charger Status': 'Pending-Approval',
-            'Quick Actions': ['View', 'Disable', 'Delete']
         }
     ];
 
@@ -281,7 +278,7 @@ const OwnerViewStation = () => {
             SessionID: 'S001',
             BookingID: 'BKG12345',
             'Transaction Type': 'Charging Payment',
-            'Amount(LKR)': 775.00,
+            'Total Earning(LKR)': 775.00,
             'Commission(LKR)': 77.50,
             'Owner Revenue(LKR)': 697.50,
             'Payment Status': 'Completed',
@@ -293,9 +290,9 @@ const OwnerViewStation = () => {
             Charger: 'StationA-Charger02',
             Connector: 'CCS2 DC',
             SessionID: 'S002',
-            BookingID: 'Walk-in',
+            BookingID: '-',
             'Transaction Type': 'Charging Payment',
-            'Amount(LKR)': 1100.00,
+            'Total Earning(LKR)': 1100.00,
             'Commission(LKR)': 110.00,
             'Owner Revenue(LKR)': 990.00,
             'Payment Status': 'Completed',
@@ -309,7 +306,7 @@ const OwnerViewStation = () => {
             SessionID: 'S003',
             BookingID: 'BKG12346',
             'Transaction Type': 'Charging Payment',
-            'Amount(LKR)': 1750.00,
+            'Total Earning(LKR)': 1750.00,
             'Commission(LKR)': 175.00,
             'Owner Revenue(LKR)': 1575.00,
             'Payment Status': 'Pending',
@@ -322,32 +319,32 @@ const OwnerViewStation = () => {
             Connector: 'N/A',
             SessionID: 'S003',
             BookingID: 'BKG12346',
-            'Transaction Type': 'Penalty Fee',
-            'Amount(LKR)': 200.00,
-            'Commission(LKR)': 20.00,
-            'Owner Revenue(LKR)': 180.00,
+            'Transaction Type': 'Charging Payment',
+            'Total Earning(LKR)': 2000.00,
+            'Commission(LKR)': 200.00,
+            'Owner Revenue(LKR)': 1800.00,
             'Payment Status': 'Pending',
             'Quick Actions': ['View Receipt']
         },
         {
             TransactionID: 'TRN005',
             'Date & Time': '2025-07-17 09:35 AM',
-            Charger: 'N/A',
-            Connector: 'N/A',
-            SessionID: 'N/A',
+            Charger: '',
+            Connector: '',
+            SessionID: '',
             BookingID: 'BKG12348',
             'Transaction Type': 'Late Cancellation',
-            'Amount(LKR)': 1900.00,
-            'Commission(LKR)': null,
-            'Owner Revenue(LKR)': null,
+            'Total Earning(LKR)': 1900.00,
+            'Commission(LKR)': 200.00,
+            'Owner Revenue(LKR)': 1700.00,
             'Payment Status': 'Pending',
             'Quick Actions': ['View Receipt']
         }
     ];
 
     // Table columns configuration (no changes here)
-    const chargersColumns = ['chargerID', 'Charger Name', 'Joined On', 'Power Type', 'Maximum Power Output(kW)', 'Connectors', 'Unit Price(per kW)', 'Total Sessions', 'Revenue', 'No of Active Reports', 'Charger Status', 'Quick Actions'];
-    const transactionsColumns = ['TransactionID', 'Date & Time', 'Charger', 'Connector', 'SessionID', 'BookingID', 'Transaction Type', 'Amount(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions'];
+    const chargersColumns = ['chargerID', 'Charger Name', 'Joined On', 'Power Type', 'Maximum Power Output(kW)', 'Connectors', 'Unit Price(per kW)', 'Total Sessions', 'Revenue', 'No of Active Reports', 'Charger Status'];
+    const transactionsColumns = ['TransactionID', 'Date & Time', 'SessionID', 'BookingID', 'Transaction Type', 'Total Earning(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions'];
 
     // Profile Tab Content
     const ProfileTab = () => {
