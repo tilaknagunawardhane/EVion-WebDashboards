@@ -81,7 +81,7 @@ export default function ChargingStationsOverviewPage(){
             {/* Main Content */}
             <div className="grid grid-colos-1 md:grid-cols-4 gap-4 md:gap-6">
                 {/* Left Side */}
-                <div className="md:col-span-3">
+                <div className="md:col-span-4">
 
                     {/* Search and Filter Bar */}
                     <div className="mb-6">
