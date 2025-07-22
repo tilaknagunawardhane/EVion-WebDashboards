@@ -11,6 +11,7 @@ import MapImage from '../../../../assets/map-placeholder.png';
 import ApprovalCard from '../../components/ApprovalCard';
 import ViewStationRightPanel from '../../components/stationComponents/ViewStationRightPanel';
 import AdminPageHeader from '../../components/AdminPageHeader';
+import { useNavigate } from 'react-router-dom';
 
 const ViewStation = () => {
     const [activeTab, setActiveTab] = useState('profile');
@@ -18,6 +19,8 @@ const ViewStation = () => {
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
     const [rating] = useState(3.0); // Sample rating
+
+    const navigate = useNavigate();
 
     // Sample station data
     const station = {
@@ -88,28 +91,31 @@ const ViewStation = () => {
     const chargersData = [
         {
             id: 'CHG-001',
+            name: 'Super Charger -DC',
             connectedOn: '2023-01-15',
             type: 'DC',
             power: '150 kW',
             connectors: 2,
             connectorTypes: ['CCS2', 'CHAdeMO'],
             bookings: 'Available',
-            currentState: 'In Use',
+            currentState: 'Active',
             lastUpdate: '2023-05-20 14:30'
         },
         {
             id: 'CHG-002',
+            name: 'Super Charger -AC',
             connectedOn: '2023-02-10',
             type: 'DC',
             power: '60 kW',
             connectors: 1,
             connectorTypes: ['CCS2'],
             bookings: 'Not Available',
-            currentState: 'Free',
+            currentState: 'Active',
             lastUpdate: '2023-05-20 15:45'
         },
         {
             id: 'CHG-003',
+            name: 'Charger 1 - DC',
             connectedOn: '2023-03-05',
             type: 'AC',
             power: '22 kW',
@@ -121,6 +127,7 @@ const ViewStation = () => {
         },
         {
             id: 'CHG-004',
+            name: 'Bay 1 -DC Charger',
             connectedOn: '2022-12-20',
             type: 'DC',
             power: '120 kW',
@@ -132,6 +139,7 @@ const ViewStation = () => {
         },
         {
             id: 'CHG-005',
+            name: 'AC Charger',
             connectedOn: '2023-04-01',
             type: 'AC',
             power: '11 kW',
@@ -158,13 +166,13 @@ const ViewStation = () => {
             vehicle: 'Tesla Model 3',
             energyDelivered: '32 kWh',
             energyCost: 'LKR 1,250',
-            status: 'Booked',
+            category: 'Reservation',
             penalties: 'LKR 0',
             totalFee: 'LKR 1,250',
             paymentStatus: 'Paid',
             rating: 4,
-            complaints: 'None',
-            resolveStatus: 'N/A',
+            complaints: '',
+            resolveStatus: '',
             refunds: 'LKR 0'
         },
         {
@@ -180,13 +188,13 @@ const ViewStation = () => {
             vehicle: 'BYD Atto 3',
             energyDelivered: '48 kWh',
             energyCost: 'LKR 1,890',
-            status: 'Walk-in',
+            category: 'Walk-in',
             penalties: 'LKR 0',
             totalFee: 'LKR 1,890',
             paymentStatus: 'Paid',
             rating: 5,
-            complaints: 'None',
-            resolveStatus: 'N/A',
+            complaints: '',
+            resolveStatus: '',
             refunds: 'LKR 0'
         },
         {
@@ -202,7 +210,7 @@ const ViewStation = () => {
             vehicle: 'MG ZS EV',
             energyDelivered: '28 kWh',
             energyCost: 'LKR 1,100',
-            status: 'Booked (late arrival)',
+            category: 'Reservation - Late Arrival',
             penalties: 'LKR 200',
             totalFee: 'LKR 1,300',
             paymentStatus: 'Paid',
@@ -224,13 +232,13 @@ const ViewStation = () => {
             vehicle: 'Nissan Leaf',
             energyDelivered: '25 kWh',
             energyCost: 'LKR 980',
-            status: 'Booked',
+            category: 'Reservation',
             penalties: 'LKR 0',
             totalFee: 'LKR 980',
             paymentStatus: 'Pending',
             rating: 0,
-            complaints: 'None',
-            resolveStatus: 'N/A',
+            complaints: '',
+            resolveStatus: '',
             refunds: 'LKR 0'
         },
         {
@@ -246,7 +254,7 @@ const ViewStation = () => {
             vehicle: 'BYD Han',
             energyDelivered: '42 kWh',
             energyCost: 'LKR 1,650',
-            status: 'Walk-in',
+            category: 'Walk-in',
             penalties: 'LKR 0',
             totalFee: 'LKR 1,650',
             paymentStatus: 'Refunded',
@@ -256,6 +264,7 @@ const ViewStation = () => {
             refunds: 'LKR 1,650'
         }
     ];
+
 
     // Status color configuration
     const statusColors = {
@@ -293,7 +302,7 @@ const ViewStation = () => {
         },
         'Removed': {
             bg: `${COLORS.secondaryText}20`,
-            text: COLORS.secondaryText
+            text: COLORS.danger
         },
         'Paid': {
             bg: `${COLORS.success}20`,
@@ -359,7 +368,7 @@ const ViewStation = () => {
                     {/* Operator Info */}
                     <div>
                         {/* Stats Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                             <StatCard
                                 title="Total Earnings"
                                 value={station.totalEarnings}
@@ -419,26 +428,28 @@ const ViewStation = () => {
     const ChargersTab = () => {
         const columns = [
             'Charger ID',
+            'Charger Name',
             'Connected On',
             'Charger Type',
             'Power Output',
             'No of Connectors',
             'Supported Connectors',
             'Bookings',
-            'Current State',
+            'Current Status',
             'Last Status Update',
             'Actions'
         ];
 
         const processedChargersData = chargersData.map(charger => ({
             'Charger ID': charger.id,
+            'Charger Name': charger.name,
             'Connected On': charger.connectedOn,
             'Charger Type': charger.type,
             'Power Output': charger.power,
             'No of Connectors': charger.connectors,
             'Supported Connectors': charger.connectorTypes.join(', '),
             'Bookings': charger.bookings,
-            'Current State': charger.currentState,
+            'Current Status': charger.currentState,
             'Last Status Update': charger.lastUpdate,
             'Actions': 'View History'
         }));
@@ -458,21 +469,19 @@ const ViewStation = () => {
                             filterOptions={[
                                 { value: 'Charger Type', label: 'DC' },
                                 { value: 'Charger Type', label: 'AC' },
-                                { value: 'Current State', label: 'In Use' },
-                                { value: 'Current State', label: 'Free' },
-                                { value: 'Current State', label: 'Faulty' }
+                                { value: 'Current Status', label: 'Active' },
+                                { value: 'Current Status', label: 'Faulty' }
                             ]}
                             sortOptions={columns.map(col => ({ value: col, label: col }))}
                             searchPlaceholder="Search chargers..."
+                            
                         />
                     </div>
-                    <OverviewCard padding='p-6 w-full'>
+                    <OverviewCard padding='p-0 w-full'>
                         {/* Table container with constrained width */}
                         <div className="w-full overflow-hidden">
-                            <div className="bg-white rounded-sm shadow-sm w-full"
+                            <div className="bg-white rounded-lg shadow-sm w-full"
                                 style={{
-                                    border: `1px solid ${COLORS.border}`,
-                                    boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)',
                                     width: '100%',
                                     maxWidth: '100%',
                                     tableLayout: 'fixed'
@@ -483,7 +492,7 @@ const ViewStation = () => {
                                     filter={filter}
                                     sort={sort}
                                     search={search}
-                                    onRowClick={(row) => console.log('Charger clicked:', row)}
+                                    onRowClick={(charger) => navigate(`/admin/stations/chargerprofile/${charger.id}`)}
                                     style={{ width: '100%' }}
                                 />
                             </div>
@@ -503,13 +512,12 @@ const ViewStation = () => {
             'Start',
             'End',
             'Duration',
+            'Category',
             'Charger ID',
             'Connector Type',
-            'Charger Type',
             'Vehicle',
             'Energy Delivered',
             'Energy Cost',
-            'Status',
             'Penalties',
             'Total Fee',
             'Payment Status',
@@ -533,7 +541,7 @@ const ViewStation = () => {
             'Vehicle': session.vehicle,
             'Energy Delivered': session.energyDelivered,
             'Energy Cost': session.energyCost,
-            'Status': session.status,
+            'Category': session.category,
             'Penalties': session.penalties,
             'Total Fee': session.totalFee,
             'Payment Status': session.paymentStatus,
@@ -557,7 +565,7 @@ const ViewStation = () => {
                             sort={sort}
                             setSort={setSort}
                             filterOptions={[
-                                { value: 'Status', label: 'Booked' },
+                                { value: 'Status', label: 'Reservation' },
                                 { value: 'Status', label: 'Walk-in' },
                                 { value: 'Payment Status', label: 'Paid' },
                                 { value: 'Payment Status', label: 'Pending' },
@@ -568,16 +576,251 @@ const ViewStation = () => {
                             searchPlaceholder="Search sessions..."
                         />
                     </div>
-                    <OverviewCard padding='p-6'>
+                    <OverviewCard padding='p-0'>
                         {/* Sessions Table */}
-                        <div className="bg-white rounded-sm shadow-sm overflow-hidden"
-                            style={{
-                                border: `1px solid ${COLORS.border}`,
-                                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
-                            }}>
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                             <DataTable
                                 columns={columns}
                                 data={processedSessionsData}
+                                filter={filter}
+                                sort={sort}
+                                search={search}
+                                onRowClick={(row) => console.log('Session clicked:', row)}
+                            />
+                        </div>
+                    </OverviewCard>
+                </div>
+
+
+            </div>
+
+
+        );
+    };
+
+    const TransactionsTab = () => {
+        const columns = ['TransactionID', 'Date & Time', 'SessionID', 'BookingID', 'Transaction Type', 'Amount(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions'];
+
+        const transactionsData = [
+            {
+                TransactionID: 'TRN001',
+                'Date & Time': '2025-07-15 10:35 AM',
+                Charger: 'StationA-Charger01',
+                Connector: 'Type 2 AC',
+                SessionID: 'S001',
+                BookingID: 'BKG12345',
+                'Transaction Type': 'Charging Payment',
+                'Amount(LKR)': 775.00,
+                'Commission(LKR)': 77.50,
+                'Owner Revenue(LKR)': 697.50,
+                'Payment Status': 'Completed',
+                'Quick Actions': ['View Receipt']
+            },
+            {
+                TransactionID: 'TRN002',
+                'Date & Time': '2025-07-15 11:50 AM',
+                Charger: 'StationA-Charger02',
+                Connector: 'CCS2 DC',
+                SessionID: 'S002',
+                BookingID: '-',
+                'Transaction Type': 'Charging Payment',
+                'Amount(LKR)': 1100.00,
+                'Commission(LKR)': 110.00,
+                'Owner Revenue(LKR)': 990.00,
+                'Payment Status': 'Completed',
+                'Quick Actions': ['View Receipt']
+            },
+            {
+                TransactionID: 'TRN003',
+                'Date & Time': '2025-07-16 02:55 PM',
+                Charger: 'StationB-Charger03',
+                Connector: 'CHAdeMO DC',
+                SessionID: 'S003',
+                BookingID: 'BKG12346',
+                'Transaction Type': 'Charging Payment',
+                'Amount(LKR)': 1750.00,
+                'Commission(LKR)': 175.00,
+                'Owner Revenue(LKR)': 1575.00,
+                'Payment Status': 'Pending',
+                'Quick Actions': ['View Receipt']
+            },
+            {
+                TransactionID: 'TRN004',
+                'Date & Time': '2025-07-16 03:00 PM',
+                Charger: 'StationB-Charger03',
+                Connector: 'CHAdeMO DC',
+                SessionID: 'S003',
+                BookingID: 'BKG12346',
+                'Transaction Type': 'Charging Payment',
+                'Amount(LKR)': 2000.00,
+                'Commission(LKR)': 200.00,
+                'Owner Revenue(LKR)': 1800.00,
+                'Payment Status': 'Completed',
+                'Quick Actions': ['View Receipt']
+            },
+            {
+                TransactionID: 'TRN005',
+                'Date & Time': '2025-07-17 09:35 AM',
+                Charger: 'StationB-Charger03',
+                Connector: 'CHAdeMO DC',
+                SessionID: '',
+                BookingID: 'BKG12348',
+                'Transaction Type': 'Late Cancellation',
+                'Amount(LKR)': 1900.00,
+                'Commission(LKR)': 200.00,
+                'Owner Revenue(LKR)': 1700.00,
+                'Payment Status': 'Completed',
+                'Quick Actions': ['View Receipt']
+            }
+        ];
+
+        return (
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {/* Left Side - 3/4 width */}
+                <div className="lg:col-span-4">
+                    <div className="mb-6">
+                        <DataTableTopBar
+                            search={search}
+                            setSearch={setSearch}
+                            filter={filter}
+                            setFilter={setFilter}
+                            sort={sort}
+                            setSort={setSort}
+                            filterOptions={[
+                                { value: 'Status', label: 'Reservation' },
+                                { value: 'Status', label: 'Walk-in' },
+                                { value: 'Payment Status', label: 'Paid' },
+                                { value: 'Payment Status', label: 'Pending' },
+                                { value: 'Charger Type', label: 'DC' },
+                                { value: 'Charger Type', label: 'AC' }
+                            ]}
+                            sortOptions={columns.map(col => ({ value: col, label: col }))}
+                            searchPlaceholder="Search transactions..."
+                        />
+                    </div>
+                    <OverviewCard padding='p-0'>
+                        {/* Sessions Table */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                            <DataTable
+                                columns={columns}
+                                data={transactionsData}
+                                filter={filter}
+                                sort={sort}
+                                search={search}
+                                onRowClick={(row) => console.log('Session clicked:', row)}
+                            />
+                        </div>
+                    </OverviewCard>
+                </div>
+
+
+            </div>
+
+
+        );
+    };
+
+    const FaultsTab = () => {
+        const columns = ['FaultID', 'Date & Time Reported', 'Fault Type', 'Category', 'Description', 'Associated Charger', 'Connector', 'Status', 'Last Update On', 'Any actions took to resolve']
+
+        const faultsData = [
+            {
+                FaultID: 'FLT001',
+                'Date & Time Reported': '2025-07-15 09:15 AM',
+                'Fault Type': 'Charger',
+                Category: 'Charger not working',
+                Description: 'Charger 01 at Station A is completely unresponsive. No power light.',
+                'Associated Charger': 'Charger01',
+                Connector: 'All', // Or a specific connector if only one is affected
+                Status: 'In Progress',
+                'Last Update On': '2025-07-15 10:00 AM',
+                'Any actions took to resolve': 'Remote diagnostics initiated. Technician scheduled for 2025-07-15 PM.',
+            
+            },
+            {
+                FaultID: 'FLT002',
+                'Date & Time Reported': '2025-07-14 03:00 PM',
+                'Fault Type': 'Station',
+                Category: 'Power Outage',
+                Description: 'Entire Station B is offline due to a local power outage.',
+                'Associated Charger': 'N/A', // Applies to the whole station
+                Connector: 'N/A',
+                Status: 'Resolved',
+                'Last Update On': '2025-07-14 06:30 PM',
+                'Any actions took to resolve': 'Ceylon Electricity Board contacted. Power restored at 6:15 PM.',
+              
+            },
+            {
+                FaultID: 'FLT003',
+                'Date & Time Reported': '2025-07-16 07:45 AM',
+                'Fault Type': 'Charger',
+                Category: 'Connector broken',
+                Description: 'CCS2 connector on Charger 02 at Station C is physically damaged. Plastic housing cracked.',
+                'Associated Charger': 'Charger02',
+                Connector: 'CCS2 DC',
+                Status: 'New',
+                'Last Update On': '2025-07-16 08:00 AM',
+                'Any actions took to resolve': 'Connector taken out of service. Replacement part ordered.',
+               
+            },
+            {
+                FaultID: 'FLT004',
+                'Date & Time Reported': '2025-07-13 11:00 AM',
+                'Fault Type': 'Booking',
+                Category: 'Occupied by other vehicle',
+                Description: 'Customer reported booked slot at Station A was occupied by another vehicle when arrived.',
+                'Associated Charger': 'Charger03',
+                Connector: 'Type 2 AC',
+                Status: 'Resolved',
+                'Last Update On': '2025-07-13 01:30 PM',
+                'Any actions took to resolve': 'Contacted customer, verified issue, issued full refund for the booking. Reminder sent to station staff regarding parking rules.',
+           
+            },
+            {
+                FaultID: 'FLT005',
+                'Date & Time Reported': '2025-07-16 01:00 PM',
+                'Fault Type': 'Charger',
+                Category: 'Charging speed inconsistent',
+                Description: 'Customer reported fluctuating charging speed on Charger 04 at Station D.',
+                'Associated Charger': 'Charger04',
+                Connector: 'Type 2 AC',
+                Status: 'In Progress',
+                'Last Update On': '2025-07-16 02:00 PM',
+                'Any actions took to resolve': 'Monitoring charger performance remotely. Logs being reviewed for anomalies.',
+       
+            }
+        ];
+
+        return (
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {/* Left Side - 3/4 width */}
+                <div className="lg:col-span-4">
+                    <div className="mb-6">
+                        <DataTableTopBar
+                            search={search}
+                            setSearch={setSearch}
+                            filter={filter}
+                            setFilter={setFilter}
+                            sort={sort}
+                            setSort={setSort}
+                            filterOptions={[
+                                { value: 'Status', label: 'Reservation' },
+                                { value: 'Status', label: 'Walk-in' },
+                                { value: 'Payment Status', label: 'Paid' },
+                                { value: 'Payment Status', label: 'Pending' },
+                                { value: 'Charger Type', label: 'DC' },
+                                { value: 'Charger Type', label: 'AC' }
+                            ]}
+                            sortOptions={columns.map(col => ({ value: col, label: col }))}
+                            searchPlaceholder="Search transactions..."
+                        />
+                    </div>
+                    <OverviewCard padding='p-0'>
+                        {/* Sessions Table */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                            <DataTable
+                                columns={columns}
+                                data={faultsData}
                                 filter={filter}
                                 sort={sort}
                                 search={search}
@@ -615,16 +858,8 @@ const ViewStation = () => {
                 {activeTab === 'profile' && <ProfileTab />}
                 {activeTab === 'chargers' && <ChargersTab />}
                 {activeTab === 'sessions' && <SessionsTab />}
-                {activeTab === 'transactions' && (
-                    <div className="bg-white rounded-lg shadow-sm p-6 text-center text-gray-500">
-                        Transactions data will be displayed here
-                    </div>
-                )}
-                {activeTab === 'faults' && (
-                    <div className="bg-white rounded-lg shadow-sm p-6 text-center text-gray-500">
-                        Faults & Complaints data will be displayed here
-                    </div>
-                )}
+                {activeTab === 'transactions' && <TransactionsTab /> }
+                {activeTab === 'faults' && <FaultsTab /> }
             </div>
         </div>
     );

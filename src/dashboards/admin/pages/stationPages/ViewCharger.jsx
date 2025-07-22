@@ -1,28 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
-import { useNavigate } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
 import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
 import DataTable from '../../../../components/ui/DataTable';
-import StarIcon from '../../../../assets/star-filled.svg';
-import StarOutlineIcon from '../../../../assets/star-outline.svg';
-import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
-import ConnectorView from '../../components/chargerComponents/ConnectorCard';
+import AdminPageHeader from '../../components/AdminPageHeader';
 import { FiMoreVertical } from 'react-icons/fi';
-import AddChargingStationForm from '../../components/stationComponents/RAddStationForm'; 
 
-const OwnerViewCharger = () => {
-    const [activeTab, setActiveTab] = useState('overview');
+const AdminViewCharger = () => {
+    const [activeTab, setActiveTab] = useState('sessions');
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
-    const navigate = useNavigate();
-
-    const [showChargerForm, setShowChargerForm] = useState(false);
-    const [formMode, setFormMode] = useState('edit-charger');
-    const [initialChargerData, setInitialChargerData] = useState(null);
-
-    
 
     // Sample station data
     const station = {
@@ -64,89 +52,20 @@ const OwnerViewCharger = () => {
         'Quick Actions': ['View', 'Disable', 'Delete']  
     };
 
-    // Sample connector data
-    const connectorsData = [
-        {
-            connectorName:"CCS1",
-            session:null,
-            bookings: [
-            { dateOffset: 0, startTime: "00:00", endTime: "01:30" },
-            { dateOffset: 0, startTime: "04:30", endTime: "05:00" },
-            { dateOffset: 0, startTime: "09:00", endTime: "11:30" },
-            { dateOffset: 0, startTime: "13:00", endTime: "13:30" },
-            { dateOffset: 0, startTime: "14:00", endTime: "14:30" },
-            { dateOffset: 0, startTime: "15:30", endTime: "17:00" },
-
-            { dateOffset: 1, startTime: "03:00", endTime: "04:30" },
-            { dateOffset: 1, startTime: "08:00", endTime: "09:30" },
-            { dateOffset: 1, startTime: "14:00", endTime: "14:30" },
-            { dateOffset: 1, startTime: "19:30", endTime: "20:00" },
-
-            { dateOffset: 2, startTime: "15:00", endTime: "15:30" },
-            ],   
-        },
-        {
-            connectorName: "CHAdeMO",
-            session: {
-                vehicle: "Nissan Leaf",
-                startDate: "2025-07-14",
-                startTime: "11:00",
-                endTime: "11:30",
-                energy: 12.3,
-                cost: 450,
-                progress: 62,
-            },
-            bookings: [
-            { dateOffset: 0, startTime: "00:00", endTime: "01:30" },
-            { dateOffset: 0, startTime: "04:30", endTime: "05:00" },
-            { dateOffset: 0, startTime: "09:00", endTime: "11:30" },
-            { dateOffset: 0, startTime: "13:00", endTime: "13:30" },
-            { dateOffset: 0, startTime: "14:00", endTime: "14:30" },
-            { dateOffset: 0, startTime: "15:30", endTime: "17:00" },
-
-            { dateOffset: 1, startTime: "03:00", endTime: "04:30" },
-            { dateOffset: 1, startTime: "08:00", endTime: "09:30" },
-            { dateOffset: 1, startTime: "14:00", endTime: "14:30" },
-            { dateOffset: 1, startTime: "19:30", endTime: "20:00" },
-
-            { dateOffset: 2, startTime: "15:00", endTime: "15:30" },
-            ],  
-        }
-    ];
-
-    const timeSlots = [
-    "00:00 - 00:30", "00:30 - 01:00", "01:00 - 01:30", "01:30 - 02:00",
-    "02:00 - 02:30", "02:30 - 03:00", "03:00 - 03:30", "03:30 - 04:00",
-    "04:00 - 04:30", "04:30 - 05:00", "05:00 - 05:30", "05:30 - 06:00",
-    "06:00 - 06:30", "06:30 - 07:00", "07:00 - 07:30", "07:30 - 08:00",
-    "08:00 - 08:30", "08:30 - 09:00", "09:00 - 09:30", "09:30 - 10:00",
-    "10:00 - 10:30", "10:30 - 11:00", "11:00 - 11:30", "11:30 - 12:00",
-    "12:00 - 12:30", "12:30 - 13:00", "13:00 - 13:30", "13:30 - 14:00",
-    "14:00 - 14:30", "14:30 - 15:00", "15:00 - 15:30", "15:30 - 16:00",
-    "16:00 - 16:30", "16:30 - 17:00", "17:00 - 17:30", "17:30 - 18:00",
-    "18:00 - 18:30", "18:30 - 19:00", "19:00 - 19:30", "19:30 - 20:00",
-    "20:00 - 20:30", "20:30 - 21:00", "21:00 - 21:30", "21:30 - 22:00",
-    "22:00 - 22:30", "22:30 - 23:00", "23:00 - 23:30", "23:30 - 24:00",
-    ];
-
     // Tab configuration
     const tabs = [
-        { id: 'overview', label: 'Overview' },
         { id: 'sessions', label: 'Sessions' },
         { id: 'bookings', label: 'Bookings'},
         { id: 'transactions', label: 'Transactions Related to Charger'},
         { id: 'faults', label: 'Faults'},
-        { id: 'stats', label: 'Stats'},
     ];
 
     // Mobile labels for tabs
     const mobileLabels = {
-        overview: 'Overview',
         sessions: 'Sessions',
         bookings: 'Bookings',
         transactions: 'Transactions Related to Charger',
         faults: 'Faults',
-        stats: 'Stats',
     };
 
     const sessionsData = [
@@ -348,7 +267,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-10 10:35 AM',
             Connector: 'Type 2',
             'Transaction Type': 'Charging Payment',
-            'Total Earning (LKR)': 775.00,
+            'Amount (LKR)': 775.00,
             'Commission(LKR)': 75.00,
             'Owner Revenue(LKR)': 700.00,
             'Payment Status': 'Completed',
@@ -361,7 +280,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-10 11:50 AM',
             Connector: 'CCS2',
             'Transaction Type': 'Charging Payment',
-            'Total Earning (LKR)': 1100.00,
+            'Amount (LKR)': 1100.00,
             'Commission(LKR)': 100.00,
             'Owner Revenue(LKR)': 1000.00,
             'Payment Status': 'Completed',
@@ -374,7 +293,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-11 02:55 PM',
             Connector: 'CHAdeMO',
             'Transaction Type': 'Charging Payment',
-            'Total Earning (LKR)': 1750.00,
+            'Amount (LKR)': 1750.00,
             'Commission(LKR)': 25.000,
             'Owner Revenue(LKR)': 1500.00,
             'Payment Status': 'Pending',
@@ -387,7 +306,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-11 03:00 PM',
             Connector: 'N/A', // Penalty doesn't directly use a connector
             'Transaction Type': 'Late Cancellation Fee',
-            'Total Earning (LKR)': 200.00,
+            'Amount (LKR)': 200.00,
             'Commission(LKR)': null,
             'Owner Revenue(LKR)': null,
             'Payment Status': 'Pending',
@@ -400,7 +319,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-12 09:35 AM',
             Connector: 'N/A',
             'Transaction Type': 'Charging Payment',
-            'Total Earning (LKR)': 1900.00,
+            'Amount (LKR)': 1900.00,
             'Commission(LKR)': 300.00,
             'Owner Revenue(LKR)': 1600.00,
             'Payment Status': 'Completed',
@@ -449,145 +368,8 @@ const OwnerViewCharger = () => {
 
     const sessionsColumns = ['SessionID', 'Date', 'Connector Used', 'Vehicle', 'Started At', 'Ended At', 'Duration', 'Total Energy Delivered(kWh)', 'BookingID/Walk-in', 'Charging Cost(LKR)', 'Penalties Received', 'Total Payment', 'Payment Status', 'Ratings Given', 'Issue Reported?', 'Any actions taken to resolve', 'Quick Actions'];
     const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Connector', 'Vehicle', 'Slot Start Time', 'Slot End Time', 'Booking Status', 'Cancellation Time', 'Reason', 'Estimated Energy (kWh)', 'Estimated Charging Cost (LKR)', 'Penalties Charged', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
-    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Connector', 'Transaction Type', 'Total Earning (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
+    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Connector', 'Transaction Type', 'Amount (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
     const faultsColumns = ['FaultID', 'Date & Time Reported', 'Fault Type', 'Category', 'Description', 'Connector', 'Status', 'Last Update On', 'Any actions took to resolve', 'Quick Actions']
-
-    const handleEditCharger = () => {
-        console.log('Edit Charger clicked');
-        setFormMode('edit-charger');
-        // Map the charger data to the expected format for RAddStationForm's initialChargerData
-        setInitialChargerData({
-            id: charger.chargerID, // Pass the ID if your form needs it for update API calls
-            name: charger['Charger Name'],
-            maxPower: charger['Maximum Power Output(kW)'].replace(' kW', ''), // Remove ' kW' and parse if needed
-            powerType: charger['Power Type'].split(' ')[0], // Extract 'DC' or 'AC'
-            connectorTypes: charger['Connectors'], // Use connectorTypes for consistency with RAddStationForm
-        });
-        setShowChargerForm(true);
-        setShowChargerMenu(false); // Close the dropdown menu
-    };
-
-    // Function to handle form submission from RAddStationForm
-    const handleFormSubmit = (data) => {
-        console.log("Form submitted with data:", data);
-        // Implement your logic to update the charger data in your backend
-        // For now, just close the form
-        setShowChargerForm(false);
-    };
-
-    // Function to close the form
-    const handleCloseForm = () => {
-        setShowChargerForm(false);
-        setInitialChargerData(null); // Clear initial data when closing
-    };
-
-    // Overview Tab Content
-    const OverviewTab = () => {
-        const [showChargerMenu, setShowChargerMenu] = useState(false);
-        const chargerMenuRef = useRef();
-
-        useEffect(() => {
-            const handleClickOutside = (e) => {
-                if (chargerMenuRef.current && !chargerMenuRef.current.contains(e.target)) {
-                    setShowChargerMenu(false);
-                }
-            };
-            document.addEventListener('mousedown', handleClickOutside);
-            return () => document.removeEventListener('mousedown', handleClickOutside);
-        }, []);
-
-        const handleRemoveCharger = () => {
-            const confirmRemove = window.confirm("Are you sure you want to remove this charger?");
-            if (confirmRemove) {
-                console.log('Remove Charger confirmed');
-                navigate('/station-owner/stations/stationprofile/s1');
-                // Logic to remove the charger
-            }
-            setShowChargerMenu(false);
-        };
-
-        return (
-            <div className="w-full bg-transparent rounded-xl">
-
-                <div className="flex-col space-y-2 bg-white px-8 py-6 rounded-xl mb-4">  
-                    <div className="flex justify-between items-center w-full">
-                        <div style={{ fontWeight: FONTS.weights.medium, color: COLORS.mainTextColor, fontSize: FONTS.sizes.xl }}>
-                            {charger['Charger Name']}
-                        </div>
-                        <div className="relative" ref={chargerMenuRef}>
-                            <button onClick={() => setShowChargerMenu(!showChargerMenu)}>
-                                <FiMoreVertical size={20} color={COLORS.mainTextColor} />
-                            </button>
-
-                            {showChargerMenu && (
-                                <div
-                                    className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-50"
-                                    style={{ border: '1px solid #e5e7eb' }}
-                                >
-                                    <button
-                                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                                        onClick={handleEditCharger}
-                                    >
-                                        Edit Charger
-                                    </button>
-                                    <button
-                                        className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
-                                        onClick={handleRemoveCharger}
-                                    >
-                                        Remove Charger
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex flex-wrap justify-between gap-4 text-sm">
-                        <div>
-                            <strong
-                            style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                            >
-                            Power Type:
-                            </strong>{' '}
-                            {charger['Power Type']}
-                        </div>
-                        <div>
-                            <strong
-                            style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                            >
-                            Max Power Output:
-                            </strong>{' '}
-                            {charger['Maximum Power Output(kW)']}
-                        </div>
-                        <div>
-                            <strong
-                            style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                            >
-                            Unit Price( per kW ):
-                            </strong>{' '}
-                            {charger['Unit Price(per kW)']}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {connectorsData.map((connector, idx) => (
-                        <div key={idx} className="space-y-4 bg-white rounded-xl p-8">
-                        <ConnectorView
-                            connectorName={connector.connectorName}
-                            session={connector.session}
-                            bookings={connector.bookings}
-                            timeSlots={timeSlots}
-                            // onEdit={() => console.log('Edit', connector.connectorName)}
-                            // onDisable={() => console.log('Disable', connector.connectorName)}
-                            // onRemove={() => console.log('Remove', connector.connectorName)}
-                        />
-                        </div>
-                    ))}
-                </div>
-
-            </div>
-        );
-    };
 
     // Table Tab Content
     const TableTab = ({ title, columns, data, onRowClick }) => (
@@ -625,7 +407,7 @@ const OwnerViewCharger = () => {
             backgroundColor: COLORS.background,
         }}>
 
-            <StationOwnerPageHeader title={`${station.name}-${charger['Charger Name']}`} />
+            <AdminPageHeader title={`${station.name}-${charger['Charger Name']}`} />
 
 
             {/* Tab Navigation */}
@@ -638,7 +420,6 @@ const OwnerViewCharger = () => {
 
             {/* Tab Content */}
             <div className="mt-6">
-                {activeTab === 'overview' && <OverviewTab />}
 
                 {activeTab === 'sessions' && (
                     <TableTab
@@ -671,16 +452,9 @@ const OwnerViewCharger = () => {
                     />
                 )}
             </div>
-            {showChargerForm && (
-                <AddChargingStationForm
-                    onClose={handleCloseForm}
-                    onSubmit={handleFormSubmit}
-                    mode={formMode}
-                    initialChargerData={initialChargerData}
-                />
-            )}
+            
         </div>
     );
 };
 
-export default OwnerViewCharger;
+export default AdminViewCharger;

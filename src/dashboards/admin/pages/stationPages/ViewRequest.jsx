@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState} from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { COLORS, FONTS } from '../../../../constants';
 import NotificationsIcon from '../../../../assets/notifications.svg';
@@ -10,12 +10,10 @@ export default function ViewRequest() {
     const { type, id } = useParams(); // Get request ID and type from URL
     const location = useLocation();
 
-    const pageTitle = type === 'connector' ? 'New Charger' : 'New Charging Station';
-
     // Sample data - replace with actual data fetching
-    const request = {
+    const [requestData, setRequestData] = useState({
         id: id,
-        title: pageTitle,
+        title: type === 'connector' ? 'New Charger' : 'New Charging Station',
         stationName: "EviGO Charging Station",
         address: "No.24, Joshep Road, Welipanna",
         status: "NEW",
@@ -32,10 +30,9 @@ export default function ViewRequest() {
         taxId: "#ewfb45555547",
         location: "Bloomfield Cricket and Athletic Club",
         chargersPlanned: "02",
-        // Add these new fields for connector type
-        rating: 4.5, // Sample rating
-        reviewCount: 24, // Sample review count
-        existingChargers: type === 'connector' ? [ // Only include for connectors
+        rating: 4.5,
+        reviewCount: 24,
+        existingChargers: type === 'connector' ? [
             {
                 name: "Existing Charger 1",
                 ports: ["CCS2"],
@@ -63,6 +60,13 @@ export default function ViewRequest() {
                 price: "LKR 55.00"
             }
         ]
+    });
+
+    const handleStatusUpdate = (newStatus) => {
+        setRequestData(prev => ({
+            ...prev,
+            status: newStatus
+        }));
     };
 
     return (
@@ -72,18 +76,20 @@ export default function ViewRequest() {
             backgroundColor: COLORS.background,
         }}>
             {/* Header Section */}
-            <AdminPageHeader title={`${request.title}`} />
+            <AdminPageHeader title={`${requestData.title}`} />
 
             {/* Main Content */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
                 {/* Left Side - Pass both request and type props */}
                 <div className="md:col-span-3">
-                    <RequestDetailsWithStation request={request} type={type} />
+                    <RequestDetailsWithStation request={requestData} type={type} />
                 </div>
 
                 {/* Right Side */}
                 <div className="md:sticky md:top-6 space-y-4 md:space-y-6">
-                    <ViewRequestRightPanel request={request} />
+                    <ViewRequestRightPanel 
+                        request={requestData}
+                        onStatusUpdate={handleStatusUpdate} />
                 </div>
             </div>
         </div>

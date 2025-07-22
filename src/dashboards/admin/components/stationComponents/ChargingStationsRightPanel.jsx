@@ -42,7 +42,7 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
 
   return (
     <div
-      className="rounded-xl border bg-white min-h-[300px] p-3 flex flex-col gap-6 shadow-sm"
+      className="rounded-xl border bg-white p-3 flex flex-col gap-6 h-[calc(100vh-140px)] overflow-y-auto"
       style={{
         borderColor: COLORS.stroke,
         background: COLORS.background,
@@ -85,7 +85,7 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
                   <div className="w-8 h-8 flex items-center justify-center rounded-lg" style={{ backgroundColor: COLORS.bgGreen }}>
                     {renderGreenIcon(ConnectorsIcon)}
                   </div>
-                  <div style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.semibold }}>Connectors</div>
+                  <div style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.semibold }}>Chargers</div>
                 </div>
               </div>
               <div className="grid grid-rows-2 mt-2">

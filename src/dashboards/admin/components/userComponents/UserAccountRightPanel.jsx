@@ -9,15 +9,21 @@ export default function UserAccountRightPanel({ user, stats }) {
 
     return (
         <div
-            className="rounded-lg md:rounded-xl border bg-white w-full p-3 md:p-4 flex flex-col gap-4 md:gap-6 shadow-sm"
+            className="rounded-lg md:rounded-xl border h-[calc(100vh-200px)] overflow-y-auto bg-white w-full p-3 md:p-4 flex flex-col gap-2 md:gap-4"
             style={{
                 borderColor: COLORS.stroke,
                 background: COLORS.background,
                 fontFamily: FONTS.family.sans,
             }}
         >
+
+
             {/* User Profile Card */}
             <UserProfileCard user={user} />
+
+            <Button>
+                Remove User Account
+            </Button>
 
             {/* Account Status History Header */}
             <div className="mt-0 text-center">

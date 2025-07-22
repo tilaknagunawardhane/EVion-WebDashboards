@@ -89,7 +89,7 @@ export default function UserAccountPage() {
         'Ending Bat. Level',
         'Energy Delivered',
         'Energy Cost',
-        'Status',
+        'Category',
         'Booking Fee',
         'Charged Penalties',
         'Total Fee',
@@ -97,7 +97,8 @@ export default function UserAccountPage() {
         'Rating Given',
         'Complaints',
         'Resolve Status',
-        'Refunds'
+        'Refunds',
+        'Quick Actions'
       ],
       data: [
         {
@@ -115,34 +116,29 @@ export default function UserAccountPage() {
           'Ending Bat. Level': '85%',
           'Energy Delivered': '24.5 kWh',
           'Energy Cost': '$7.35',
-          'Status': 'Booked',
+          'Category': 'Reservation',
           'Booking Fee': '$2.00',
           'Charged Penalties': '$0.00',
           'Total Fee': '$9.35',
           'Payment Status': 'Paid',
           'Rating Given': '4.5',
-          'Complaints': 'None',
-          'Resolve Status': '-',
-          'Refunds': '$0.00'
+          'Complaints': '',
+          'Resolve Status': '',
+          'Refunds': '',
+          'Quick Actions': ['View Receipt']
         },
         // Add more session data as needed
       ]
     },
     bookings: {
       columns: [
+        'Booking ID',
         'Session ID',
         'Date',
         'Slot',
         'Start',
         'End',
         'Duration',
-        'Station',
-        'Location',
-        'Connector Type',
-        'Charger Type',
-        'Vehicle',
-        'Starting Bat. Level',
-        'Ending Bat. Level',
         'Energy Delivered',
         'Energy Cost',
         'Booking Fee',
@@ -150,25 +146,20 @@ export default function UserAccountPage() {
         'Reason to cancel',
         'Charged Penalties',
         'Total Fee',
-        'Rating Given',
         'Complaints',
         'Resolve Status',
         'Refunds',
-        'View Receipt'
+        'Quick Actions'
       ],
       data: [
         {
-          'Session ID': 'BOOK-001',
+          'Booking ID': 'BOOK-001',
+          'Session ID': 'SESS-124',
           'Date': '2023-06-18',
           'Slot': '10:00 - 11:00',
           'Start': '10:05',
           'End': '10:50',
           'Duration': '45 min',
-          'Station': 'Mall Parking EV',
-          'Location': '800 Shop Rd, Metropolis',
-          'Connector Type': 'Type 2',
-          'Charger Type': 'AC',
-          'Vehicle': 'Nissan Leaf',
           'Starting Bat. Level': '30%',
           'Ending Bat. Level': '90%',
           'Energy Delivered': '18.2 kWh',
@@ -176,53 +167,42 @@ export default function UserAccountPage() {
           'Booking Fee': '$1.50',
           'Status': 'Attended',
           'Reason to cancel': '-',
-          'Charged Penalties': '$0.00',
+          'Charged Penalties': '',
           'Total Fee': '$6.96',
-          'Rating Given': '5.0',
-          'Complaints': 'None',
-          'Resolve Status': '-',
-          'Refunds': '$0.00',
-          'View Receipt': <a href="#" style={{ color: COLORS.primary }}>View</a>
+          'Complaints': '',
+          'Resolve Status': '',
+          'Refunds': '',
+          'Quick Actions': ['View Receipt']
         },
         // Add more booking data as needed
       ]
     },
     payments: {
       columns: [
+        'Transaction ID',
         'Session ID',
+        'Booking ID',
         'Date & Time',
-        'Station',
-        'Location',
-        'Connector Type',
-        'Charger Type',
-        'Duration',
-        'Vehicle',
-        'Energy Delivered',
-        'Energy Cost',
-        'Booking Fee',
-        'Penalties',
-        'Total Fee',
-        'Complaint ID',
-        'Refunds',
+        'Description',
+        'Paid Amount(LKR)',
         'View Receipt'
       ],
       data: [
         {
           'Session ID': 'PAY-001',
+          'Transaction ID': 'TR-001',
           'Date & Time': '2023-06-15 09:30',
-          'Station': 'Tech Park Chargers',
-          'Location': '200 Innovation Dr, Gotham',
-          'Connector Type': 'CHAdeMO',
-          'Charger Type': 'DC',
-          'Duration': '32 min',
-          'Vehicle': 'Toyota Prius',
-          'Energy Delivered': '15.8 kWh',
-          'Energy Cost': '$4.74',
-          'Booking Fee': '$1.00',
-          'Penalties': '$0.00',
-          'Total Fee': '$5.74',
-          'Complaint ID': '-',
-          'Refunds': '$0.00',
+          'Description': "Paid for the charging Session",
+          'Paid Amount(LKR)': '500.74',
+          'View Receipt': <a href="#" style={{ color: COLORS.primary }}>View</a>
+        },
+        {
+          'Session ID': 'PAY-002',
+          'Transaction ID': 'TR-002',
+          'Date & Time': '2023-06-15 09:30',
+          'Booking ID': 'ASP3456',
+          'Description': "Late Cancellation Fee",
+          'Paid Amount(LKR)': '1500.74',
           'View Receipt': <a href="#" style={{ color: COLORS.primary }}>View</a>
         },
         // Add more payment data as needed
@@ -236,14 +216,11 @@ export default function UserAccountPage() {
         'Title',
         'Description',
         'Evidences',
-        'Station',
-        'Location',
+        'Station ID',
         'Charger ID',
-        'Connector Type',
         'Booking ID',
         'Status',
-        'Resolved On',
-        'Resolved By',
+        'Last Update On',
         'Specific Actions took to resolve'
       ],
       data: [
@@ -254,14 +231,11 @@ export default function UserAccountPage() {
           'Title': 'Station not charging',
           'Description': 'Plugged in but no power delivery',
           'Evidences': 'Photo attached',
-          'Station': 'Westside EV',
-          'Location': '456 Elm St, Gotham',
+          'Station ID': 'EVS-345',
           'Charger ID': 'CHG-789',
-          'Connector Type': 'CCS1',
           'Booking ID': 'BOOK-045',
           'Status': 'Resolved',
-          'Resolved On': '2023-06-13 10:15',
-          'Resolved By': 'Tech Team',
+          'Last Update On': '2023-06-13 10:15',
           'Specific Actions took to resolve': 'Replaced faulty power module'
         },
         // Add more report data as needed
@@ -336,13 +310,9 @@ export default function UserAccountPage() {
             />
           </div>
 
-          <OverviewCard padding='p-6'>
+          <OverviewCard padding='p-0'>
             {/* Tab Content */}
-            <div className="bg-white rounded-sm shadow-sm overflow-hidden"
-              style={{
-                border: `1px solid ${COLORS.border}`,
-                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
-              }}>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <DataTable
                 columns={tabData[activeTab].columns}
                 data={tabData[activeTab].data}

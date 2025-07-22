@@ -80,7 +80,7 @@ export default function UsersRightPanel({ users = [], requests = [] }) {
 
     return (
         <div
-            className="rounded-xl border bg-white min-h-[300px] p-3 flex flex-col gap-6 shadow-sm"
+            className="rounded-xl border bg-white p-3 flex flex-col gap-6"
             style={{
                 borderColor: COLORS.stroke,
                 background: COLORS.background,
@@ -90,7 +90,7 @@ export default function UsersRightPanel({ users = [], requests = [] }) {
             {/* User Statistics Card */}
             {renderStatCard()}
 
-            <Button
+            {/* <Button
                 variant="primary"
                 type="button"
                 size="base"
@@ -103,10 +103,10 @@ export default function UsersRightPanel({ users = [], requests = [] }) {
                 className='w-full'
             >
                 View all requests
-            </Button>
+            </Button> */}
 
             {/* Requests Section */}
-            <div>
+            {/* <div>
                 <div style={{ width: '100%', height: '1px', backgroundColor: COLORS.stroke, margin: '0px 0 20px' }}></div>
 
                 <h4 style={{
@@ -125,7 +125,7 @@ export default function UsersRightPanel({ users = [], requests = [] }) {
                 </div>
 
 
-            </div>
+            </div> */}
         </div>
     );
 }
