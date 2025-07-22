@@ -32,6 +32,8 @@ import AdminTransactions from '../dashboards/admin/pages/transactionsPages/Trans
 import ChatPage from '../dashboards/admin/pages/Chat'
 
 import FaultReportsPage from '../dashboards/support-officer/pages/FaultReports'
+import FaultReportDetailPage from '../dashboards/support-officer/pages/FaultReportDetail'
+import AfterAcceptedPage from '../dashboards/support-officer/pages/AfterAccepted'
 import CommunityPage from '../dashboards/support-officer/pages/Community'
 
 import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/StationProfile'
@@ -94,6 +96,8 @@ const router = createBrowserRouter([
           { path: 'dashboard', element: <SupportOfficerDash />},
           { path: 'chargingStations', element:<ChargingStationsOverview />},
           { path: 'faultReports', element:<FaultReportsPage /> },
+          { path: 'FaultReportDetail', element:<FaultReportDetailPage /> },
+          { path: 'AfterAccepted', element:<AfterAcceptedPage /> },
           { path: 'community', element: <CommunityPage />},
           { path: 'tasks', element: <TasksPage /> }
         ]

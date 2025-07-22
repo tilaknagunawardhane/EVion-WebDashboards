@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-// import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FONTS, COLORS } from "../../../constants";
 import DataTable from "../../../components/ui/DataTable";
 import DataTableTopBar from "../../../components/ui/DataTableTopBar";
@@ -10,7 +10,7 @@ import FaultReportRightPanel from "../components/FaultReportRightPanel";
 
 export default function FaultReportsPage(){
         // const { id } = useParams();
-        // const navigate = useNavigate();
+        const navigate = useNavigate();
         const [search, setSearch] = useState('');
         const [filter, setFilter] = useState({});
         const [sort, setSort] = useState('Date');
@@ -210,9 +210,10 @@ export default function FaultReportsPage(){
                                     sort={sort}
                                     search={search}
                     
-                                    // onRowClick={(row) => {
-                                    //     navigate(`/users/${id}/${activeTab}/${row.id}`);
-                                    // }}
+                                    onRowClick={(row) => {
+                                        const reportId = row['ReportID'] || row['Report ID'];
+                                        navigate(`/support-officer/FaultReportDetail`, { state: row });
+                                      }}
                                     />
                                 </div>
                             </OverviewCard>
