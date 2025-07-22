@@ -175,6 +175,11 @@ export default function ChargingStations() {
                             filterOptions={stationFilterOptions}
                             sortOptions={stationSortOptions}
                             searchPlaceholder="Search stations..."
+                            showExportButton={true}
+                            onExport={() => {
+                                // Export functionality would go here
+                                console.log('Exporting stations data...');
+                            }}
                         />
                     </div>
 

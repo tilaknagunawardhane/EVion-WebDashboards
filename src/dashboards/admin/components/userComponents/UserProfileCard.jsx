@@ -71,7 +71,7 @@ export default function UserProfileCard({ user }) {
     );
 
     return (
-        <div className="flex flex-col gap-2 xs:gap-3 sm:gap-4 w-full">
+        <div className="flex flex-col gap-2 xs:gap-2 sm:gap-2 w-full">
             {/* Main Profile Card */}
             <div className='p-2 xs:p-3 sm:p-4 rounded-md xs:rounded-lg sm:rounded-xl w-full' style={{
                 backgroundColor: currentStatus.bgColor,
@@ -134,7 +134,7 @@ export default function UserProfileCard({ user }) {
             {user['Account Status'] === 'Blocked' && (
                 <div className='p-2 xs:p-3 sm:p-4 rounded-md xs:rounded-lg sm:rounded-xl w-full' style={{
                     backgroundColor: COLORS.bgRed,
-                    border: `2px solid ${COLORS.danger}`
+                    border: `1px solid ${COLORS.danger}`
                 }}>
                     <div className="flex flex-col gap-1 xs:gap-2 sm:gap-3 w-full">
                         {/* Balance */}

@@ -91,6 +91,7 @@ const ViewStation = () => {
     const chargersData = [
         {
             id: 'CHG-001',
+            name: 'Super Charger -DC',
             connectedOn: '2023-01-15',
             type: 'DC',
             power: '150 kW',
@@ -102,6 +103,7 @@ const ViewStation = () => {
         },
         {
             id: 'CHG-002',
+            name: 'Super Charger -AC',
             connectedOn: '2023-02-10',
             type: 'DC',
             power: '60 kW',
@@ -113,6 +115,7 @@ const ViewStation = () => {
         },
         {
             id: 'CHG-003',
+            name: 'Charger 1 - DC',
             connectedOn: '2023-03-05',
             type: 'AC',
             power: '22 kW',
@@ -124,6 +127,7 @@ const ViewStation = () => {
         },
         {
             id: 'CHG-004',
+            name: 'Bay 1 -DC Charger',
             connectedOn: '2022-12-20',
             type: 'DC',
             power: '120 kW',
@@ -135,6 +139,7 @@ const ViewStation = () => {
         },
         {
             id: 'CHG-005',
+            name: 'AC Charger',
             connectedOn: '2023-04-01',
             type: 'AC',
             power: '11 kW',
@@ -423,6 +428,7 @@ const ViewStation = () => {
     const ChargersTab = () => {
         const columns = [
             'Charger ID',
+            'Charger Name',
             'Connected On',
             'Charger Type',
             'Power Output',
@@ -436,6 +442,7 @@ const ViewStation = () => {
 
         const processedChargersData = chargersData.map(charger => ({
             'Charger ID': charger.id,
+            'Charger Name': charger.name,
             'Connected On': charger.connectedOn,
             'Charger Type': charger.type,
             'Power Output': charger.power,
@@ -505,13 +512,12 @@ const ViewStation = () => {
             'Start',
             'End',
             'Duration',
+            'Category',
             'Charger ID',
             'Connector Type',
-            'Charger Type',
             'Vehicle',
             'Energy Delivered',
             'Energy Cost',
-            'Category',
             'Penalties',
             'Total Fee',
             'Payment Status',
@@ -593,7 +599,7 @@ const ViewStation = () => {
     };
 
     const TransactionsTab = () => {
-        const columns = ['TransactionID', 'Date & Time', 'Charger', 'Connector', 'SessionID', 'BookingID', 'Transaction Type', 'Amount(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions'];
+        const columns = ['TransactionID', 'Date & Time', 'SessionID', 'BookingID', 'Transaction Type', 'Amount(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions'];
 
         const transactionsData = [
             {
