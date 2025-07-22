@@ -5,7 +5,7 @@ import StationsIcon from '../../../assets/stations.svg'
 import ConnectorsIcon from '../../../assets/connectors.svg'
 import SessionsIcon from '../../../assets/sessions.svg'
 import ElectricityIcon from '../../../assets/electricity.svg'
-import IncomeIcon from '../../../assets/electricity.svg'
+import IncomeIcon from '../../../assets/earnings2.svg'
 import StationOwnerPageHeader from '../components/StationOwnerPageHeader'
 import OverviewChart from '../components/dashboardComponents/OverviewChart'
 import ConnectorStatusChart from '../components/dashboardComponents/ConnectorStatusChart'
@@ -28,20 +28,20 @@ export default function DashboardPage() {
       icon: <img src={ConnectorsIcon} alt="Connectors" style={{ width: 20, height: 20, color: COLORS.mainTextColor }} />
     },
     {
-      title: 'Sessions',
-      value: '147',
+      title: 'Sessions - Today',
+      value: '14',
       activeSessions: '04',
       icon: <img src={SessionsIcon} alt="Sessions" style={{ width: 20, height: 20, color: COLORS.mainTextColor }} />
     },
     {
-      title: 'Electricity',
-      value: '2560 kW',
+      title: 'Electricity - Today',
+      value: '560 kW',
       icon: <img src={ElectricityIcon} alt="Electricity" style={{ width: 20, height: 20, color: COLORS.mainTextColor }} />
     },
     {
-      title: 'Income',
-      value: 'LKR 238.45K',
-      icon: <img src={IncomeIcon} alt="Income" style={{ width: 20, height: 20, color: COLORS.mainTextColor }} />,
+      title: 'Revenue - Today',
+      value: 'LKR 8.45K',
+      icon: <img src={IncomeIcon} alt="Income" className="mr-1" style={{ width: 16, height: 16, color: COLORS.mainTextColor }} />,
       trend: { value: 8.3, label: 'vs last week' }
     }
   ]
