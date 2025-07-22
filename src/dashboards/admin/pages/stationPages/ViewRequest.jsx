@@ -74,7 +74,12 @@ export default function ViewRequest() {
             </div>
         );
     }
-
+const handleStatusUpdate = (newStatus) => {
+        setRequestData(prev => ({
+            ...prev,
+            status: newStatus
+        }));
+    };
     return (
         <div style={{
             fontFamily: FONTS.family.sans,
@@ -85,12 +90,12 @@ export default function ViewRequest() {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
                 <div className="md:col-span-3">
-                    <RequestDetailsWithStation request={requestData} type={type} />
+                    <RequestDetailsWithStation request={request} type={type} />
                 </div>
 
                 <div className="md:sticky md:top-6 space-y-4 md:space-y-6">
                     <ViewRequestRightPanel 
-                        request={requestData}
+                        request={request}
                         onStatusUpdate={handleStatusUpdate} />
                 </div>
             </div>

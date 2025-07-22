@@ -203,7 +203,7 @@ export default function FaultReportDetailRightPanel({ user = {}, stats = {} }) {
                     fontSize: FONTS.sizes.base
                 }}
             >
-                Chat with User
+                Chat with Station Owner
             </button>
         </div>
     );

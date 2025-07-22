@@ -114,13 +114,13 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
         setDiscardReason('');
     };
 
-    const handleStatusUpdate = () => {
-        if (request.status === 'NEW') {
-            onStatusUpdate('IN-PROGRESS');
-        } else if (request.status === 'IN-PROGRESS') {
-            onStatusUpdate('WAITING FOR PAYMENT');
-        }
-    };
+    // const handleStatusUpdate = () => {
+    //     if (request.status === 'NEW') {
+    //         onStatusUpdate('IN-PROGRESS');
+    //     } else if (request.status === 'IN-PROGRESS') {
+    //         onStatusUpdate('WAITING FOR PAYMENT');
+    //     }
+    // };
 
     const renderActionButtons = () => {
         switch (currentRequest.status) {
@@ -173,6 +173,7 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                             className="w-full"
                             onClick={handleComplete}
                             disabled={isLoading}
+                            // onClick={handleStatusUpdate}
                         >
                             Complete Installation
                         </Button>
@@ -206,18 +207,22 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
 
                 {/* Email with Chat Icon */}
                 <div className="flex items-center justify-center gap-2">
-                    <a
-                        href={`mailto:${currentRequest.email}`}
-                        className="flex items-center gap-1 text-primary hover:underline"
-                        style={{
-                            color: COLORS.primary,
-                            fontSize: FONTS.sizes.sm,
-                            cursor: 'pointer',
-                            textDecoration: 'none'
-                        }}
-                    >
-                        {currentRequest.email}
+                    <div className="underline">
+                        <a
+                            href={`mailto:${currentRequest.email}`}
+                            className="flex items-center gap-1 text-primary underline"
+                            style={{
+                                color: COLORS.primary,
+                                fontSize: FONTS.sizes.sm,
+                                cursor: 'pointer',
+                                textDecoration: 'none'
+                            }}
+                        >
+                            {currentRequest.email}
                         </a>
+                    </div>
+
+                    <div  className="rounded-full p-3" style={{cursor: 'pointer', backgroundColor: COLORS.primary}} onClick={() => navigate(`/admin/chat/`)}>
                         <img
                             src={ChatIcon}
                             alt="Chat icon"
