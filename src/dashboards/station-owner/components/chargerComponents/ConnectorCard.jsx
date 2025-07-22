@@ -3,6 +3,9 @@ import { COLORS, FONTS } from '../../../../constants';
 import ClockIcon from '../../../../assets/session_time.svg';
 import EnergyIcon from '../../../../assets/session_energy.svg';
 import CostIcon from '../../../../assets/session_cost.svg';
+import { FiMoreVertical } from 'react-icons/fi';
+import BookingDisableForm from '../chargerComponents/BookingDisableForm';
+
 
 const ChargingSessionCard = ({ connectorName, session, bookings, timeSlots  }) => {
 

@@ -40,6 +40,7 @@ export default function AccountSetup() {
   const [formData, setFormData] = useState({
     business: '',
     reg: '',
+    confirmReg: '',
     tax: '',
     district: '',
     accountholder: '',
@@ -118,9 +119,19 @@ export default function AccountSetup() {
 
   const validateStep = () => {
     const newErrors = {};
+    if (currentStep === 1) {
+      if (!formData.business.trim()) newErrors.business = 'Please enter your business name';
+      if (!formData.reg.trim()) newErrors.reg = 'Please enter your business registration number';
+      else if (!/^[a-zA-Z0-9-]+$/.test(formData.reg))
+        newErrors.reg = 'Business registration number must contain only letters, numbers, and hyphens';
+      if (formData.reg !== formData.confirmReg) newErrors.confirmReg = 'Business registration numbers do not match';
+      if (!formData.district) newErrors.district = 'Please select a district';
+}
 
     if (currentStep === 2) {
       if (!formData.accountholder.trim()) newErrors.accountholder = 'Please enter account holder name';
+      else if (!/^[a-zA-Z\s]+$/.test(formData.accountholder))
+        newErrors.accountholder = 'Account holder name must contain only letters and spaces';
       if (!formData.bank.trim()) newErrors.bank = 'Please select a bank';
       if (!formData.branch.trim()) newErrors.branch = 'Please select a branch';
       if (!formData.accountnumber.trim()) newErrors.accountnumber = 'Please enter account number';
@@ -235,12 +246,13 @@ export default function AccountSetup() {
         return (
           <>
             <InputField
-              label="Business Name (If Applicable)"
+              label="Business Name"
               placeholder="Enter your business name"
               value={formData.business}
               onChange={handleInputChange('business')}
               error={!!errors.business}
               errorMessage={errors.business}
+              required
             />
             {/* <InputField
               label="District"
@@ -273,6 +285,7 @@ export default function AccountSetup() {
                     {d.name}, {d.province}
                   </option>
                 ))}
+                
               </select>
             </div>
             <InputField
@@ -283,8 +296,19 @@ export default function AccountSetup() {
               onChange={handleInputChange('reg')}
               error={!!errors.reg}
               errorMessage={errors.reg}
+              required
             />
             <InputField
+            label="Business Registration Number Confirmation"
+            type="text"
+            placeholder="Confirm your business registration number"
+            value={formData.confirmReg}
+            onChange={handleInputChange('confirmReg')}
+            error={!!errors.confirmReg}
+            errorMessage={errors.confirmReg}
+            required
+            />
+            {/* <InputField
               label="Tax ID"
               type="text"
               placeholder="Enter your business's tax ID"
@@ -292,7 +316,7 @@ export default function AccountSetup() {
               onChange={handleInputChange('tax')}
               error={!!errors.tax}
               errorMessage={errors.tax}
-            />
+            /> */}
           </>
         );
       case 2:

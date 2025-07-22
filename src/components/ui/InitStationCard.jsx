@@ -202,11 +202,11 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
           {expanded ? 'Hide Details' : 'More'}
         </button>
 
-        {safeStation.status === 'approved' && (
+        {/* {safeStation.status === 'approved' && (
           <Button variant="primary" onClick={() => onPay?.(safeStation)}>
             Pay Now
           </Button>
-        )}
+        )} */}
       </div>
     </div>
   );

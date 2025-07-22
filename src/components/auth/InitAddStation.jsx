@@ -29,7 +29,7 @@ export default function InitAddStation() {
                 color: COLORS.mainTextColor
             }}
             >
-            Hello Adeesha!
+            Hello Vishwani!
             </h1>
             <p 
             className="max-w-md mx-auto md:max-w-3xl mb-12"
@@ -53,7 +53,9 @@ export default function InitAddStation() {
                     color: COLORS.secondaryText,
                 }}
                 >
+                <a href="https://docs.google.com/document/d/1nC-bu2dzJP0s9nWcWrtm-6IkaGVFCMEE6h_feuzeGy0/edit?usp=sharing" style={{ color: COLORS.primary }}>
                 Installation Process & Charges
+                </a>
                 </p>
             </div>
             {/* Chat Icon */}

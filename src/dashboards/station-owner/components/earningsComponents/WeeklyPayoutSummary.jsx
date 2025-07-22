@@ -33,7 +33,7 @@ const MOCK_BREAKDOWN = [
 ];
 
 const week = 'July 15-21, 2025';
-const subscriptionFee = 1000;
+const subscriptionFee = 0;
 
 const WeeklyPayoutSummary = ({ data }) => {
   const [showBreakdown, setShowBreakdown] = useState(false);
@@ -127,7 +127,7 @@ const WeeklyPayoutSummary = ({ data }) => {
 
                     {/* <hr className="my-3" /> */}
                     <div className="text-sm mb-6" style={{color: COLORS.mainTextColor}}>
-                        <div className="flex justify-between mb-1">
+                        {/* <div className="flex justify-between mb-1">
                             <span>Total Revenue</span>
 
                             <div>
@@ -135,14 +135,14 @@ const WeeklyPayoutSummary = ({ data }) => {
                                 <span style={{fontSize: FONTS.sizes.xs}}>LKR</span>
                             </div>
                             
-                        </div>
-                        <div className="flex justify-between mb-1" style={{color: COLORS.danger}}>
+                        </div> */}
+                        {/* <div className="flex justify-between mb-1" style={{color: COLORS.danger}}>
                             <span>Subscription Fee</span>
                             <div>
                                 <span style={{fontSize: FONTS.sizes.base}}>-{subscriptionFee}</span>
                                 <span style={{fontSize: FONTS.sizes.xs}}>LKR</span>
                             </div>
-                        </div>
+                        </div> */}
                         <div className="flex justify-between font-medium" style={{color:COLORS.primary}}>
                             <span>Net Payout</span>
                             <div>

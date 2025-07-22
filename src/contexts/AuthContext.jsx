@@ -138,7 +138,7 @@ export function AuthProvider({ children }) {
             });
           } else if (stationCheck.data.hasApprovedStation) {
             // Case 2: Has at least one approved station
-            navigate('/station-owner');
+            navigate('/station-owner/dashboards');
             toast.success('Accessing your station dashboard', {
               position: "top-right",
               autoClose: 3000

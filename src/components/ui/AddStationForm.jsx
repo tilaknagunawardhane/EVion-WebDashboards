@@ -23,6 +23,14 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const { id: paramStationId } = useParams(); // Only used in edit mode if prop not provided
+  const [locationData, setLocationData] = useState(null);
+  // Handler for setting location (simulated map)
+  const handleSetLocationOnMap = () => {
+    alert('Opening map to set location...');
+    const dummyLat = 6.90 + Math.random() * 0.1;
+    const dummyLng = 79.90 + Math.random() * 0.1;
+    setLocationData({ lat: dummyLat, lng: dummyLng });
+  };
 
   // Prefer propStationId over paramStationId
   const stationId = propStationId || paramStationId;
@@ -327,8 +335,8 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
 
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/10 flex items-center justify-center">
-      <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-md max-h-[90vh] overflow-hidden">
-        <div className="h-full overflow-y-auto">
+      <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-md max-h-[90vh] flex flex-col">
+        <div className="flex-1 overflow-y-auto">
           <button
             onClick={onClose}
             className="absolute top-3 right-4 text-3xl font-extralight hover:text-gray-600"
@@ -351,6 +359,8 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
               elecProviders={['CEB', 'LECO', 'Private']}
               sources={['Grid', 'Solar', 'Hybrid']}
               supportedPowerTypes={['AC', 'DC']}
+              locationData={locationData}
+              onSetLocationClick={handleSetLocationOnMap}
             />
           ) : (
             <StepTwoForm
