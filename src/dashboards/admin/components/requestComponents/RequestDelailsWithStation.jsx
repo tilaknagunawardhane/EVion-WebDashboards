@@ -84,8 +84,8 @@ export default function RequestDetailsWithStation({ request, type }) {
                 <h3 className="text-sm font-medium" style={{ color: COLORS.mainTextColor }}>
                     No of Chargers Planned
                 </h3>
-                <p className="text-xl font-medium" style={{ color: COLORS.mainTextColor }}>
-                    {request.chargersPlanned}
+                <p className="text-sm font-medium" style={{ color: COLORS.mainTextColor }}>
+                    {request.chargersPlanned || '02'}
                 </p>
             </div>
 

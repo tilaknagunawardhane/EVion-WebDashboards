@@ -16,7 +16,7 @@ export default function ChargerDetails({ charger }) {
       </h4>
       
       {/* Power Output Row */}
-      <div className="flex justify-between items-baseline mb-3">
+      <div className="flex justify-between items-baseline mb-4">
         <p className="text-xs" style={{ 
           color: COLORS.secondaryText,
           fontSize: FONTS.sizes.xs

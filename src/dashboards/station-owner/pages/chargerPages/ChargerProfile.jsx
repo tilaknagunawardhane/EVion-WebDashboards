@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
 import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
 import DataTable from '../../../../components/ui/DataTable';
 import StarIcon from '../../../../assets/star-filled.svg';
 import StarOutlineIcon from '../../../../assets/star-outline.svg';
 import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
-import ConnectorView from '../../components/chargerComponents/ConnectorCard'
+import ConnectorView from '../../components/chargerComponents/ConnectorCard';
+import { FiMoreVertical } from 'react-icons/fi';
+import AddChargingStationForm from '../../components/stationComponents/RAddStationForm'; 
 
-const OwnerViewStation = () => {
+const OwnerViewCharger = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
+
+    const [showChargerForm, setShowChargerForm] = useState(false);
+    const [formMode, setFormMode] = useState('edit-charger');
+    const [initialChargerData, setInitialChargerData] = useState(null);
+
+    
 
     // Sample station data
     const station = {
@@ -128,7 +136,7 @@ const OwnerViewStation = () => {
         { id: 'bookings', label: 'Bookings'},
         { id: 'transactions', label: 'Transactions Related to Charger'},
         { id: 'faults', label: 'Faults'},
-        { id: 'stats', label: 'Stats'},
+        // { id: 'stats', label: 'Stats'},
     ];
 
     // Mobile labels for tabs
@@ -138,7 +146,7 @@ const OwnerViewStation = () => {
         bookings: 'Bookings',
         transactions: 'Transactions Related to Charger',
         faults: 'Faults',
-        stats: 'Stats',
+        // stats: 'Stats',
     };
 
     const sessionsData = [
@@ -153,12 +161,12 @@ const OwnerViewStation = () => {
         'Total Energy Delivered(kWh)': 15.5,
         'BookingID/Walk-in': 'BKG12345',
         'Charging Cost(LKR)': 775.00,
-        'Penalties Received': 'None',
+        'Penalties Received': '',
         'Total Payment': 775.00,
         'Payment Status': 'Paid',
         'Ratings Given': 5,
         'Issue Reported?': 'No',
-        'Any actions taken to resolve': 'N/A',
+        'Any actions taken to resolve': '',
         'Quick Actions': ['View Receipt']
     },
     {
@@ -170,14 +178,14 @@ const OwnerViewStation = () => {
         'Ended At': '11:45 AM',
         Duration: '30m',
         'Total Energy Delivered(kWh)': 22.0,
-        'BookingID/Walk-in': 'Walk-in',
+        'BookingID/Walk-in': '',
         'Charging Cost(LKR)': 1100.00,
-        'Penalties Received': 'None',
+        'Penalties Received': '',
         'Total Payment': 1100.00,
         'Payment Status': 'Paid',
         'Ratings Given': 4,
         'Issue Reported?': 'No',
-        'Any actions taken to resolve': 'N/A',
+        'Any actions taken to resolve': '',
         'Quick Actions': ['View Receipt']
     },
     {
@@ -194,9 +202,9 @@ const OwnerViewStation = () => {
         'Penalties Received': 200.00,
         'Total Payment': 1950.00,
         'Payment Status': 'Pending',
-        'Ratings Given': 'N/A',
+        'Ratings Given': '',
         'Issue Reported?': 'Yes - Connector Malfunction',
-        'Any actions taken to resolve': 'Technician dispatched',
+        'Any actions taken to resolve': 'Disabled Charger',
         'Quick Actions': ['View Receipt']
     },
     {
@@ -210,12 +218,12 @@ const OwnerViewStation = () => {
         'Total Energy Delivered(kWh)': 28.0,
         'BookingID/Walk-in': 'BKG12347',
         'Charging Cost(LKR)': 1400.00,
-        'Penalties Received': 'None',
+        'Penalties Received': '',
         'Total Payment': 1400.00,
         'Payment Status': 'Paid',
         'Ratings Given': 5,
         'Issue Reported?': 'No',
-        'Any actions taken to resolve': 'N/A',
+        'Any actions taken to resolve': '',
         'Quick Actions': ['View Receipt']
     },
     {
@@ -227,14 +235,14 @@ const OwnerViewStation = () => {
         'Ended At': '04:20 PM',
         Duration: '20m',
         'Total Energy Delivered(kWh)': 40.0,
-        'BookingID/Walk-in': 'Walk-in',
+        'BookingID/Walk-in': '',
         'Charging Cost(LKR)': 2000.00,
-        'Penalties Received': 'None',
+        'Penalties Received': '',
         'Total Payment': 2000.00,
         'Payment Status': 'Paid',
-        'Ratings Given': 'N/A',
+        'Ratings Given': '',
         'Issue Reported?': 'No',
-        'Any actions taken to resolve': 'N/A',
+        'Any actions taken to resolve': '',
         'Quick Actions': ['View Receipt']
     }
     ];
@@ -244,19 +252,18 @@ const OwnerViewStation = () => {
             BookingID: 'BKG12345',
             SessionID: 'S001',
             'Booking Date': '2025-07-09',
-            Connector: 'Type 2 AC',
-            Vehicle: 'Tesla Model 3',
-            'Slot Start Time': '09:00 AM',
-            'Slot End Time': '10:30 AM',
+            'Booked Slot': '08:00 AM -08:30 AM',
+            'Charging Started': '08:00 AM',
+            'Charging Ended': '08:30 AM',
             'Booking Status': 'Completed',
-            'Cancellation Time': 'N/A',
-            Reason: 'N/A',
-            'Estimated Energy (kWh)': 15.0,
-            'Estimated Charging Cost (LKR)': 750.00,
-            'Penalties Charged': 'None',
+            'Cancellation Time': '',
+            Reason: '',
+            'Energy (kWh)': 15.0,
+            'Charging Cost (LKR)': 750.00,
+            'Penalties Charged': '',
             'Payment Status': 'Paid',
             'Reported Issue?': 'No',
-            'Any actions taken to resolve': 'N/A'
+            'Any actions taken to resolve': ''
         },
         {
             BookingID: 'BKG12346',
@@ -264,17 +271,18 @@ const OwnerViewStation = () => {
             'Booking Date': '2025-07-10',
             Connector: 'CHAdeMO DC',
             Vehicle: 'Hyundai Kona EV',
-            'Slot Start Time': '02:00 PM',
-            'Slot End Time': '02:45 PM',
+            'Booked Slot': '14:00 PM - 15:00 PM',
+            'Charging Started': '14:06 PM',
+            'Charging Ended': '14:45 PM',
             'Booking Status': 'Completed',
-            'Cancellation Time': 'N/A',
-            Reason: 'N/A',
-            'Estimated Energy (kWh)': 30.0,
-            'Estimated Charging Cost (LKR)': 1500.00,
-            'Penalties Charged': 'Overstay Fee',
+            'Cancellation Time': '',
+            Reason: '',
+            'Energy (kWh)': 30.0,
+            'Charging Cost (LKR)': 1500.00,
+            'Penalties Charged': 300.00,
             'Payment Status': 'Pending',
             'Reported Issue?': 'Yes - Connector Malfunction',
-            'Any actions taken to resolve': 'Technician dispatched, Customer contacted'
+            'Any actions taken to resolve': 'Customer contacted'
         },
         {
             BookingID: 'BKG12347',
@@ -282,53 +290,56 @@ const OwnerViewStation = () => {
             'Booking Date': '2025-07-11',
             Connector: 'Type 2 AC',
             Vehicle: 'MG ZS EV',
-            'Slot Start Time': '08:30 AM',
-            'Slot End Time': '12:00 PM',
+            'Booked Slot': '14:00 PM - 15:00 PM',
+            'Charging Started': '14:06 PM',
+            'Charging Ended': '14:45 PM',
             'Booking Status': 'Completed',
-            'Cancellation Time': 'N/A',
-            Reason: 'N/A',
-            'Estimated Energy (kWh)': 25.0,
-            'Estimated Charging Cost (LKR)': 1250.00,
-            'Penalties Charged': 'None',
+            'Cancellation Time': '',
+            Reason: '',
+            'Energy (kWh)': 25.0,
+            'Charging Cost (LKR)': 1250.00,
+            'Penalties Charged': '',
             'Payment Status': 'Paid',
             'Reported Issue?': 'No',
-            'Any actions taken to resolve': 'N/A'
+            'Any actions taken to resolve': ''
         },
         {
             BookingID: 'BKG12348',
-            SessionID: 'N/A', // No associated session, likely cancelled
+            SessionID: '', // No associated session, likely cancelled
             'Booking Date': '2025-07-12',
             Connector: 'CCS2 DC',
             Vehicle: 'BMW iX',
-            'Slot Start Time': '10:00 AM',
-            'Slot End Time': '11:00 AM',
+            'Booked Slot': '08:00 AM -08:30 AM',
+            'Charging Started': '08:00 AM',
+            'Charging Ended': '08:30 AM',
             'Booking Status': 'Cancelled',
             'Cancellation Time': '2025-07-12 09:30 AM',
             Reason: 'Change of plans',
-            'Estimated Energy (kWh)': 40.0,
-            'Estimated Charging Cost (LKR)': 2000.00,
-            'Penalties Charged': 'Cancellation Fee',
+            'Energy (kWh)': 40.0,
+            'Charging Cost (LKR)': 2000.00,
+            'Penalties Charged': 500.00,
             'Payment Status': 'Refunded',
             'Reported Issue?': 'No',
-            'Any actions taken to resolve': 'N/A'
+            'Any actions taken to resolve': ''
         },
         {
             BookingID: 'BKG12349',
-            SessionID: 'N/A', // No associated session, future booking
+            SessionID: '', // No associated session, future booking
             'Booking Date': '2025-07-14',
             Connector: 'Type 2 AC',
             Vehicle: 'Kia EV6',
-            'Slot Start Time': '03:00 PM',
-            'Slot End Time': '04:30 PM',
-            'Booking Status': 'Confirmed',
-            'Cancellation Time': 'N/A',
-            Reason: 'N/A',
-            'Estimated Energy (kWh)': 20.0,
-            'Estimated Charging Cost (LKR)': 1000.00,
-            'Penalties Charged': 'None',
+            'Booked Slot': '14:00 PM - 15:00 PM',
+            'Charging Started': '14:06 PM',
+            'Charging Ended': '14:45 PM',
+            'Booking Status': 'Cancelled',
+            'Cancellation Time': '',
+            Reason: '',
+            'Energy (kWh)': 20.0,
+            'Charging Cost (LKR)': '',
+            'Penalties Charged': '',
             'Payment Status': 'Pending',
             'Reported Issue?': 'No',
-            'Any actions taken to resolve': 'N/A'
+            'Any actions taken to resolve': ''
         }
     ];
 
@@ -340,7 +351,7 @@ const OwnerViewStation = () => {
             'Date & Time': '2025-07-10 10:35 AM',
             Connector: 'Type 2',
             'Transaction Type': 'Charging Payment',
-            'Amount (LKR)': 775.00,
+            'Total Earning (LKR)': 775.00,
             'Commission(LKR)': 75.00,
             'Owner Revenue(LKR)': 700.00,
             'Payment Status': 'Completed',
@@ -349,11 +360,11 @@ const OwnerViewStation = () => {
         {
             TransactionID: 'TRN002',
             SessionID: 'S002',
-            BookingID: 'Walk-in', // No booking ID for walk-in
+            BookingID: '', // No booking ID for walk-in
             'Date & Time': '2025-07-10 11:50 AM',
             Connector: 'CCS2',
             'Transaction Type': 'Charging Payment',
-            'Amount (LKR)': 1100.00,
+            'Total Earning (LKR)': 1100.00,
             'Commission(LKR)': 100.00,
             'Owner Revenue(LKR)': 1000.00,
             'Payment Status': 'Completed',
@@ -366,7 +377,7 @@ const OwnerViewStation = () => {
             'Date & Time': '2025-07-11 02:55 PM',
             Connector: 'CHAdeMO',
             'Transaction Type': 'Charging Payment',
-            'Amount (LKR)': 1750.00,
+            'Total Earning (LKR)': 1750.00,
             'Commission(LKR)': 25.000,
             'Owner Revenue(LKR)': 1500.00,
             'Payment Status': 'Pending',
@@ -377,9 +388,9 @@ const OwnerViewStation = () => {
             SessionID: 'S003', // Related to the same session as TRN003
             BookingID: 'BKG12346',
             'Date & Time': '2025-07-11 03:00 PM',
-            Connector: 'N/A', // Penalty doesn't directly use a connector
+            Connector: '', // Penalty doesn't directly use a connector
             'Transaction Type': 'Late Cancellation Fee',
-            'Amount (LKR)': 200.00,
+            'Total Earning (LKR)': 200.00,
             'Commission(LKR)': null,
             'Owner Revenue(LKR)': null,
             'Payment Status': 'Pending',
@@ -387,12 +398,12 @@ const OwnerViewStation = () => {
         },
         {
             TransactionID: 'TRN005',
-            SessionID: 'N/A', // Cancellation doesn't have an active session
+            SessionID: '', // Cancellation doesn't have an active session
             BookingID: 'BKG12348',
             'Date & Time': '2025-07-12 09:35 AM',
-            Connector: 'N/A',
+            Connector: '',
             'Transaction Type': 'Charging Payment',
-            'Amount (LKR)': 1900.00,
+            'Total Earning (LKR)': 1900.00,
             'Commission(LKR)': 300.00,
             'Owner Revenue(LKR)': 1600.00,
             'Payment Status': 'Completed',
@@ -410,7 +421,7 @@ const OwnerViewStation = () => {
             Connector: 'All',
             Status: 'Investigating',
             'Last Update On': '2025-07-15 10:00 AM',
-            'Any actions took to resolve': 'Remote diagnostics initiated. Technician scheduled for 2025-07-15 PM.',
+            'Any actions took to resolve': 'Remote diagnostics initiated.',
             'Quick Actions': ['Contact Support Officer']
         },
         {
@@ -440,45 +451,96 @@ const OwnerViewStation = () => {
     ];
 
     const sessionsColumns = ['SessionID', 'Date', 'Connector Used', 'Vehicle', 'Started At', 'Ended At', 'Duration', 'Total Energy Delivered(kWh)', 'BookingID/Walk-in', 'Charging Cost(LKR)', 'Penalties Received', 'Total Payment', 'Payment Status', 'Ratings Given', 'Issue Reported?', 'Any actions taken to resolve', 'Quick Actions'];
-    const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Connector', 'Vehicle', 'Slot Start Time', 'Slot End Time', 'Booking Status', 'Cancellation Time', 'Reason', 'Estimated Energy (kWh)', 'Estimated Charging Cost (LKR)', 'Penalties Charged', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
-    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Connector', 'Transaction Type', 'Amount (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
+    const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Booked Slot', 'Charging Started', 'Charging Ended', 'Booking Status', 'Cancellation Time', 'Reason', 'Charging Cost (LKR)', 'Penalties Charged', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
+    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Transaction Type', 'Total Earning (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
     const faultsColumns = ['FaultID', 'Date & Time Reported', 'Fault Type', 'Category', 'Description', 'Connector', 'Status', 'Last Update On', 'Any actions took to resolve', 'Quick Actions']
+
+    const handleEditCharger = () => {
+        console.log('Edit Charger clicked');
+        setFormMode('edit-charger');
+        // Map the charger data to the expected format for RAddStationForm's initialChargerData
+        setInitialChargerData({
+            id: charger.chargerID, // Pass the ID if your form needs it for update API calls
+            name: charger['Charger Name'],
+            maxPower: charger['Maximum Power Output(kW)'].replace(' kW', ''), // Remove ' kW' and parse if needed
+            powerType: charger['Power Type'].split(' ')[0], // Extract 'DC' or 'AC'
+            connectorTypes: charger['Connectors'], // Use connectorTypes for consistency with RAddStationForm
+        });
+        setShowChargerForm(true);
+        setShowChargerMenu(false); // Close the dropdown menu
+    };
+
+    // Function to handle form submission from RAddStationForm
+    const handleFormSubmit = (data) => {
+        console.log("Form submitted with data:", data);
+        // Implement your logic to update the charger data in your backend
+        // For now, just close the form
+        setShowChargerForm(false);
+    };
+
+    // Function to close the form
+    const handleCloseForm = () => {
+        setShowChargerForm(false);
+        setInitialChargerData(null); // Clear initial data when closing
+    };
 
     // Overview Tab Content
     const OverviewTab = () => {
-        // const statusColors = {
-        //     'Active': {
-        //         bg: `${COLORS.primary}20`,
-        //         text: COLORS.primary
-        //     },
-        //     'Closed': {
-        //         bg: `${COLORS.danger}20`,
-        //         text: COLORS.danger
-        //     },
-        //     'Under Maintenance': {
-        //         bg: `${COLORS.HighlightText}20`,
-        //         text: COLORS.HighlightText
-        //     },
-        //     'Disabled': {
-        //         bg: `${COLORS.danger}20`,
-        //         text: COLORS.danger
-        //     },
-        //     'Deleted': {
-        //         bg: `${COLORS.mainTextColor}20`,
-        //         text: COLORS.mainTextColor
-        //     }
-        // };
+        const [showChargerMenu, setShowChargerMenu] = useState(false);
+        const chargerMenuRef = useRef();
 
-        // const currentStatus = charger.status || 'Active';
-        // const statusStyle = statusColors[currentStatus] || statusColors['Active'];
+        useEffect(() => {
+            const handleClickOutside = (e) => {
+                if (chargerMenuRef.current && !chargerMenuRef.current.contains(e.target)) {
+                    setShowChargerMenu(false);
+                }
+            };
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }, []);
+
+        const handleRemoveCharger = () => {
+            const confirmRemove = window.confirm("Are you sure you want to remove this charger?");
+            if (confirmRemove) {
+                console.log('Remove Charger confirmed');
+                navigate('/station-owner/stations/stationprofile/s1');
+                // Logic to remove the charger
+            }
+            setShowChargerMenu(false);
+        };
 
         return (
             <div className="w-full bg-transparent rounded-xl">
 
                 <div className="flex-col space-y-2 bg-white px-8 py-6 rounded-xl mb-4">  
-                    <div className="flex flex-wrap gap-4 text-sm">
+                    <div className="flex justify-between items-center w-full">
                         <div style={{ fontWeight: FONTS.weights.medium, color: COLORS.mainTextColor, fontSize: FONTS.sizes.xl }}>
                             {charger['Charger Name']}
+                        </div>
+                        <div className="relative" ref={chargerMenuRef}>
+                            <button onClick={() => setShowChargerMenu(!showChargerMenu)}>
+                                <FiMoreVertical size={20} color={COLORS.mainTextColor} />
+                            </button>
+
+                            {showChargerMenu && (
+                                <div
+                                    className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-50"
+                                    style={{ border: '1px solid #e5e7eb' }}
+                                >
+                                    <button
+                                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                                        onClick={handleEditCharger}
+                                    >
+                                        Edit Charger
+                                    </button>
+                                    <button
+                                        className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                                        onClick={handleRemoveCharger}
+                                    >
+                                        Remove Charger
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -518,9 +580,9 @@ const OwnerViewStation = () => {
                             session={connector.session}
                             bookings={connector.bookings}
                             timeSlots={timeSlots}
-                            onEdit={() => console.log('Edit', connector.connectorName)}
-                            onDisable={() => console.log('Disable', connector.connectorName)}
-                            onRemove={() => console.log('Remove', connector.connectorName)}
+                            // onEdit={() => console.log('Edit', connector.connectorName)}
+                            // onDisable={() => console.log('Disable', connector.connectorName)}
+                            // onRemove={() => console.log('Remove', connector.connectorName)}
                         />
                         </div>
                     ))}
@@ -612,8 +674,16 @@ const OwnerViewStation = () => {
                     />
                 )}
             </div>
+            {showChargerForm && (
+                <AddChargingStationForm
+                    onClose={handleCloseForm}
+                    onSubmit={handleFormSubmit}
+                    mode={formMode}
+                    initialChargerData={initialChargerData}
+                />
+            )}
         </div>
     );
 };
 
-export default OwnerViewStation;
+export default OwnerViewCharger;

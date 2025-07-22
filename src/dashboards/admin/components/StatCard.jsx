@@ -4,7 +4,7 @@ import { FONTS } from '../../../constants/fonts';
 import StationIcon from '../../../assets/stations.svg';
 import ConnectorIcon from '../../../assets/connectors.svg';
 import UserIcon from '../../../assets/user_icon.svg';
-import RevenueIcon from '../../../assets/earnings_icon.svg';
+import RevenueIcon from '../../../assets/earnings2.svg';
 import ElectricityIcon from '../../../assets/electricity.svg';
 import SessionsIcon from '../../../assets/sessions.svg';
 import UpArrowIcon from '../../../assets/up_arrow.svg';
@@ -17,7 +17,7 @@ export default function StatCard({ title, value, subValue, icon, status }) {
     stations: <img src={StationIcon} alt="Stations" style={{ width: 20, height: 20 }} />,
     connectors: <img src={ConnectorIcon} alt="Connectors" style={{ width: 20, height: 20 }} />,
     users: <img src={UserIcon} alt="Users" style={{ width: 20, height: 20 }} />,
-    revenue: <img src={RevenueIcon} alt="Revenue" style={{ width: 20, height: 20 }} />,
+    revenue: <img src={RevenueIcon} alt="Revenue" style={{ width: 16, height: 16 }} />,
     electricity: <img src={ElectricityIcon} alt="Electricity" style={{ width: 20, height: 20 }} />,
     sessions: <img src={SessionsIcon} alt="Sessions" style={{ width: 20, height: 20 }} />,
     reports: <img src={ReportsIcon} alt="Reports" style={{ width: 20, height: 20 }} />,
@@ -30,25 +30,26 @@ export default function StatCard({ title, value, subValue, icon, status }) {
   const textColor = isPositive ? COLORS.primary : COLORS.danger;
 
   return (
-    <div className="p-4 rounded-lg shadow-sm" style={{ 
+    <div className="p-4 rounded-lg" style={{ 
       backgroundColor: 'white',
-      border: `1px solid ${COLORS.border}`
+      border: `1px solid ${COLORS.border}`,
+      boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)'
     }}>
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <div className='flex items-center'>
-            <div className="p-2 rounded-md" style={{ 
+            <div className="p-0 rounded-md" style={{ 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
               {iconComponents[icon]}
             </div>
-            <p className="text-sm" style={{ color: COLORS.mainTextColor }}>{title}</p>
+            <p className="text-sm font-medium ml-2" style={{ color: COLORS.mainTextColor }}>{title}</p>
           </div>
           <div className="flex items-baseline mt-1">
             <h3 
-              className="text-2xl font-bold" 
+              className="text-xl font-medium" 
               style={{ color: COLORS.mainTextColor }}
             >
               {value}

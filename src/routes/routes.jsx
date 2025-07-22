@@ -26,16 +26,21 @@ import UserAccountPage from '../dashboards/admin/pages/userPages/userAccount'
 import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
 import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
 import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
+import AdminViewCharger from '../dashboards/admin/pages/stationPages/ViewCharger'
+import AdminTransactions from '../dashboards/admin/pages/transactionsPages/Transactions'
 
 import ChatPage from '../dashboards/admin/pages/Chat'
 
 import FaultReportsPage from '../dashboards/support-officer/pages/FaultReports'
+import FaultReportDetailPage from '../dashboards/support-officer/pages/FaultReportDetail'
+import AfterAcceptedPage from '../dashboards/support-officer/pages/AfterAccepted'
 import CommunityPage from '../dashboards/support-officer/pages/Community'
 
 import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/StationProfile'
 import OwnerViewCharger from '../dashboards/station-owner/pages/chargerPages/ChargerProfile'
 import FaultAlerts from '../dashboards/station-owner/pages/faultsPages/FaultReports'
 import OwnerChatPage from '../dashboards/station-owner/pages/Chat'
+import OwnerEarnings from '../dashboards/station-owner/pages/earningsPages/Earnings'
 
 
 const router = createBrowserRouter([
@@ -59,11 +64,13 @@ const router = createBrowserRouter([
           { path: 'users', element: <UsersPage /> },
           { path: 'dashboard', element: <AdminDash /> },
           { path: 'stations', element: <AdminStaionsPage/>},
+          { path: 'payments', element: <AdminTransactions />},
           { path: 'users/:id', element: <UserAccountPage/>},
           { path: 'stations/requests', element: <RequestsPage/>},
           { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
           { path: 'stations/:id', element: <ViewStation/>},
           { path: 'chat', element: <ChatPage/>},
+          { path: 'stations/chargerprofile/:id', element: <AdminViewCharger /> }
 
         ]
       },
@@ -77,7 +84,8 @@ const router = createBrowserRouter([
           { path: 'stations/stationprofile/:id', element: <OwnerViewStation />},
           { path: 'stations/chargerprofile/:id', element: <OwnerViewCharger />},
           { path: 'alerts', element: <FaultAlerts /> },
-          { path: 'chat', element: <OwnerChatPage /> }
+          { path: 'chat', element: <OwnerChatPage /> },
+          { path: 'earnings', element: <OwnerEarnings /> },
 
         ]
       },
@@ -88,6 +96,8 @@ const router = createBrowserRouter([
           { path: 'dashboard', element: <SupportOfficerDash />},
           { path: 'chargingStations', element:<ChargingStationsOverview />},
           { path: 'faultReports', element:<FaultReportsPage /> },
+          { path: 'FaultReportDetail', element:<FaultReportDetailPage /> },
+          { path: 'AfterAccepted', element:<AfterAcceptedPage /> },
           { path: 'community', element: <CommunityPage />},
           { path: 'tasks', element: <TasksPage /> }
         ]

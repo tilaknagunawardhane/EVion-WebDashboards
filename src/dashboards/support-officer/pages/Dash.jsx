@@ -9,6 +9,7 @@ import FaultStatusChart from '../components/FaultStatusChart'
 import ActiveUserCard from '../components/ActiveUserCard'
 import ChargingStationComplaintsChart from '../components/ChargingStationComplaintsChart'
 import CommunityPostsChart from '../components/CommunityPostsChart'
+import PageHeader from "../../admin/components/AdminPageHeader";
 
 
 export default function SupportOfficerDashboardPage() {
@@ -26,22 +27,7 @@ export default function SupportOfficerDashboardPage() {
         <div style={{ fontFamily: FONTS.family.sans, padding: '24px', backgroundColor:COLORS.background
          }}>
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-                    Platform Overview
-                </h1>
-                <div className="notification-icon">
-                    <img
-                        src={NotificationsIcon}
-                        alt="Notifications"
-                        style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: `brightness(0) saturate(100%) invert(48%) sepia(99%) saturate(1230%) hue-rotate(130deg) brightness(95%) contrast(101%)`
-                        }}
-                    />
-                </div>
-            </div>
+            <PageHeader title="Platform Overview" />
 
             {/* Platform Overview Section */}
             <section className="mb-8">

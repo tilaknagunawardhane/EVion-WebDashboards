@@ -2,33 +2,39 @@ import React, { useMemo } from 'react';
 import { COLORS, FONTS } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 import ChatIcon from '../../assets/chat.svg';
-import { color } from 'chart.js/helpers';
 
 const getStatusStyle = (status) => {
   const statusMap = {
+    'Success': { background: COLORS.bgGreen, color: COLORS.primary }, 
     'Active': { background: COLORS.bgGreen, color: COLORS.primary },
     'Completed': { background: COLORS.bgGreen, color: COLORS.primary },
     'Confirmed': { background: COLORS.bgGreen, color: COLORS.primary },
     'Attended': { background: COLORS.bgGreen, color: COLORS.primary },
     'Paid': { background: COLORS.bgGreen, color: COLORS.primary },
-    'Resolved': { background: COLORS.bgGreen, color: COLORS.primary },
+    'New': { background: COLORS.bgGreen, color: COLORS.primary },
+    'Open': { background: COLORS.bgGreen, color: COLORS.primary },
+
     'Closed': { background: COLORS.bgRed, color: COLORS.danger },
-    'Under Maintenance': { background: '#fadba9', color: COLORS.mainTextColor },
+    'Unpaid': { background: COLORS.bgRed, color: COLORS.danger },
     'Disabled': { background: COLORS.bgRed, color: COLORS.danger },
     'Blocked': { background: COLORS.bgRed, color: COLORS.danger },
-    'Deleted': { background: COLORS.bgRed, color: COLORS.danger },
     'No-show': { background: COLORS.bgRed, color: COLORS.danger },
     'Cancelled': { background: COLORS.bgRed, color: COLORS.danger },
-    'Pending': { background: COLORS.bgRed, color: COLORS.danger },
-    'In Progress': { background: '#fadba9', color: COLORS.mainTextColor },
-    'Walk-in': { background: '#fadba9', color: COLORS.mainTextColor },
-    'New': { background: '#d0e0ff', color: COLORS.primary },
+    'Refunded': { background: COLORS.bgRed, color: COLORS.danger },
+    'Faulty': { background: COLORS.bgRed, color: COLORS.danger },
+    'Overdue': { background: COLORS.bgRed, color: COLORS.danger },
+
+    'Under Maintenance': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'In Progress': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'Walk-in': { background: COLORS.bgYellow, color: COLORS.HighlightText },
     'Pending': { background: COLORS.bgYellow, color: COLORS.HighlightText },
-    'Refunded': { background: '#d0f0fd', color: COLORS.primary },
     'Pending-Approval': { background: COLORS.bgYellow, color: COLORS.HighlightText },
-    'Open': { background: COLORS.bgBlue, color: COLORS.chargerFree },
-    'Investigating': { background: COLORS.bgYellow, color: COLORS.HighlightText },
-    'Default': { background: COLORS.bgGreen, color: COLORS.primary },
+
+    'Deleted': { background: COLORS.background, color: COLORS.secondaryText },
+    'Removed': { background: COLORS.background, color: COLORS.secondaryText },
+    'Resolved': { background: COLORS.background, color: COLORS.secondaryText },
+    
+    'Default': { background: COLORS.background, color: COLORS.secondaryText },
   };
   
   return statusMap[status] || statusMap['Default'];
@@ -41,24 +47,31 @@ const getStatusDotColor = (status) => {
     'Confirmed': COLORS.primary,
     'Attended': COLORS.primary,
     'Paid': COLORS.primary,
-    'Resolved': COLORS.primary,
+    'New': COLORS.primary,
+    'Success': COLORS.primary,
+    'Open': COLORS.primary,
+
     'Closed': COLORS.danger,
     'Disabled': COLORS.danger,
     'Deleted': COLORS.danger,
     'Blocked': COLORS.danger,
     'No-show': COLORS.danger,
+    'Unpaid': COLORS.danger,
     'Cancelled': COLORS.danger,
-    'Pending': COLORS.danger,
+    'Refunded': COLORS.danger,
+    'Faulty': COLORS.danger,
+    'Overdue': COLORS.danger,
+
     'Under Maintenance': COLORS.HighlightText,
     'In Progress': COLORS.HighlightText,
     'Walk-in': COLORS.HighlightText,
-    'New': COLORS.primary,
-    'Refunded': COLORS.primary,
     'Pending': COLORS.HighlightText,
     'Pending-Approval': COLORS.HighlightText,
-    'Open': COLORS.chargerFree,
-    'Investigating': COLORS.HighlightText,
-    'Default': COLORS.primary
+    
+    'Removed': COLORS.secondaryText,
+    'Resolved': COLORS.secondaryText,
+
+    'Default': COLORS.secondaryText
   };
   
   return statusColorMap[status] || statusColorMap['Default'];
@@ -78,7 +91,7 @@ const renderCellContent = (value, column, rowData) => {
   if (column.toLowerCase().includes('status')) {
     return (
       <span 
-        className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
+        className="px-2.5 py-1 text-xs font-normal inline-flex items-center gap-1 rounded-md"
         style={getStatusStyle(value)}
       >
         <span 
@@ -113,7 +126,7 @@ const renderCellContent = (value, column, rowData) => {
         <span 
           className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
           style={{ 
-            background: '#fdc7c7', 
+            background: COLORS.bgRed, 
             color: COLORS.danger 
           }}
         >
@@ -130,7 +143,7 @@ const renderCellContent = (value, column, rowData) => {
   
   
   // Handle action links
-  if (column === 'View Receipt' || column === 'Actions') {
+  if (column === 'View Receipt' || column === 'Download Receipt' || column === 'Actions') {
     return (
       <a 
         href="#" 
@@ -142,6 +155,29 @@ const renderCellContent = (value, column, rowData) => {
           color: COLORS.primary,
           textDecoration: 'underline',
           fontWeight: FONTS.weights.medium
+        }}
+      >
+        {value}
+      </a>
+    );
+  }
+
+  if (column === 'Revenue Breakdown') {
+    return (
+      <a 
+        href="#" 
+        onClick={(e) => {
+          e.stopPropagation();
+          // if (onBreakdownClick) {
+          //   onBreakdownClick(row);
+          // }
+        }}
+        className="underline"
+        style={{ 
+          color: COLORS.primary,
+          textDecoration: 'underline',
+          fontWeight: FONTS.weights.normal,
+          fontSize:FONTS.sizes.xs
         }}
       >
         {value}
@@ -247,7 +283,43 @@ const renderQuickActions = (actions, rowData) => {
       ),
       color: COLORS.mainTextColor,
       onClick: () => console.log('Contact Support Officer', rowData)
-    }
+    },
+    'View Account Details': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
+    'Make Payment': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
+    'Resend': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
   };
 
   return (

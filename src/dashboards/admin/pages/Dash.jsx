@@ -16,7 +16,7 @@ export default function AdminDashboardPage() {
     const dashboardData = {
         stats: {
             stations: { total: 448, pending: 3 },
-            connectors: { total: 2302, faulted: 15 },
+            chargers: { total: 2302, faulted: 15 },
             users: { total: 12501, riskPercentage: '-3.87' },
             revenue: { total: 52311, sessions: 45200, bookingFees: '+7111' }
         },
@@ -56,9 +56,9 @@ export default function AdminDashboardPage() {
                     />
 
                     <StatCard
-                        title="Connectors"
-                        value={dashboardData.stats.connectors.total}
-                        subValue={`${dashboardData.stats.connectors.faulted} Faulted`}
+                        title="Chargers"
+                        value={dashboardData.stats.chargers.total}
+                        subValue={`${dashboardData.stats.chargers.faulted} Faulted`}
                         icon="connectors"
                     />
 
@@ -140,12 +140,12 @@ export default function AdminDashboardPage() {
                                     Charging Session Trend
                                 </h2>
                                 <StatusCard
-                                    value={dashboardData.stats.connectors.faulted}
-                                    total={dashboardData.stats.connectors.total}
+                                    value={dashboardData.stats.chargers.faulted}
+                                    total={dashboardData.stats.chargers.total}
                                 >
                                     <ConnectorStatusChart
-                                        faulted={dashboardData.stats.connectors.faulted}
-                                        operational={dashboardData.stats.connectors.total - dashboardData.stats.connectors.faulted}
+                                        faulted={dashboardData.stats.chargers.faulted}
+                                        operational={dashboardData.stats.chargers.total - dashboardData.stats.chargers.faulted}
                                     />
                                 </StatusCard>
                             </div>

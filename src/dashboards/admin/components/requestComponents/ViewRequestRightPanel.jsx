@@ -6,6 +6,13 @@ import Button from '../../../../components/ui/Button';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
+import { Pointer } from 'lucide-react';
+
+const primaryColorFilter = `
+brightness(0)
+invert(1)
+`;
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -30,12 +37,14 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-export default function ViewRequestRightPanel({ request }) {
+export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
     const [showDiscardModal, setShowDiscardModal] = useState(false);
     const [discardReason, setDiscardReason] = useState('');
     const [isTextareaFocused, setIsTextareaFocused] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [currentRequest, setCurrentRequest] = useState(request);
+
+    const navigate = useNavigate();
 
     const user = {
         Name: currentRequest.requester,
@@ -105,6 +114,14 @@ export default function ViewRequestRightPanel({ request }) {
         setDiscardReason('');
     };
 
+    const handleStatusUpdate = () => {
+        if (request.status === 'NEW') {
+            onStatusUpdate('IN-PROGRESS');
+        } else if (request.status === 'IN-PROGRESS') {
+            onStatusUpdate('WAITING FOR PAYMENT');
+        }
+    };
+
     const renderActionButtons = () => {
         switch (currentRequest.status) {
             case 'NEW':
@@ -163,11 +180,12 @@ export default function ViewRequestRightPanel({ request }) {
                 );
             case 'WAITING FOR PAYMENT':
                 return (
-                    <div className="text-center py-2 px-4 rounded-md"
+                    <div className="text-center py-2 px-4 rounded-md bg-transparent"
                         style={{
-                            backgroundColor: `${COLORS.primary}20`,
+                            backgroundColor: COLORS.bgGreen,
                             color: COLORS.primary,
-                            fontWeight: FONTS.weights.medium
+                            fontWeight: FONTS.weights.medium,
+                            fontSize: FONTS.sizes.sm
                         }}>
                         APPROVED
                     </div>
@@ -178,9 +196,9 @@ export default function ViewRequestRightPanel({ request }) {
     };
 
     return (
-        <div className="flex flex-col h-full relative">
-            {/* Scrollable content area */}
-            <div className="space-y-4 md:space-y-6 overflow-y-auto flex-1">
+        <div className="flex flex-col h-[calc(100vh-140px)] overflow-y-auto relative">
+            {/* Scrollable content area - No need for blur here since modal has its own backdrop */}
+            <div className="space-y-4 md:space-y-6 flex-1">
                 {/* User Profile Section */}
                 <div className="w-full">
                     <UserProfileCard user={user} />
@@ -199,12 +217,15 @@ export default function ViewRequestRightPanel({ request }) {
                         }}
                     >
                         {currentRequest.email}
+                        </a>
                         <img
                             src={ChatIcon}
                             alt="Chat icon"
-                            className="w-5 h-5"
+                            style={{ filter: primaryColorFilter }}
+                            className="w-4 h-4"
                         />
-                    </a>
+                    </div>
+                    
                 </div>
 
                 {/* Operator Info Section */}
@@ -241,7 +262,7 @@ export default function ViewRequestRightPanel({ request }) {
             <div className="sticky bottom-0 bg-white pt-4 pb-2" style={{
                 backgroundColor: COLORS.background
             }}>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                     {renderActionButtons()}
                 </div>
             </div>
@@ -256,7 +277,7 @@ export default function ViewRequestRightPanel({ request }) {
                         Discard {currentRequest.title.includes('Charger') ? 'Charger' : 'Station'}
                     </h2>
                     <p className="mb-4 text-sm" style={{ 
-                        color: COLORS.secondaryText,
+                        color: COLORS.mainTextColor,
                         fontFamily: FONTS.family.sans
                     }}>
                         Do you really want to discard this request to add a new charging {currentRequest.title.includes('Charger') ? 'charger' : 'station'}?
@@ -265,17 +286,18 @@ export default function ViewRequestRightPanel({ request }) {
                     <div className="mb-6">
                         <label className="block text-xs mb-2" style={{ 
                             color: COLORS.secondaryText,
-                            fontFamily: FONTS.family.sans
+                            fontFamily: FONTS.family.sans,
+                            fontWeight: FONTS.weights.normal
                         }}>
                             Enter the reason to discard
                         </label>
                         <textarea
                             className="w-full p-3 border rounded text-sm transition-colors"
                             style={{
-                                borderColor: isTextareaFocused ? COLORS.primary : COLORS.stroke,
+                                borderColor: isTextareaFocused ? COLORS.danger : COLORS.stroke,
                                 minHeight: '100px',
                                 fontFamily: FONTS.family.sans,
-                                backgroundColor: COLORS.background,
+                                backgroundColor: isTextareaFocused ? COLORS.bgRed : COLORS.background,
                                 outline: 'none'
                             }}
                             value={discardReason}

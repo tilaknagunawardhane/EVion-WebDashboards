@@ -131,7 +131,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-between gap-4 text-sm mt-2">
+        <div className="flex flex-wrap justify-between gap-4 text-sm">
           <div>
             <strong
               style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}

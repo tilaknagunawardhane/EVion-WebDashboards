@@ -85,11 +85,13 @@ export default function ViewRequest() {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
                 <div className="md:col-span-3">
-                    <RequestDetailsWithStation request={request} type={type} />
+                    <RequestDetailsWithStation request={requestData} type={type} />
                 </div>
 
                 <div className="md:sticky md:top-6 space-y-4 md:space-y-6">
-                    <ViewRequestRightPanel request={request} />
+                    <ViewRequestRightPanel 
+                        request={requestData}
+                        onStatusUpdate={handleStatusUpdate} />
                 </div>
             </div>
         </div>
