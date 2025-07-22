@@ -220,7 +220,7 @@ export default function RequestsPage() {
     // Define your custom tabs
     const requestTabs = [
         { id: 'stations', label: 'Stations' },
-        { id: 'connectors', label: 'Connectors' }
+        { id: 'connectors', label: 'Chargers' }
     ];
 
     // Group requests by status

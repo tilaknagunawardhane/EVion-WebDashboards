@@ -351,7 +351,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-10 10:35 AM',
             Connector: 'Type 2',
             'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 775.00,
+            'Total Earning (LKR)': 775.00,
             'Commission(LKR)': 75.00,
             'Owner Revenue(LKR)': 700.00,
             'Payment Status': 'Completed',
@@ -364,7 +364,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-10 11:50 AM',
             Connector: 'CCS2',
             'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 1100.00,
+            'Total Earning (LKR)': 1100.00,
             'Commission(LKR)': 100.00,
             'Owner Revenue(LKR)': 1000.00,
             'Payment Status': 'Completed',
@@ -377,7 +377,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-11 02:55 PM',
             Connector: 'CHAdeMO',
             'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 1750.00,
+            'Total Earning (LKR)': 1750.00,
             'Commission(LKR)': 25.000,
             'Owner Revenue(LKR)': 1500.00,
             'Payment Status': 'Pending',
@@ -390,7 +390,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-11 03:00 PM',
             Connector: '', // Penalty doesn't directly use a connector
             'Transaction Type': 'Late Cancellation Fee',
-            'Total Earning(LKR)': 200.00,
+            'Total Earning (LKR)': 200.00,
             'Commission(LKR)': null,
             'Owner Revenue(LKR)': null,
             'Payment Status': 'Pending',
@@ -403,7 +403,7 @@ const OwnerViewCharger = () => {
             'Date & Time': '2025-07-12 09:35 AM',
             Connector: '',
             'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 1900.00,
+            'Total Earning (LKR)': 1900.00,
             'Commission(LKR)': 300.00,
             'Owner Revenue(LKR)': 1600.00,
             'Payment Status': 'Completed',
@@ -452,7 +452,7 @@ const OwnerViewCharger = () => {
 
     const sessionsColumns = ['SessionID', 'Date', 'Connector Used', 'Vehicle', 'Started At', 'Ended At', 'Duration', 'Total Energy Delivered(kWh)', 'BookingID/Walk-in', 'Charging Cost(LKR)', 'Penalties Received', 'Total Payment', 'Payment Status', 'Ratings Given', 'Issue Reported?', 'Any actions taken to resolve', 'Quick Actions'];
     const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Booked Slot', 'Charging Started', 'Charging Ended', 'Booking Status', 'Cancellation Time', 'Reason', 'Charging Cost (LKR)', 'Penalties Charged', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
-    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Transaction Type', 'Total Earning(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
+    const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Transaction Type', 'Total Earning (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
     const faultsColumns = ['FaultID', 'Date & Time Reported', 'Fault Type', 'Category', 'Description', 'Connector', 'Status', 'Last Update On', 'Any actions took to resolve', 'Quick Actions']
 
     const handleEditCharger = () => {

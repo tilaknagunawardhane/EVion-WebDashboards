@@ -25,19 +25,14 @@ export default function AdminDashboard() {
       icon: StationsIcon
     },
     { 
-      name: 'Users', 
+      name: 'EV Users', 
       path: '/admin/users', 
       icon: UserIcon
     },
     { 
-      name: 'Transactions', 
-      path: '/admin/transactions', 
+      name: 'Payments', 
+      path: '/admin/payments', 
       icon: EarningsIcon
-    },
-    { 
-      name: 'Reports', 
-      path: '/admin/reports', 
-      icon: ReportsIcon
     },
   ]
 

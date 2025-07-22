@@ -48,13 +48,6 @@ const ConnectorCard = ({
                                         border: `1px solid ${color}`
                                     }}
                                 >
-                                    {/* <PlugIcon
-                                        style={{
-                                            width: '18px',
-                                            height: '18px',
-                                            fill: color
-                                        }}
-                                    /> */}
                                     <img
                                         src={PlugIcon}
                                         alt=""

@@ -5,7 +5,7 @@ import StationIcon from '../../assets/stations.svg'
 import AlertIcon from '../../assets/alert_black_icon.svg'
 import CommentIcon from '../../assets/comment_icon.svg'
 import SettingsIcon from '../../assets/settings_icon.svg'
-import logo from '../../assets/Logo 2.png'
+import logo from '../../assets/Logo 2.svg'
 import { COLORS, FONTS } from '../../constants'
 
 
@@ -51,7 +51,7 @@ export default function SupportOfficerDashboard() {
       style={{ 
         filter: isActive 
           ? 'brightness(0) invert(1)'  // White for active state
-          : `brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(90%) contrast(90%)` // Gray for inactive
+          : `brightness(0) saturate(100%) invert(22%) sepia(9%) saturate(1204%) hue-rotate(152deg) brightness(93%) contrast(87%)` // Gray for inactive
       }} 
     />
   )
@@ -60,12 +60,12 @@ export default function SupportOfficerDashboard() {
     <div className="min-h-screen flex" style={{ fontFamily: FONTS.family.sans }}>
       {/* Sidebar */}
       <div 
-        className="h-full w-64 flex flex-col border-r fixed"
-        style={{ backgroundColor: 'white', borderRight: `1px solid ${COLORS.border}` }}
+        className="h-full w-64 flex flex-col fixed shadow-xl"
+        style={{ backgroundColor: 'white' }}
       >
         {/* Logo Section */}
         <div 
-          className="p-6 border-b flex items-center justify-center"
+          className="p-6 mt-2 border-b flex items-center justify-center"
           style={{ borderColor: COLORS.border }}
         >
           <img src={logo} alt="Logo" style={{ height: 28, width: 'auto' }} />
@@ -83,7 +83,7 @@ export default function SupportOfficerDashboard() {
                   }
                   style={({ isActive }) => ({ 
                     backgroundColor: isActive ? COLORS.primary : 'transparent',
-                    color: isActive ? COLORS.background : COLORS.secondaryText,
+                    color: isActive ? COLORS.background : COLORS.mainTextColor,
                     fontSize: FONTS.sizes.sm
                   })}
                 >
@@ -111,7 +111,7 @@ export default function SupportOfficerDashboard() {
                   }
                   style={({ isActive }) => ({ 
                     backgroundColor: isActive ? COLORS.primary : 'transparent',
-                    color: isActive ? COLORS.background : COLORS.secondaryText,
+                    color: isActive ? COLORS.background : COLORS.mainTextColor,
                     fontSize: FONTS.sizes.sm
                   })}
                 >
@@ -137,7 +137,7 @@ export default function SupportOfficerDashboard() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-64 p-6" style={{ backgroundColor: COLORS.background }}>
+      <div className="flex-1 ml-64 p-0" style={{ backgroundColor: COLORS.background }}>
         <Outlet />
       </div>
     </div>
