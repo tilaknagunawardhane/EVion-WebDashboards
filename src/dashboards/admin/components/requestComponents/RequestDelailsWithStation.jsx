@@ -7,7 +7,6 @@ import StarIcon from '../../../../assets/star-filled.svg';
 import StarOutlineIcon from '../../../../assets/star-outline.svg';
 
 export default function RequestDetailsWithStation({ request, type }) {
-    // Status color configuration
     const statusColors = {
         'NEW': {
             bg: `${COLORS.primary}20`,
@@ -20,20 +19,14 @@ export default function RequestDetailsWithStation({ request, type }) {
         'REJECTED': {
             bg: `${COLORS.danger}20`,
             text: COLORS.danger
-        },
-        'WAITING FOR PAYMENT': {
-            bg: `${COLORS.HighlightText}20`,
-            text: COLORS.HighlightText
         }
     };
 
-    const currentStatus = request.status || 'NEW';
+    const currentStatus = request.status;
     const statusStyle = statusColors[currentStatus] || statusColors['NEW'];
-    const rating = 4.5; // Sample rating - would come from API in real app
 
     return (
         <div className="space-y-6">
-            {/* Station Header - Responsive flex layout */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4" 
                  style={{ borderColor: COLORS.stroke }}>
                 <div>
@@ -41,27 +34,26 @@ export default function RequestDetailsWithStation({ request, type }) {
                         color: COLORS.mainTextColor, 
                         fontWeight: FONTS.weights.semibold
                     }}>
-                        {request.stationName || 'EviGO Charging Station'}
+                        {request.stationName}
                     </h2>
                     <p className="text-sm" style={{ color: COLORS.secondaryText }}>
-                        {request.address || 'No. 24, Joshiep Road, Weijinama'}
+                        {request.address}
                     </p>
                     
-                    {/* Rating Stars - Only for connector type */}
                     {type === 'connector' && (
                         <div className="flex items-center mt-2">
                             <div className="flex mr-2">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                     <img
                                         key={star}
-                                        src={star <= Math.floor(rating) ? StarIcon : StarOutlineIcon}
-                                        alt={star <= rating ? 'Filled star' : 'Empty star'}
+                                        src={star <= Math.floor(request.rating || 0) ? StarIcon : StarOutlineIcon}
+                                        alt={star <= (request.rating || 0) ? 'Filled star' : 'Empty star'}
                                         className="w-4 h-4 mr-1"
                                     />
                                 ))}
                             </div>
                             <span className="text-xs" style={{ color: COLORS.secondaryText }}>
-                                {rating.toFixed(1)} ({request.reviewCount || 24} reviews)
+                                {request.rating?.toFixed(1) || '0.0'} ({request.reviewCount || 0} reviews)
                             </span>
                         </div>
                     )}
@@ -76,7 +68,6 @@ export default function RequestDetailsWithStation({ request, type }) {
                 </div>
             </div>
 
-            {/* Image Card - Responsive sizing */}
             <div className="mb-6">
                 <OverviewCard padding="p-4">
                     <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
@@ -89,17 +80,15 @@ export default function RequestDetailsWithStation({ request, type }) {
                 </OverviewCard>
             </div>
 
-            {/* Chargers Planned - Responsive flex */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
                 <h3 className="text-sm font-medium" style={{ color: COLORS.mainTextColor }}>
                     No of Chargers Planned
                 </h3>
                 <p className="text-xl font-medium" style={{ color: COLORS.mainTextColor }}>
-                    {request.chargersPlanned || '02'}
+                    {request.chargersPlanned}
                 </p>
             </div>
 
-            {/* New Charger Details - Responsive grid */}
             <div>
                 <h3 className="text-sm font-medium mb-3" style={{ color: COLORS.mainTextColor }}>
                     {type === 'connector' ? 'New Charger Details' : 'Charger Details'}
@@ -111,7 +100,6 @@ export default function RequestDetailsWithStation({ request, type }) {
                 </div>
             </div>
 
-            {/* Existing Chargers Section - Only for connector type */}
             {type === 'connector' && request.existingChargers?.length > 0 && (
                 <div className="mb-6">
                     <h3 className="text-sm font-medium mb-3" style={{ color: COLORS.mainTextColor }}>

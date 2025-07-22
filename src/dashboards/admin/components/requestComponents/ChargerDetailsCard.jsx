@@ -16,7 +16,7 @@ export default function ChargerDetails({ charger }) {
       </h4>
       
       {/* Power Output Row */}
-      <div className="flex justify-between items-baseline mb-0">
+      <div className="flex justify-between items-baseline mb-3">
         <p className="text-xs" style={{ 
           color: COLORS.secondaryText,
           fontSize: FONTS.sizes.xs
@@ -41,7 +41,7 @@ export default function ChargerDetails({ charger }) {
       </div>
 
       {/* Unit Price Row */}
-      <div className="flex justify-between items-baseline mb-3">
+      {/* <div className="flex justify-between items-baseline mb-3">
         <p className="text-xs" style={{ 
           color: COLORS.secondaryText,
           fontSize: FONTS.sizes.xs
@@ -63,7 +63,7 @@ export default function ChargerDetails({ charger }) {
             {charger.price?.split(' ')[1] || '60.00'}
           </span>
         </div>
-      </div>
+      </div> */}
       
       {/* Connector Types */}
       <div>
