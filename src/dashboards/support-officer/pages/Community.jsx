@@ -1,32 +1,16 @@
 import React, {useState} from "react";
-import { useNavigate, useParams } from 'react-router-dom';
 import { FONTS, COLORS } from "../../../constants";
-import DataTableTopBar from "../../../components/ui/DataTableTopBar";
 import OverviewCard from "../../admin/components/OverviewCard";
 import PageHeader from "../../admin/components/AdminPageHeader";
 import TabBar from "../../../components/ui/TabBar";
-import { CommunityPost, Hashtags, DateTime, Header, Content, Replies } from "../components/CommunityPost";
+import { CommunityPost } from "../components/CommunityPost";
 import CommunityRightPanel from "../components/CommunityRightPanel";
 
 export default function CommunityPage(){
     const [activeTab, setActiveTab] = useState('communityDiscussion');
     const [expandedPosts, setExpandedPosts] = useState({});
     const [showAllReplies, setShowAllReplies] = useState({});
-
-    const CommunityTabs = [
-        { id: 'communityDiscussion', label: 'Community Discussion' },
-        { id: 'pendingForApproval', label: 'Pending For Approval' },
-        { id: 'flaggedbyUsers', label: 'Flagged by Users' },
-    ];
-
-    const mobileTabLabels = {
-        communityDiscussion: 'Community Discussion',
-        pendingForApproval: 'Pending For Approval',
-        flaggedbyUsers: 'Flagged by Users',
-    };
-
-    // Sample data for different tabs
-    const postsData = {
+    const [postsData, setPostsData] = useState({
         communityDiscussion: [
             {
                 id: 'post1',
@@ -37,58 +21,19 @@ export default function CommunityPage(){
                     {
                         src: 'https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=400&h=200&fit=crop&crop=center',
                         alt: 'BYD Atto 3 electric vehicle'
-                    },
-                    {
-                        src: 'https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=400&h=200&fit=crop&crop=center',
-                        alt: 'BYD Atto 3 electric vehicle'
-                    },
-                    null // This will render as placeholder
+                    }
                 ],
-                content: `Hi everyone, I recently bought an EV and noticed that the real-world range I'm getting on 
-                    a full charge is significantly lower than the manufacturer's advertised range. For 
-                    example, my EV is supposed to do 450 km per charge, but I barely get around 370 km, 
-                    even with careful driving. I'm trying to understand what factors actually affect this — 
-                    things like AC usage, passenger load, or terrain. Can other EV users share their 
-                    experiences? How much range are you realistically getting, and what are your driving 
-                    conditions like? Also, any tips to improve range would be great!`,
+                content: `Hi everyone, I recently bought an EV and noticed that the real-world range...`,
                 replies: [
                     {
                         username: 'John Doe',
                         timestamp: '3 hrs ago',
                         avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face',
-                        content: `Hey, totally relatable! I drive a BYD Atto 3, and yeah, the range difference is real. On paper, it says 420 
-                            km, but realistically I get around 350 km, especially if I'm using AC or carrying passengers.`,
+                        content: `Hey, totally relatable! I drive a BYD Atto 3...`,
                         readMore: true
-                    },
-                    {
-                        username: 'Sarah Smith',
-                        timestamp: '2 hrs ago',
-                        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face',
-                        content: `I've found that driving style makes a huge difference. Aggressive acceleration and high speeds really drain the battery. Try to maintain a steady speed and use regenerative braking.`,
-                        readMore: false
                     }
                 ],
                 showViewAll: true,
-                isFlagged: false,
-                isPending: false
-            },
-            {
-                id: 'post2',
-                hashtags: ['batterylife', 'maintenance'],
-                dateTime: 'Tuesday 7 Jul, 09:15 AM',
-                header: 'How often should I service my EV battery?',
-                images: [],
-                content: `I've had my electric vehicle for about a year now and I'm wondering about battery maintenance. The dealership mentioned annual check-ups, but I'm not sure what exactly gets checked. Does anyone have experience with this? Are there specific things I should be monitoring between service appointments? I've heard about battery degradation but not sure how to track it.`,
-                replies: [
-                    {
-                        username: 'Mike Johnson',
-                        timestamp: '5 hrs ago',
-                        avatar: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=40&h=40&fit=crop&crop=face',
-                        content: `Most EVs have built-in battery health monitoring. You can usually find it in your vehicle's settings menu. The most important things to watch are the maximum charge capacity over time and any unusual temperature fluctuations.`,
-                        readMore: false
-                    }
-                ],
-                showViewAll: false,
                 isFlagged: false,
                 isPending: false
             }
@@ -105,7 +50,7 @@ export default function CommunityPage(){
                         alt: 'Tesla vehicle'
                     }
                 ],
-                content: `A friend who works at Tesla told me they're developing a new budget model called Model 2 that will be priced under $25,000. Has anyone else heard about this? Apparently it will have a smaller battery but with new technology that gives it decent range. Wondering if it's worth waiting for or if I should just get a Model 3 now.`,
+                content: `A friend who works at Tesla told me they're developing a new budget model...`,
                 replies: [],
                 showViewAll: false,
                 isFlagged: false,
@@ -119,13 +64,13 @@ export default function CommunityPage(){
                 dateTime: 'Thursday 9 Jul, 10:45 AM',
                 header: 'Why electric vehicles are actually worse for the environment',
                 images: [],
-                content: `I think all this EV hype is just greenwashing. The mining for lithium destroys ecosystems, and most electricity still comes from fossil fuels. We're just moving the pollution somewhere else. Plus, the batteries can't be recycled properly.`,
+                content: `I think all this EV hype is just greenwashing...`,
                 replies: [
                     {
                         username: 'EcoWarrior',
                         timestamp: '1 hr ago',
                         avatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=40&h=40&fit=crop&crop=face',
-                        content: `This is misinformation. Multiple studies show EVs have lower lifetime emissions even with current electricity grids. Battery recycling technology is improving rapidly.`,
+                        content: `This is misinformation. Multiple studies show EVs have lower lifetime emissions...`,
                         readMore: true
                     }
                 ],
@@ -134,7 +79,13 @@ export default function CommunityPage(){
                 isPending: false
             }
         ]
-    };
+    });
+
+    const CommunityTabs = [
+        { id: 'communityDiscussion', label: 'Community Discussion' },
+        { id: 'pendingForApproval', label: 'Pending For Approval' },
+        { id: 'flaggedbyUsers', label: 'Flagged by Users' },
+    ];
 
     const currentUser = {
         id: '001',
@@ -163,8 +114,66 @@ export default function CommunityPage(){
         }));
     };
 
+    const handleApprovePost = (postId) => {
+        setPostsData(prev => {
+            // Find the post to approve
+            const postToApprove = prev.pendingForApproval.find(post => post.id === postId);
+            
+            // Remove from pending
+            const updatedPending = prev.pendingForApproval.filter(post => post.id !== postId);
+            
+            // Add to community discussion
+            return {
+                ...prev,
+                pendingForApproval: updatedPending,
+                communityDiscussion: [
+                    ...prev.communityDiscussion,
+                    { ...postToApprove, isPending: false }
+                ]
+            };
+        });
+    };
+
+    const handleDiscardPost = (postId) => {
+        setPostsData(prev => ({
+            ...prev,
+            flaggedbyUsers: prev.flaggedbyUsers.filter(post => post.id !== postId)
+        }));
+    };
+
     const getActivePosts = () => {
-        return postsData[activeTab] || [];
+        return postsData[activeTab].map(post => {
+            let actions = null;
+            
+            if (activeTab === 'pendingForApproval') {
+                actions = (
+                    <div className="flex justify-end mt-4">
+                        <button 
+                            onClick={() => handleApprovePost(post.id)}
+                            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                        >
+                            Approve Post
+                        </button>
+                    </div>
+                );
+            } else if (activeTab === 'flaggedbyUsers') {
+                actions = (
+                    <div className="flex justify-end mt-4">
+                        <button 
+                            onClick={() => handleDiscardPost(post.id)}
+                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                        >
+                            Discard Post
+                        </button>
+                    </div>
+                );
+            }
+            
+            return {
+                ...post,
+                actions
+            };
+        });
     };
 
     return (
@@ -182,7 +191,6 @@ export default function CommunityPage(){
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
                     tabs={CommunityTabs}
-                    mobileLabels={mobileTabLabels}
                 />
             </div>
 
@@ -193,14 +201,16 @@ export default function CommunityPage(){
                     <OverviewCard>
                         <div className="space-y-8">
                             {getActivePosts().map(post => (
-                                <CommunityPost 
-                                    key={post.id}
-                                    {...post}
-                                    isExpanded={expandedPosts[post.id]}
-                                    onExpand={() => toggleExpandPost(post.id)}
-                                    showAllReplies={showAllReplies[post.id]}
-                                    onViewAllReplies={() => toggleShowAllReplies(post.id)}
-                                />
+                                <div key={post.id}>
+                                    <CommunityPost 
+                                        {...post}
+                                        isExpanded={expandedPosts[post.id]}
+                                        onExpand={() => toggleExpandPost(post.id)}
+                                        showAllReplies={showAllReplies[post.id]}
+                                        onViewAllReplies={() => toggleShowAllReplies(post.id)}
+                                    />
+                                    {post.actions}
+                                </div>
                             ))}
                         </div>
                     </OverviewCard>
