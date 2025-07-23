@@ -1,9 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { COLORS, FONTS } from '../../../constants';
 import OverviewCard from '../../admin/components/OverviewCard';
 import UserIcon from '../../../assets/user_icon.svg';
 
 export default function FaultReportDetailRightPanel({ user = {}, stats = {} }) {
+    const navigate = useNavigate();
+    
     // User data with defaults
     const safeUser = {
         Name: 'John Doe',
@@ -202,6 +205,7 @@ export default function FaultReportDetailRightPanel({ user = {}, stats = {} }) {
                     backgroundColor: COLORS.primary,
                     fontSize: FONTS.sizes.base
                 }}
+                onClick={() => navigate('/support-officer/UserChat')}
             >
                 Chat with Station Owner
             </button>
