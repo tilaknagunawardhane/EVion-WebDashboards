@@ -61,8 +61,20 @@ export function AuthProvider({ children }) {
       const token = localStorage.getItem('accessToken');
       if (token) {
         const res = await axios.get(`${API_BASE_URL}/api/auth/me`);
+        // const res = await res1.json();
+        // console.log('User role is:', res.data.data.roles);
+
+        // console.log('VerifyToken response:', res.data);
+        if (!res.data?.data?.user) {
+          throw new Error('Invalid user data in response');
+        }
         // setCurrentUser(res.data.user.userType);
-        console.log('Current user is ', res.data.user.userType);
+        const userRole = res.data.data.roles; 
+        // console.log('User role is:', userRole);
+        setCurrentUser(userRole);
+        // setCurrentUser(res.data.data.roles);
+        // console.log('User verified:',currentUser);
+        // console.log('Setting user role to:', userRole);
 
       }
     } catch (err) {
@@ -98,7 +110,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem('userID', res.data.user._id);
       setCurrentUser(userType);
       console.log('res: ', res);
-      console.log('current user:', userType);
+      console.log('current user:', res.data.userType);
 
       // Show success toast
       toast.success(`Welcome back, ${res.data.user.name || res.data.user.email}!`, {
@@ -107,7 +119,7 @@ export function AuthProvider({ children }) {
       });
 
       // Redirect based on role
-      if (userType === 'admin') {
+      if (res.data.userType === 'admin') {
         // console.log('.... Is it here??', currentUser);
         // const currentUser = 'admin'
 
@@ -217,10 +229,15 @@ export function AuthProvider({ children }) {
     verifyToken();
   }, []);
 
+  useEffect(() => {
+  console.log('Current user updated:', currentUser);
+}, [currentUser]);
+
   return (
     <AuthContext.Provider value={{
       currentUser, login, logout, loading, loginA,
-      isAdmin: currentUser?.userType === 'admin',
+      // isAdmin: currentUser?.userType === 'admin',
+      isAdmin: currentUser === 'admin',
       isSupportOfficer: currentUser?.role === 'support-officer',
       isStationOwner: currentUser?.userType === 'stationowner'
     }}>
