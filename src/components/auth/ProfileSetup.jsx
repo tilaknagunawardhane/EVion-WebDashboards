@@ -1,11 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { COLORS, FONTS } from '../../constants';
 import evionLogo from '../../assets/Logo 2.svg';
-// import stationImage from '../../assets/station2.svg';
 import Button from '../../components/ui/Button';
 import InputField from '../../components/ui/InputField';
-import { Navigate } from 'react-router-dom';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const steps = [
   { id: 1, label: 'Business & Legal Details' },
@@ -19,52 +21,83 @@ const stepDescriptions = {
   3: "National ID is required to confirm your identity. We handle all personal data with strict privacy and security standards.",
 };
 
-const districts = [
-  'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 'Hambanthota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Monaragala', 'Mullaitivu', 'Nuwara Eliya'
-];
-
-const banks = [
-  "Bank of Ceylon",
-  "People's Bank",
-  "Commercial Bank",
-  "Hatton National Bank (HNB)",
-  "Sampath Bank",
-  "Seylan Bank",
-  "National Development Bank (NDB)",
-  "DFCC Bank",
-  "Pan Asia Bank",
-  "Union Bank",
-  "Nations Trust Bank",
-  "Cargills Bank",
-  "HSBC",
-  "Standard Chartered Bank",
-  "ICICI Bank",
-  "Amana Bank",
-  "Bank of China",
-  "MCB Bank",
-];
-
 export default function AccountSetup() {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const { userData } = location.state || {};
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // State for dropdown data
+  const [dropdownData, setDropdownData] = useState({
+    districts: [],
+    banks: [],
+    branches: []
+  });
+
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     business: '',
     reg: '',
+    confirmReg: '',
     tax: '',
     district: '',
     accountholder: '',
     bank: '',
+    branch: '',
     accountnumber: '',
     idNumber: '',
     nicImage: null,
   });
 
   const [errors, setErrors] = useState({});
-  const [showSuccess, setShowSuccess] = useState(false); //Toast State
+  const [showSuccess, setShowSuccess] = useState(false);
+  const fileInputRef = useRef(null);
 
+  useEffect(() => {
+    if (!userData) {
+      navigate('/auth');
+      return;
+    }
 
-  const fileInputRef = useRef(null); 
+    const fetchInitialData = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/common/data`);
+        setDropdownData({
+          districts: response.data.data.districts,
+          banks: response.data.data.banks,
+          branches: []
+        });
+        setLoading(false);
+      } catch (error) {
+        toast.error('Failed to load initial data');
+        navigate('/auth');
+      }
+    };
+
+    fetchInitialData();
+  }, [userData, navigate]);
+
+  // Load branches when bank is selected
+  useEffect(() => {
+    if (formData.bank) {
+      const fetchBranches = async () => {
+        try {
+          const response = await axios.get(`${API_BASE_URL}/api/common/branches/${formData.bank}`);
+          setDropdownData(prev => ({
+            ...prev,
+            branches: response.data.data
+          }));
+        } catch (error) {
+          toast.error('Failed to load branches');
+        }
+      };
+
+      fetchBranches();
+    }
+  }, [formData.bank]);
+
 
   const handleInputChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -86,10 +119,21 @@ export default function AccountSetup() {
 
   const validateStep = () => {
     const newErrors = {};
+    if (currentStep === 1) {
+      if (!formData.business.trim()) newErrors.business = 'Please enter your business name';
+      if (!formData.reg.trim()) newErrors.reg = 'Please enter your business registration number';
+      else if (!/^[a-zA-Z0-9-]+$/.test(formData.reg))
+        newErrors.reg = 'Business registration number must contain only letters, numbers, and hyphens';
+      if (formData.reg !== formData.confirmReg) newErrors.confirmReg = 'Business registration numbers do not match';
+      if (!formData.district) newErrors.district = 'Please select a district';
+}
 
     if (currentStep === 2) {
       if (!formData.accountholder.trim()) newErrors.accountholder = 'Please enter account holder name';
+      else if (!/^[a-zA-Z\s]+$/.test(formData.accountholder))
+        newErrors.accountholder = 'Account holder name must contain only letters and spaces';
       if (!formData.bank.trim()) newErrors.bank = 'Please select a bank';
+      if (!formData.branch.trim()) newErrors.branch = 'Please select a branch';
       if (!formData.accountnumber.trim()) newErrors.accountnumber = 'Please enter account number';
       else if (!/^\d{6,20}$/.test(formData.accountnumber))
         newErrors.accountnumber = 'Account number must be numeric and 6-20 digits long';
@@ -117,37 +161,83 @@ export default function AccountSetup() {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateStep()) return;
 
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 5000);
-    
-    navigate('/initaddstation', {
-      state: {
-        userData: {
-          name: searchParams.get("name") || "-",
-          email: searchParams.get("email") || "-",
-          sections: [
-            {
-              'Business Name': formData.business,
-              'District': formData.district,
-              'Reg No': formData.reg,
-              'Tax ID': formData.tax,
-            },
-            {
-              'Account Holder': formData.accountholder,
-              'Bank': formData.bank,
-              'Account Number': formData.accountnumber,
-            },
-            {
-              'NIC': formData.idNumber,
-              'NIC Image': formData.nicImage ? 'Uploaded' : 'Not Uploaded',
-            }
-          ]
-        }
+    setIsSubmitting(true);
+
+    try {
+      // Create FormData for multipart upload
+      const formDataToSend = new FormData();
+
+      // Add user data from previous steps
+      formDataToSend.append('name', userData.name || searchParams.get("name") || "");
+      formDataToSend.append('email', userData.email || searchParams.get("email") || "");
+      formDataToSend.append('contact', userData.phone || searchParams.get("phone") || "");
+      formDataToSend.append('password', userData.password || searchParams.get("password") || "");
+
+      // Add business information
+      formDataToSend.append('businessName', formData.business);
+      formDataToSend.append('businessRegistrationNumber', formData.reg);
+      formDataToSend.append('taxId', formData.tax);
+      formDataToSend.append('district', formData.district);
+
+      // Add payment information
+      formDataToSend.append('accountHolderName', formData.accountholder);
+      formDataToSend.append('bank', formData.bank);
+      formDataToSend.append('branch', formData.branch);
+      formDataToSend.append('accountNumber', formData.accountnumber);
+
+      // Add identity verification
+      formDataToSend.append('nic', formData.idNumber);
+      if (formData.nicImage) {
+        formDataToSend.append('nicImage', formData.nicImage);
       }
-    });
+
+      console.log(formDataToSend);
+
+      // Submit to backend
+      const response = await axios.post(
+        `${API_BASE_URL}/api/auth/station-owner/register`,
+        formDataToSend,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      // Handle successful registration
+      toast.success('Registration successful! Verification pending.');
+
+      // Store tokens if needed
+      if (response.data.accessToken && response.data.refreshToken) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+        localStorage.setItem('userID', response.data.user._id);
+      }
+
+      // Redirect to dashboard or next step
+      navigate('/initaddstation');
+
+    } catch (error) {
+      console.error('Registration error:', error);
+
+      // Handle specific error cases
+      if (error.response) {
+        if (error.response.status === 400) {
+          toast.error(error.response.data.message || 'Validation failed');
+        } else if (error.response.status === 409) {
+          toast.error('User already exists with this email or NIC');
+        } else {
+          toast.error('Registration failed. Please try again.');
+        }
+      } else {
+        toast.error('Network error. Please check your connection.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderFormContent = () => {
@@ -156,12 +246,13 @@ export default function AccountSetup() {
         return (
           <>
             <InputField
-              label="Business Name (If Applicable)"
+              label="Business Name"
               placeholder="Enter your business name"
               value={formData.business}
               onChange={handleInputChange('business')}
               error={!!errors.business}
               errorMessage={errors.business}
+              required
             />
             {/* <InputField
               label="District"
@@ -184,11 +275,17 @@ export default function AccountSetup() {
                 value={formData.district}
                 onChange={handleInputChange('district')}
                 className="w-full rounded-lg border border-neutral-200 px-4 py-3 focus:outline-none focus:ring-1 focus:border-primary"
+                disabled={loading}
               >
-                <option value="" style={{fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal}}>Select District</option>
-                {districts.map((d) => (
-                  <option key={d} value={d} style={{fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal}}>{d}</option>
+                <option value="" style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
+                  {loading ? 'Loading districts...' : 'Select District'}
+                </option>
+                {dropdownData.districts.map((d) => (
+                  <option key={d._id} value={d._id} style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
+                    {d.name}, {d.province}
+                  </option>
                 ))}
+                
               </select>
             </div>
             <InputField
@@ -199,8 +296,19 @@ export default function AccountSetup() {
               onChange={handleInputChange('reg')}
               error={!!errors.reg}
               errorMessage={errors.reg}
+              required
             />
             <InputField
+            label="Business Registration Number Confirmation"
+            type="text"
+            placeholder="Confirm your business registration number"
+            value={formData.confirmReg}
+            onChange={handleInputChange('confirmReg')}
+            error={!!errors.confirmReg}
+            errorMessage={errors.confirmReg}
+            required
+            />
+            {/* <InputField
               label="Tax ID"
               type="text"
               placeholder="Enter your business's tax ID"
@@ -208,7 +316,7 @@ export default function AccountSetup() {
               onChange={handleInputChange('tax')}
               error={!!errors.tax}
               errorMessage={errors.tax}
-            />
+            /> */}
           </>
         );
       case 2:
@@ -238,13 +346,17 @@ export default function AccountSetup() {
                 value={formData.bank}
                 onChange={handleInputChange('bank')}
                 required
-                className={`w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-1 ${
-  errors.bank ? 'border-red-500' : 'border-neutral-200 focus:border-primary'
-}`}
+                className={`w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-1 ${errors.bank ? 'border-red-500' : 'border-neutral-200 focus:border-primary'
+                  }`}
+                disabled={loading}
               >
-                <option value="" style={{fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal}}>Select Bank</option>
-                {banks.map((d) => (
-                  <option key={d} value={d} style={{fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal}}>{d}</option>
+                <option value="" style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
+                  {loading ? 'Loading banks...' : 'Select Bank'}
+                </option>
+                {dropdownData.banks.map((b) => (
+                  <option key={b._id} value={b._id} style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
+                    {b.name} ({b.code})
+                  </option>
                 ))}
               </select>
               {errors.bank && (
@@ -253,6 +365,42 @@ export default function AccountSetup() {
                 </p>
               )}
             </div>
+
+            <div className="w-full">
+              <label
+                className="block mb-2"
+                style={{
+                  color: COLORS.mainTextColor,
+                  fontSize: FONTS.sizes.xs,
+                  fontWeight: FONTS.weights.normal,
+                }}
+              >
+                Branch
+              </label>
+              <select
+                value={formData.branch}
+                onChange={handleInputChange('branch')}
+                required
+                className={`w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-1 ${errors.branch ? 'border-red-500' : 'border-neutral-200 focus:border-primary'
+                  }`}
+                disabled={!formData.bank || loading}
+              >
+                <option value="" style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
+                  {!formData.bank ? 'Select bank first' : (loading ? 'Loading branches...' : 'Select Branch')}
+                </option>
+                {dropdownData.branches.map((b) => (
+                  <option key={b._id} value={b._id} style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
+                    {b.name}, {b.district?.name || ''}
+                  </option>
+                ))}
+              </select>
+              {errors.branch && (
+                <p className="mt-1 text-sm" style={{ color: COLORS.danger }}>
+                  {errors.branch}
+                </p>
+              )}
+            </div>
+
             <InputField
               label="Account Number"
               placeholder="Enter the account number"
@@ -340,14 +488,14 @@ export default function AccountSetup() {
           🎉 Your account has been successfully created!
         </div>
       )}
-      
+
       <div className="flex flex-col md:flex-row w-full max-w-6xl p-6 md:p-8 gap-8">
         {/* Left Panel with Progress */}
         <div className="flex-1 flex-col justify-center items-start text-left">
           <div className="flex mb-4">
-            <img 
-              src={evionLogo} 
-              alt="EVion Logo" 
+            <img
+              src={evionLogo}
+              alt="EVion Logo"
               className="h-10 w-auto"
             />
           </div>
@@ -364,7 +512,7 @@ export default function AccountSetup() {
                       if (step.id < currentStep) {
                         setCurrentStep(step.id);  // Allow going back anytime
                       } else if (step.id === currentStep) {
-                        setCurrentStep(step.id); 
+                        setCurrentStep(step.id);
                       } else {
                         if (validateStep()) setCurrentStep(step.id);  // Only allow forward jump if current step is valid
                       }

@@ -139,24 +139,25 @@ export default function AfterAccepted() {
                         </div>
                     </OverviewCard>
 
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                                <button className="px-4 py-2 rounded-lg border" style={{ borderColor: COLORS.mainTextColor }}>
-                                    Discard
-                                </button>
-                            </div>
-                        </div>
+                        
 
                         <div className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <button className="px-4 py-2 rounded-lg text-white" style={{ backgroundColor: COLORS.primary }}>
+                            <div className="grid grid-cols-1 w-full md:grid-cols-1 gap-4">
+                                {/* <button className="px-4 py-2 rounded-lg text-white" style={{ backgroundColor: COLORS.primary }}>
                                 Close Station
                                 </button>
                                 <button className="px-4 py-2 rounded-lg text-white" style={{ backgroundColor: COLORS.primary }}>
                                 Disable Charger
-                                </button>
+                                </button> */}
                                 <button className="px-4 py-2 rounded-lg text-white" style={{ backgroundColor: COLORS.primary }}>
                                 Issue Refund
+                                </button>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                                <button className="px-4 py-2 rounded-lg border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>
+                                    Discard
                                 </button>
                             </div>
                         </div>

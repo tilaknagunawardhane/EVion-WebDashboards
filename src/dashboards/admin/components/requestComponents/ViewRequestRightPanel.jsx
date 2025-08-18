@@ -3,6 +3,9 @@ import { COLORS, FONTS } from '../../../../constants';
 import UserProfileCard from '../userComponents/UserProfileCard';
 import ChatIcon from '../../../../assets/chat.svg';
 import Button from '../../../../components/ui/Button';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { Pointer } from 'lucide-react';
 
@@ -11,7 +14,9 @@ brightness(0)
 invert(1)
 `;
 
-// Modal Component with backdrop blur
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// Modal Component with backdrop blur (same as before)
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
@@ -36,43 +41,116 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
     const [showDiscardModal, setShowDiscardModal] = useState(false);
     const [discardReason, setDiscardReason] = useState('');
     const [isTextareaFocused, setIsTextareaFocused] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentRequest, setCurrentRequest] = useState(request);
 
     const navigate = useNavigate();
 
     const user = {
-        Name: request.requester,
-        'Account Status': request.requesterStatus,
-        'Date of Registration': request.date,
-        Email: request.email,
-        'Company Name': request.company,
-        'Business Reg No': request.businessRegNo,
-        'Tax ID': request.taxId
+        Name: currentRequest.requester,
+        'Account Status': currentRequest.requesterStatus,
+        'Date of Registration': currentRequest.date,
+        Email: currentRequest.email,
+        'Company Name': currentRequest.company,
+        'Business Reg No': currentRequest.businessRegNo,
+        'Tax ID': currentRequest.taxId
+    };
+
+    const handleStatusUpdate = async (action) => {
+        setIsLoading(true);
+        try {
+            const payload = {
+                action,
+                ...(action === 'discard' && { reason: discardReason })
+            };
+
+            const response = await axios.put(
+                `${API_BASE_URL}/api/admin/update-request-status/${currentRequest.id}`,
+                payload,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminAccessToken')}`
+                    }
+                }
+            );
+
+            if (response.data.success) {
+                setCurrentRequest(prev => ({
+                    ...prev,
+                    status: response.data.data.request_status === 'approved' ? 'IN-PROGRESS' : 
+                           response.data.data.request_status === 'finished' ? 'WAITING FOR PAYMENT' :
+                           'REJECTED',
+                    request_status: response.data.data.request_status,
+                    station_status: response.data.data.station_status
+                }));
+                toast.success(`Request ${action}d successfully`);
+            } else {
+                toast.error(response.data.message || 'Failed to update request status');
+            }
+        } catch (error) {
+            console.error('Error updating request status:', error);
+            toast.error(error.response?.data?.message || 'Error updating request status');
+        } finally {
+            setIsLoading(false);
+            setShowDiscardModal(false);
+            setDiscardReason('');
+        }
     };
 
     const handleDiscard = () => {
-        // Handle discard logic here
-        console.log('Discarding with reason:', discardReason);
-        setShowDiscardModal(false);
-        setDiscardReason('');
-        navigate('/admin/stations/requests')
+        handleStatusUpdate('discard');
+    };
+
+    const handleApprove = () => {
+        handleStatusUpdate('approve');
+    };
+
+    const handleComplete = () => {
+        handleStatusUpdate('complete');
     };
 
     const handleModalClose = () => {
         setShowDiscardModal(false);
-        setDiscardReason(''); // Clear textarea when modal closes
+        setDiscardReason('');
     };
 
-    const handleStatusUpdate = () => {
-        if (request.status === 'NEW') {
-            onStatusUpdate('IN-PROGRESS');
-        } else if (request.status === 'IN-PROGRESS') {
-            onStatusUpdate('WAITING FOR PAYMENT');
-        }
-    };
+    // const handleStatusUpdate = () => {
+    //     if (request.status === 'NEW') {
+    //         onStatusUpdate('IN-PROGRESS');
+    //     } else if (request.status === 'IN-PROGRESS') {
+    //         onStatusUpdate('WAITING FOR PAYMENT');
+    //     }
+    // };
 
     const renderActionButtons = () => {
-        switch (request.status) {
+        switch (currentRequest.status) {
             case 'NEW':
+                return (
+                    <>
+                        <Button
+                            variant="danger_outline"
+                            size="base"
+                            className="w-full"
+                            style={{
+                                borderColor: COLORS.danger,
+                                color: COLORS.danger
+                            }}
+                            onClick={() => setShowDiscardModal(true)}
+                            disabled={isLoading}
+                        >
+                            Discard
+                        </Button>
+                        <Button
+                            variant="primary"
+                            size="base"
+                            className="w-full"
+                            onClick={handleApprove}
+                            disabled={isLoading}
+                        >
+                            Approve
+                        </Button>
+                    </>
+                );
             case 'IN-PROGRESS':
                 return (
                     <>
@@ -85,6 +163,7 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                                 color: COLORS.danger
                             }}
                             onClick={() => setShowDiscardModal(true)}
+                            disabled={isLoading}
                         >
                             Discard
                         </Button>
@@ -92,9 +171,11 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                             variant="primary"
                             size="base"
                             className="w-full"
-                            onClick={handleStatusUpdate}
+                            onClick={handleComplete}
+                            disabled={isLoading}
+                            // onClick={handleStatusUpdate}
                         >
-                            {request.status === 'NEW' ? 'Approve' : 'Complete Installation'}
+                            Complete Installation
                         </Button>
                     </>
                 );
@@ -128,7 +209,7 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                 <div className="flex items-center justify-center gap-2">
                     <div className="underline">
                         <a
-                            href={`mailto:${request.email}`}
+                            href={`mailto:${currentRequest.email}`}
                             className="flex items-center gap-1 text-primary underline"
                             style={{
                                 color: COLORS.primary,
@@ -137,7 +218,7 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                                 textDecoration: 'none'
                             }}
                         >
-                            {request.email}
+                            {currentRequest.email}
                         </a>
                     </div>
 
@@ -157,25 +238,25 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                     <div className="space-y-2">
                         <div>
                             <p className="text-sm" style={{ color: COLORS.mainTextColor }}>
-                                {request.operator}
+                                {currentRequest.operator}
                             </p>
                         </div>
                         <div className='flex justify-between'>
                             <p className="text-xs" style={{ color: COLORS.secondaryText }}>District</p>
                             <p className="text-xs" style={{ color: COLORS.mainTextColor }}>
-                                {request.district}
+                                {currentRequest.district}
                             </p>
                         </div>
                         <div className='flex justify-between'>
                             <p className="text-xs" style={{ color: COLORS.secondaryText }}>Business Reg No.</p>
                             <p className="text-xs" style={{ color: COLORS.mainTextColor }}>
-                                {request.businessRegNo}
+                                {currentRequest.businessRegNo}
                             </p>
                         </div>
                         <div className='flex justify-between'>
                             <p className="text-xs" style={{ color: COLORS.secondaryText }}>Tax ID</p>
                             <p className="text-xs" style={{ color: COLORS.mainTextColor }}>
-                                {request.taxId}
+                                {currentRequest.taxId}
                             </p>
                         </div>
                     </div>
@@ -198,13 +279,13 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                         color: COLORS.mainTextColor,
                         fontFamily: FONTS.family.sans
                     }}>
-                        Discard {request.title.includes('Charger') ? 'Charger' : 'Station'}
+                        Discard {currentRequest.title.includes('Charger') ? 'Charger' : 'Station'}
                     </h2>
                     <p className="mb-4 text-sm" style={{ 
                         color: COLORS.mainTextColor,
                         fontFamily: FONTS.family.sans
                     }}>
-                        Do you really want to discard this request to add a new charging {request.title.includes('Charger') ? 'charger' : 'station'}?
+                        Do you really want to discard this request to add a new charging {currentRequest.title.includes('Charger') ? 'charger' : 'station'}?
                     </p>
                     
                     <div className="mb-6">
@@ -237,6 +318,7 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                             variant="outline"
                             size="base"
                             onClick={handleModalClose}
+                            disabled={isLoading}
                             style={{
                                 borderColor: COLORS.stroke,
                                 color: COLORS.mainTextColor,
@@ -249,10 +331,10 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                             variant="primary"
                             size="base"
                             onClick={handleDiscard}
-                            disabled={!discardReason.trim()}
+                            disabled={!discardReason.trim() || isLoading}
                             style={{ fontFamily: FONTS.family.sans }}
                         >
-                            Confirm
+                            {isLoading ? 'Processing...' : 'Confirm'}
                         </Button>
                     </div>
                 </div>

@@ -40,7 +40,7 @@ export default function MainRequestCard({ request }) {
             onClick={handleCardClick}
         >
             {/* User Info with Icon and Right-aligned New User badge */}
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-center mb-4"> {/* Changed from items-start to items-center */}
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: COLORS.bgGreen }}>
                         <img
@@ -49,34 +49,36 @@ export default function MainRequestCard({ request }) {
                             className="w-5 h-5"
                             style={{
                                 filter: `
-                                    brightness(0) 
-                                    saturate(100%) 
-                                    invert(67%) 
-                                    sepia(48%) 
-                                    saturate(718%) 
-                                    hue-rotate(123deg) 
-                                    brightness(95%) 
-                                    contrast(101%)
-                                `,
+            brightness(0) 
+            saturate(100%) 
+            invert(67%) 
+            sepia(48%) 
+            saturate(718%) 
+            hue-rotate(123deg) 
+            brightness(95%) 
+            contrast(101%)
+          `,
                             }}
                         />
                     </div>
-                    <h3 className="text-base font-medium" style={{
-                        color: COLORS.mainTextColor,
-                        fontFamily: FONTS.family.sans
-                    }}>
-                        {request.userName || 'John Doe'}
-                    </h3>
+                    <div className="flex items-center gap-2"> {/* Added flex container for name and badge */}
+                        <h3 className="text-base font-medium" style={{
+                            color: COLORS.mainTextColor,
+                            fontFamily: FONTS.family.sans
+                        }}>
+                            {request.userName || 'John Doe'}
+                        </h3>
+                        {request.userType === 'New User' && (
+                            <span className="text-xs px-2 py-1 rounded-full whitespace-nowrap" style={{
+                                color: COLORS.background,
+                                fontFamily: FONTS.family.sans,
+                                backgroundColor: COLORS.primary,
+                            }}>
+                                New User
+                            </span>
+                        )}
+                    </div>
                 </div>
-                {request.userType === 'New User' && (
-                    <span className="text-xs px-2 py-1 rounded-full" style={{
-                        color: COLORS.background,
-                        fontFamily: FONTS.family.sans,
-                        backgroundColor: COLORS.primary,
-                    }}>
-                        New User
-                    </span>
-                )}
             </div>
 
             {/* Station Info */}

@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
+// RequestsPage.js
+import React, { useState, useEffect } from 'react';
 import TabBar from '../../../../components/ui/TabBar';
 import { COLORS, FONTS } from '../../../../constants';
-import NotificationsIcon from '../../../../assets/notifications.svg';
 import MainRequestCard from '../../components/requestComponents/MainRequestCard';
 import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
 import { useNavigate } from 'react-router-dom';
 import AdminPageHeader from '../../components/AdminPageHeader';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function RequestsPage() {
     const [activeTab, setActiveTab] = useState('stations');
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState('Date requested');
+    const [stationRequests, setStationRequests] = useState([]);
+    const [connectorRequests, setConnectorRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     const filterOptions = [
@@ -19,211 +27,42 @@ export default function RequestsPage() {
         { label: 'Colombo', value: 'colombo' },
         { label: 'Kandy', value: 'kandy' },
         { label: 'Galle', value: 'galle' },
-        // Add more districts/cities as needed
     ];
 
-    // Sort options
     const sortOptions = [
         { label: 'Date requested', value: 'date' },
         { label: 'No of chargers', value: 'chargers' },
     ];
 
-    // Sample data for station requests
-    const stationRequests = [
-        // New Requests
-        {
-            id: 1,
-            type: 'station',
-            userName: "John Doe",
-            userType: "New User",
-            status: "NEW",
-            stationName: "EV Charging Station",
-            stationAddress: "No.24, Joshep Road, Wellpanna",
-            district: "colombo",
-            chargersRequested: "02",
-            date: "6 Jul 09:20 AM"
-        },
-        {
-            id: 2,
-            type: 'station',
-            userName: "Robert Johnson",
-            userType: "New User",
-            status: "NEW",
-            stationName: "Mall Parking Chargers",
-            stationAddress: "456 Shopping Ave, Mega Mall",
-            district: "galle",
-            chargersRequested: "01",
-            date: "5 Jul 10:45 AM"
-        },
-        {
-            id: 3,
-            type: 'station',
-            userName: "Sarah Wilson",
-            userType: "Existing User",
-            status: "NEW",
-            stationName: "Office Park Charging",
-            stationAddress: "100 Business Blvd",
-            district: "kandy",
-            chargersRequested: "05",
-            date: "3 Jul 03:45 PM"
-        },
-        // In-Progress Requests
-        {
-            id: 4,
-            type: 'station',
-            userName: "Jane Smith",
-            userType: "Existing User",
-            status: "IN-PROGRESS",
-            stationName: "City Center Charging",
-            stationAddress: "123 Main Street, Downtown",
-            district: "colombo",
-            chargersRequested: "04",
-            date: "5 Jul 02:15 PM"
-        },
-        {
-            id: 5,
-            type: 'station',
-            userName: "Michael Brown",
-            userType: "New User",
-            status: "IN-PROGRESS",
-            stationName: "Apartment Complex",
-            stationAddress: "789 Residential Lane",
-            district: "galle",
-            chargersRequested: "02",
-            date: "4 Jul 11:20 AM"
-        },
-        {
-            id: 6,
-            type: 'station',
-            userName: "David Taylor",
-            userType: "New User",
-            status: "IN-PROGRESS",
-            stationName: "University Campus",
-            stationAddress: "College Avenue, Campus Town",
-            district: "kandy",
-            chargersRequested: "06",
-            date: "2 Jul 09:10 AM"
-        },
-        // Rejected Requests
-        {
-            id: 7,
-            type: 'station',
-            userName: "Emily Davis",
-            userType: "Existing User",
-            status: "REJECTED",
-            stationName: "Highway Rest Stop",
-            stationAddress: "Mile Marker 42, Interstate 5",
-            district: "galle",
-            chargersRequested: "03",
-            date: "4 Jul 04:30 PM"
-        }
-    ];
+    useEffect(() => {
+        const fetchRequests = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get(`${API_BASE_URL}/api/admin/get-requests`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
 
-    // Sample data for connector requests
-    const connectorRequests = [
-        // New Requests
-        {
-            id: 1,
-            type: 'connector',
-            userName: "Alex Johnson",
-            userType: "Existing User",
-            status: "NEW",
-            stationName: "Tech Park Charging",
-            stationAddress: "200 Tech Park Drive",
-            district: "galle",
-            connectorType: "CCS2",
-            chargersRequested: "01",
-            date: "6 Jul 10:30 AM"
-        },
-        {
-            id: 2,
-            type: 'connector',
-            userName: "Olivia Martinez",
-            userType: "New User",
-            status: "NEW",
-            stationName: "Airport Parking",
-            stationAddress: "Terminal 1, International Airport",
-            district: "galle",
-            connectorType: "CCS1",
-            chargersRequested: "02",
-            date: "4 Jul 05:15 PM"
-        },
-        {
-            id: 3,
-            type: 'connector',
-            userName: "Sophia Garcia",
-            userType: "New User",
-            status: "NEW",
-            stationName: "Community Center",
-            stationAddress: "100 Community Center Road",
-            district: "galle",
-            connectorType: "CCS2",
-            chargersRequested: "01",
-            date: "3 Jul 04:20 PM"
-        },
-        // In-Progress Requests
-        {
-            id: 4,
-            type: 'connector',
-            userName: "Lisa Wong",
-            userType: "New User",
-            status: "IN-PROGRESS",
-            stationName: "Supermarket Chargers",
-            stationAddress: "123 Grocery Lane",
-            district: "kandy",
-            connectorType: "Type 2",
-            chargersRequested: "03",
-            date: "5 Jul 01:45 PM"
-        },
-        {
-            id: 5,
-            type: 'connector',
-            userName: "James Wilson",
-            userType: "Existing User",
-            status: "IN-PROGRESS",
-            stationName: "Gas Station Chargers",
-            stationAddress: "456 Fuel Avenue",
-            district: "Colombo",
-            connectorType: "Type 2",
-            chargersRequested: "02",
-            date: "4 Jul 12:30 PM"
-        },
-        // Rejected Requests
-        {
-            id: 6,
-            type: 'connector',
-            userName: "Thomas Lee",
-            userType: "Existing User",
-            status: "REJECTED",
-            stationName: "Hotel Parking",
-            stationAddress: "789 Hospitality Street",
-            district: "Colombo",
-            connectorType: "CHAdeMO",
-            chargersRequested: "01",
-            date: "5 Jul 11:20 AM"
-        },
-        {
-            id: 7,
-            type: 'connector',
-            userName: "Daniel Kim",
-            userType: "Existing User",
-            status: "REJECTED",
-            stationName: "Sports Complex",
-            stationAddress: "100 Athletic Drive",
-            district: "kandy",
-            connectorType: "CHAdeMO",
-            chargersRequested: "04",
-            date: "2 Jul 10:15 AM"
-        }
-    ];
+                console.log('response is: ', response);
 
-    // Define your custom tabs
-    const requestTabs = [
-        { id: 'stations', label: 'Stations' },
-        { id: 'connectors', label: 'Chargers' }
-    ];
+                if (response.data.success) {
+                    setStationRequests(response.data.data.stationRequests);
+                    setConnectorRequests(response.data.data.connectorRequests);
+                } else {
+                    toast.error('Failed to fetch requests');
+                }
+            } catch (error) {
+                console.error('Error fetching requests:', error);
+                toast.error(error.response?.data?.message || 'Error fetching requests');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    // Group requests by status
+        fetchRequests();
+    }, []);
+
     const groupRequestsByStatus = (requests) => {
         return {
             NEW: requests.filter(r => r.status === 'NEW'),
@@ -232,28 +71,45 @@ export default function RequestsPage() {
         };
     };
 
-    // Get current requests based on active tab
     const currentRequests = activeTab === 'stations' ? stationRequests : connectorRequests;
-    // Apply filtering
+    
     const filteredRequests = currentRequests.filter(request => {
         if (!filter) return true;
-        if (filter.value === 'district') return true; // Show all if "District/City" is selected
-        return request.district === filter.value;
+        if (filter.value === 'district') return true;
+        return request.district.toLowerCase() === filter.value.toLowerCase();
     });
 
-    // Apply sorting
     const sortedRequests = [...filteredRequests].sort((a, b) => {
         if (sort === 'Date requested') {
-            return new Date(b.date) - new Date(a.date); // Most recent first
+            return new Date(b.date) - new Date(a.date);
         } else if (sort === 'No of chargers') {
-            return parseInt(b.chargersRequested) - parseInt(a.chargersRequested); // Highest number first
+            return parseInt(b.chargersRequested) - parseInt(a.chargersRequested);
         }
         return 0;
     });
 
-    // Group the sorted and filtered requests
     const groupedRequests = groupRequestsByStatus(sortedRequests);
 
+    const requestTabs = [
+        { id: 'stations', label: 'Stations' },
+        { id: 'connectors', label: 'Connectors' }
+    ];
+
+    if (loading) {
+        return (
+            <div style={{
+                fontFamily: FONTS.family.sans,
+                padding: '24px',
+                backgroundColor: COLORS.background,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh'
+            }}>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
 
     return (
         <div style={{
@@ -261,13 +117,9 @@ export default function RequestsPage() {
             padding: '24px',
             backgroundColor: COLORS.background,
         }}>
-            {/* Header Section */}
             <AdminPageHeader title="Requests"/>
 
-
-            {/* Tab Bar & Filter */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                {/* Tabs on the left */}
                 <div className="w-full sm:w-auto">
                     <TabBar
                         activeTab={activeTab}
@@ -276,7 +128,6 @@ export default function RequestsPage() {
                     />
                 </div>
 
-                {/* Filter/Sort on the right */}
                 <div className="w-full sm:w-auto">
                     <DataTableTopBar
                         search={search}
@@ -293,7 +144,6 @@ export default function RequestsPage() {
                 </div>
             </div>
 
-            {/* Tab Content */}
             <div className="space-y-6">
                 {Object.entries(groupedRequests).map(([status, requests]) => (
                     requests.length > 0 && (
@@ -310,12 +160,11 @@ export default function RequestsPage() {
                                         key={request.id}
                                         request={{
                                             ...request,
-                                            // For connectors, show connector type in the address field
-                                            stationAddress: request.connectorType
+                                            stationAddress: request.type === 'connector'
                                                 ? `Connector Type: ${request.connectorType}`
                                                 : request.stationAddress
                                         }}
-                                        onClick={() => navigate(`/admin/requests/${activeTab}/${request.id}`)}
+                                        onClick={() => navigate(`/admin/requests/${request.type}/${request.id}`)}
                                     />
                                 ))}
                             </div>

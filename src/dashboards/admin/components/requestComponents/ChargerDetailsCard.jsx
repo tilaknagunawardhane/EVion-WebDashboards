@@ -39,6 +39,31 @@ export default function ChargerDetails({ charger }) {
           </span>
         </div>
       </div>
+
+      {/* Unit Price Row */}
+      {/* <div className="flex justify-between items-baseline mb-3">
+        <p className="text-xs" style={{ 
+          color: COLORS.secondaryText,
+          fontSize: FONTS.sizes.xs
+        }}>
+          Unit Price
+        </p>
+        <div className="flex items-baseline">
+          <span className="text-xs mr-1" style={{
+            color: COLORS.mainTextColor,
+            fontSize: FONTS.sizes.xs
+          }}>
+            LKR
+          </span>
+          <span style={{
+            color: COLORS.mainTextColor,
+            fontSize: FONTS.sizes.sm,
+            fontWeight: FONTS.weights.medium
+          }}>
+            {charger.price?.split(' ')[1] || '60.00'}
+          </span>
+        </div>
+      </div> */}
       
       {/* Connector Types */}
       <div>

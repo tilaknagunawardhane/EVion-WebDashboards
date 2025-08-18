@@ -8,12 +8,26 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef();
 
+  // Safe defaults for station data
+  const safeStation = {
+    name: '',
+    status: 'processing',
+    address: '',
+    powerTypes: [],
+    electricityProvider: '',
+    powerSource: '',
+    numChargers: 0,
+    chargers: [],
+    ...station
+  };
+
   const statusColors = {
-    'Processing': COLORS.star || '#F59E0B',
-    'Approved': COLORS.primary || '#3B82F6',
-    'To be Installed': COLORS.mainTextColor || '#10B981',
-    'Active': COLORS.primary,
-    'Closed': COLORS.bgGreen
+    'processing': COLORS.star || '#F59E0B',
+    'approved': COLORS.primary || '#3B82F6',
+    'to-be-installed': COLORS.mainTextColor || '#10B981',
+    'active': COLORS.primary,
+    'closed': COLORS.bgGreen,
+    'rejected': COLORS.bgRed
   };
 
   useEffect(() => {
@@ -35,8 +49,6 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
       }}
       onClick={onClick}
     >
-
-
       <div className="flex justify-between items-start mb-0">
         <div>
           <h3
@@ -47,7 +59,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
               color: COLORS.mainTextColor
             }}
           >
-            {station.name}
+            {safeStation.name}
           </h3>
 
           <p
@@ -57,9 +69,8 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
               fontSize: FONTS.sizes.xs,
             }}
           >
-            {station.address}
+            {safeStation.address}
           </p>
-
         </div>
 
         <div className="relative" ref={menuRef}>
@@ -72,7 +83,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
               className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-50"
               style={{ border: '1px solid #e5e7eb' }}
             >
-              {station.status === 'Processing' && (
+              {safeStation.status === 'processing' && (
                 <button
                   className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                   onClick={() => {
@@ -86,7 +97,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
               <button
                 className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
                 onClick={() => {
-                  onRemove?.(station);
+                  onRemove?.(safeStation);
                   setShowMenu(false);
                 }}
               >
@@ -98,17 +109,27 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
       </div>
 
       <span
-          className="px-4 py-1.5 rounded-xl text-xs font-semibold mb-8"
-          style={{
-            backgroundColor: statusColors[station.status] || '#E5E7EB',
-            color: 'white',
-            fontWeight: FONTS.weights.normal
-          }}
-        >
-          {station.status}
+        className="px-4 py-1.5 rounded-xl text-xs font-semibold mb-8"
+        style={{
+          backgroundColor: statusColors[safeStation.status] || '#E5E7EB',
+          color: 'white',
+          fontWeight: FONTS.weights.normal
+        }}
+      >
+        {safeStation.status}
       </span>
 
       <div className="flex-col gap-0 mt-8">  
+        <div className="flex flex-wrap gap-4 text-sm mt-2">
+          <div>
+            <strong
+              style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}
+            >
+              Power Types:
+            </strong>{' '}
+            {safeStation.powerTypes?.join(', ') || 'N/A'}
+          </div>
+        </div>
 
         <div className="flex flex-wrap justify-between gap-4 text-sm">
           <div>
@@ -117,7 +138,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
             >
               Electricity Provider:
             </strong>{' '}
-            {station.electricityProvider}
+            {safeStation.electricityProvider || 'N/A'}
           </div>
           <div>
             <strong
@@ -125,40 +146,50 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
             >
               Power Source:
             </strong>{' '}
-            {station.powerSource}
+            {safeStation.powerSource || 'N/A'}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-4 text-sm mt-2">
-            <div>
-              <strong
-                style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}
-              >
-                Number of Chargers:
-              </strong>{' '}
-              {station.numChargers}
-            </div>
+          <div>
+            <strong
+              style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}
+            >
+              Number of Chargers:
+            </strong>{' '}
+            {safeStation.numChargers}
+          </div>
         </div>
       </div>
 
-      { expanded && (
+      {expanded && (
         <div className="mt-4 space-y-4">
-          {station.chargers.map((charger, idx) => (
-            <div key={idx} className="rounded-lg p-4" style={{ backgroundColor: COLORS.background }}>
-              <h4 className="mb-2" style={{ color: COLORS.mainTextColor }}>
-                {charger.name}
-              </h4>
-              <p style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
-                <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Power Type:</strong> {charger.powerType}
-              </p>
-              <p style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
-                <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs  }}>Max Power Output:</strong> {charger.maxPower} kW
-              </p>
-              <p style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
-                <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs   }}>Connectors:</strong> {charger.connectors.join(', ')}
-              </p>
-            </div>
-          ))}
+          {safeStation.chargers?.map((charger, idx) => {
+            const safeCharger = {
+              name: 'Unnamed Charger',
+              powerType: 'Unknown',
+              maxPower: 0,
+              connectors: [],
+              ...charger
+            };
+            
+            return (
+              <div key={idx} className="rounded-lg p-4" style={{ backgroundColor: COLORS.background }}>
+                <h4 className="mb-2" style={{ color: COLORS.mainTextColor }}>
+                  {safeCharger.name}
+                </h4>
+                <p style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
+                  <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Power Type:</strong> {safeCharger.powerType}
+                </p>
+                <p style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
+                  <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Max Power Output:</strong> {safeCharger.maxPower} kW
+                </p>
+                <p style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
+                  <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Connectors:</strong> {safeCharger.connectors?.join(', ') || 'None'}
+                </p>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -167,37 +198,16 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
           className="mt-4 underline"
           style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
           onClick={() => setExpanded(!expanded)}
-          >
-          { expanded ? 'Hide Details' : 'More' }
+        >
+          {expanded ? 'Hide Details' : 'More'}
         </button>
 
-        {/* {station.status === 'Processing' && (
-          <button
-            className="mt-4 underline"
-            style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-            // onClick={() => setExpanded(!expanded)}
-            >
-            Edit
-          </button>
-        )} */}
-
-        {station.status === 'Approved' && (
-          <Button variant="primary" onClick={() => onPay?.(station)}>
+        {/* {safeStation.status === 'approved' && (
+          <Button variant="primary" onClick={() => onPay?.(safeStation)}>
             Pay Now
           </Button>
-        )}
-
-        {/* <button
-          className="mt-4 underline"
-          style={{ color: COLORS.danger, fontSize: FONTS.sizes.sm }}
-          // onClick={() => setExpanded(!expanded)}
-          >
-          Remove
-        </button> */}
-
-
+        )} */}
       </div>
-
     </div>
   );
 }

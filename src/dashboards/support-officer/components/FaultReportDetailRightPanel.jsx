@@ -207,7 +207,7 @@ export default function FaultReportDetailRightPanel({ user = {}, stats = {} }) {
                 }}
                 onClick={() => navigate('/support-officer/UserChat')}
             >
-                Chat with User
+                Chat with Station Owner
             </button>
         </div>
     );

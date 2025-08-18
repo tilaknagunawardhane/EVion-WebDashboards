@@ -11,7 +11,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function AdminLogins() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { loginA } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -51,8 +51,10 @@ export default function AdminLogins() {
 
     if (!valid) return;
 
-    const userData = { email, role: 'station-owner' }; // Adjust role based on your logic
-    login(userData);
+    // const userData = { email, role: 'station-owner' }; // Adjust role based on your logic
+    // login(userData);
+
+    loginA(email, password, 'station-owner');
 
     // navigate('/profilesetup');
   };
@@ -151,7 +153,7 @@ export default function AdminLogins() {
                 </a>
 
                 <br />
-                <a href="/auth?mode=support-officerlogin"> HEHE </a>
+                {/* <a href="/auth?mode=support-officerlogin"> HEHE </a> */}
 
               </div>
             </form>
