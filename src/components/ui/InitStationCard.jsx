@@ -1,10 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { COLORS, FONTS } from '../../constants';
 import Button from '../ui/Button';
 import { FiMoreVertical } from 'react-icons/fi'; 
 
-export default function StationCard({ station, onEdit, onPay, onRemove, onClick }) {
-  const [expanded, setExpanded] = useState(false);
+export default function StationCard({ station, onEdit, onRemove, onClick }) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef();
 
@@ -24,21 +23,11 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
   const statusColors = {
     'processing': COLORS.star || '#F59E0B',
     'approved': COLORS.primary || '#3B82F6',
-    'to-be-installed': COLORS.mainTextColor || '#10B981',
+    'to_be_installed': COLORS.mainTextColor || '#10B981',
     'active': COLORS.primary,
     'closed': COLORS.bgGreen,
-    'rejected': COLORS.bgRed
+    'rejected': COLORS.danger,
   };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
     <div
@@ -108,17 +97,6 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
         </div>
       </div>
 
-      <span
-        className="px-4 py-1.5 rounded-xl text-xs font-semibold mb-8"
-        style={{
-          backgroundColor: statusColors[safeStation.status] || '#E5E7EB',
-          color: 'white',
-          fontWeight: FONTS.weights.normal
-        }}
-      >
-        {safeStation.status}
-      </span>
-
       <div className="flex-col gap-0 mt-8">  
         <div className="flex flex-wrap gap-4 text-sm mt-2">
           <div>
@@ -160,9 +138,7 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
             {safeStation.numChargers}
           </div>
         </div>
-      </div>
 
-      {expanded && (
         <div className="mt-4 space-y-4">
           {safeStation.chargers?.map((charger, idx) => {
             const safeCharger = {
@@ -170,11 +146,26 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
               powerType: 'Unknown',
               maxPower: 0,
               connectors: [],
+              status: 'processing',
               ...charger
             };
+
+            const formattedStatus = safeCharger.status
+              .replace(/_/g, ' ')
+              .replace(/\b\w/g, l => l.toUpperCase());
             
             return (
-              <div key={idx} className="rounded-lg p-4" style={{ backgroundColor: COLORS.background }}>
+              <div key={idx} className="relative rounded-lg p-4" style={{ backgroundColor: COLORS.background }}>
+                <span
+                  className="absolute top-2 right-2 px-3 py-1 rounded-xl text-xs font-semibold"
+                  style={{
+                    backgroundColor: statusColors[safeCharger.status] || '#E5E7EB',
+                    color: 'white',
+                    fontWeight: FONTS.weights.normal
+                  }}
+                >
+                  {formattedStatus}
+                </span>
                 <h4 className="mb-2" style={{ color: COLORS.mainTextColor }}>
                   {safeCharger.name}
                 </h4>
@@ -191,22 +182,6 @@ export default function StationCard({ station, onEdit, onPay, onRemove, onClick 
             );
           })}
         </div>
-      )}
-
-      <div className='flex justify-between mt-6'>
-        <button
-          className="mt-4 underline"
-          style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? 'Hide Details' : 'More'}
-        </button>
-
-        {/* {safeStation.status === 'approved' && (
-          <Button variant="primary" onClick={() => onPay?.(safeStation)}>
-            Pay Now
-          </Button>
-        )} */}
       </div>
     </div>
   );
