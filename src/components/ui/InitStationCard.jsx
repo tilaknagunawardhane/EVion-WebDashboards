@@ -21,12 +21,13 @@ export default function StationCard({ station, onEdit, onRemove, onClick }) {
   };
 
   const statusColors = {
-    'processing': COLORS.star || '#F59E0B',
-    'approved': COLORS.primary || '#3B82F6',
-    'to_be_installed': COLORS.mainTextColor || '#10B981',
-    'active': COLORS.primary,
-    'closed': COLORS.bgGreen,
-    'rejected': COLORS.danger,
+    'processing': { bg: `${COLORS.primary}20`, text: COLORS.primary },
+    'to_be_installed': { bg: `${COLORS.HighlightText}20`, text: COLORS.HighlightText},
+    'rejected': { bg: `${COLORS.danger}20`, text: COLORS.danger },
+    'open': { bg: `${COLORS.primary}20`, text: COLORS.primary },
+    'unavailable': { bg: `${COLORS.primary}20`, text: COLORS.primary },
+    'disabled_by_SO': { bg: `${COLORS.primary}20`, text: COLORS.primary },
+    'deleted': { bg: `${COLORS.primary}20`, text: COLORS.primary }
   };
 
   return (
@@ -150,18 +151,21 @@ export default function StationCard({ station, onEdit, onRemove, onClick }) {
               ...charger
             };
 
+            const statusColor = statusColors[safeCharger.status];
+
             const formattedStatus = safeCharger.status
+              .toUpperCase()
               .replace(/_/g, ' ')
               .replace(/\b\w/g, l => l.toUpperCase());
             
             return (
               <div key={idx} className="relative rounded-lg p-4" style={{ backgroundColor: COLORS.background }}>
                 <span
-                  className="absolute top-2 right-2 px-3 py-1 rounded-xl text-xs font-semibold"
+                  className="absolute top-4 right-3 px-3 py-1 rounded-xl text-xs font-semibold"
                   style={{
-                    backgroundColor: statusColors[safeCharger.status] || '#E5E7EB',
-                    color: 'white',
-                    fontWeight: FONTS.weights.normal
+                    backgroundColor: statusColor.bg || '#E5E7EB',
+                    color: statusColor.text,
+                    fontWeight: FONTS.weights.medium,
                   }}
                 >
                   {formattedStatus}
