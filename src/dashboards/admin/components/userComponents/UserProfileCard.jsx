@@ -95,7 +95,7 @@ export default function UserProfileCard({ user }) {
                                     {user.Name}
                                 </h2>
                                 <span
-                                    className="px-3 py-1 xs:px-3 xs:py-1 text-xxs xs:text-xs inline-flex items-center gap-1 rounded-full"
+                                    className="px-3 py-1 xs:px-3 xs:py-1 text-xxs xs:text-xs inline-flex items-center gap-1 rounded-full font-semibold uppercase"
                                     style={{
                                         background: currentStatus.statusBgColor,
                                         color: currentStatus.statusTextColor,
@@ -104,7 +104,7 @@ export default function UserProfileCard({ user }) {
 
                                     }}
                                 >
-                                    {user['Account Status']}
+                                      {user['Account Status']}
                                 </span>
                             </div>
                         </div>

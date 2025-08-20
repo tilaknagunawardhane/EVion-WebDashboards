@@ -123,8 +123,7 @@ export default function ViewRequest() {
 
                 <div className="md:sticky md:top-6 space-y-4 md:space-y-6">
                     <ViewRequestRightPanel 
-                        request={request}
-                        onStatusUpdate={handleStatusUpdate} />
+                        request={request} />
                 </div>
             </div>
         </div>
