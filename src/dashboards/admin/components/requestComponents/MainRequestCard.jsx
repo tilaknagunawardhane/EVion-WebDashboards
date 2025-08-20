@@ -8,11 +8,11 @@ export default function MainRequestCard({ request }) {
 
     // Status color configuration
     const statusColors = {
-        'NEW': {
+        'PROCESSING': {
             bg: `${COLORS.primary}20`,
             text: COLORS.primary
         },
-        'IN-PROGRESS': {
+        'TO_BE_INSTALLED': {
             bg: `${COLORS.HighlightText}20`,
             text: COLORS.HighlightText
         },
@@ -22,13 +22,14 @@ export default function MainRequestCard({ request }) {
         }
     };
 
-    const currentStatus = request.status || 'NEW';
-    const statusColor = statusColors[currentStatus] || statusColors['NEW'];
+    // const currentStatus = request.status || 'NEW';
+    const currentStatus = request.status;
+    const statusColor = statusColors[currentStatus] || statusColors['PROCESSING'];
 
 
     const handleCardClick = () => {
         // Add type parameter to navigation
-        navigate(`/admin/stations/requests/${request.type}/${request.id}`);
+        navigate(`/admin/stations/requests/${request.id}`);
     };
 
     return (
@@ -46,18 +47,18 @@ export default function MainRequestCard({ request }) {
                         <img
                             src={UserIcon}
                             alt="User"
-                            className="w-5 h-5"
+                            className="w-4 h-4"
                             style={{
                                 filter: `
-            brightness(0) 
-            saturate(100%) 
-            invert(67%) 
-            sepia(48%) 
-            saturate(718%) 
-            hue-rotate(123deg) 
-            brightness(95%) 
-            contrast(101%)
-          `,
+                                    brightness(0) 
+                                    saturate(100%) 
+                                    invert(67%) 
+                                    sepia(48%) 
+                                    saturate(718%) 
+                                    hue-rotate(123deg) 
+                                    brightness(95%) 
+                                    contrast(101%)
+                                `,
                             }}
                         />
                     </div>
@@ -68,13 +69,13 @@ export default function MainRequestCard({ request }) {
                         }}>
                             {request.userName || 'John Doe'}
                         </h3>
-                        {request.userType === 'New User' && (
+                        {request.stationType === 'New Station' && (
                             <span className="text-xs px-2 py-1 rounded-full whitespace-nowrap" style={{
                                 color: COLORS.background,
                                 fontFamily: FONTS.family.sans,
                                 backgroundColor: COLORS.primary,
                             }}>
-                                New User
+                                New Station
                             </span>
                         )}
                     </div>
@@ -94,21 +95,27 @@ export default function MainRequestCard({ request }) {
                     color: COLORS.secondaryText,
                     fontFamily: FONTS.family.sans
                 }}>
-                    {request.stationAddress || 'No.24, Joshep Road, Wellpanna'}
+                    {request.powerType} Charger
+                </p>
+                <p className="text-xs" style={{
+                    color: COLORS.secondaryText,
+                    fontFamily: FONTS.family.sans
+                }}>
+                    Max Power Output: {request.power} kWh
                 </p>
             </div>
 
-            {/* Chargers Requested */}
+            {/* Connectors Requested */}
             <div className="mb-4">
                 <p className="text-xs" style={{
                     color: COLORS.mainTextColor,
                     fontFamily: FONTS.family.sans
                 }}>
-                    No. of Chargers Requested: <span style={{
+                    Connectors Requested: <span style={{
                         color: COLORS.mainTextColor,
                         fontWeight: FONTS.weights.medium
                     }}>
-                        {request.chargersRequested || '02'}
+                        {request.connectorType || '02'}
                     </span>
                 </p>
             </div>
@@ -121,7 +128,7 @@ export default function MainRequestCard({ request }) {
                     fontFamily: FONTS.family.sans,
                     fontWeight: FONTS.weights.medium
                 }}>
-                    {currentStatus}
+                    {currentStatus.replace('_', ' ').replace('_', '  ')}
                 </span>
 
                 <div className="text-xs" style={{

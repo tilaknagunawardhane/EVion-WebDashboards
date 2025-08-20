@@ -13,17 +13,17 @@ import 'react-toastify/dist/ReactToastify.css';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function RequestsPage() {
-    const [activeTab, setActiveTab] = useState('stations');
+    // const [activeTab, setActiveTab] = useState('stations');
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState('Date requested');
-    const [stationRequests, setStationRequests] = useState([]);
-    const [connectorRequests, setConnectorRequests] = useState([]);
+    // const [stationRequests, setStationRequests] = useState([]);
+    const [chargerRequests, setChargerRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     const filterOptions = [
-        { label: 'District/City', value: 'district' },
+        { label: 'All Districts', value: 'all' },
         { label: 'Colombo', value: 'colombo' },
         { label: 'Kandy', value: 'kandy' },
         { label: 'Galle', value: 'galle' },
@@ -31,7 +31,8 @@ export default function RequestsPage() {
 
     const sortOptions = [
         { label: 'Date requested', value: 'date' },
-        { label: 'No of chargers', value: 'chargers' },
+        { label: 'Station Type', value: 'stationType' },
+        { label: 'Status', value: 'status' },
     ];
 
     useEffect(() => {
@@ -47,8 +48,8 @@ export default function RequestsPage() {
                 console.log('response is: ', response);
 
                 if (response.data.success) {
-                    setStationRequests(response.data.data.stationRequests);
-                    setConnectorRequests(response.data.data.connectorRequests);
+                    // setStationRequests(response.data.data.stationRequests);
+                    setChargerRequests(response.data.data);
                 } else {
                     toast.error('Failed to fetch requests');
                 }
@@ -65,35 +66,38 @@ export default function RequestsPage() {
 
     const groupRequestsByStatus = (requests) => {
         return {
-            NEW: requests.filter(r => r.status === 'NEW'),
-            'IN-PROGRESS': requests.filter(r => r.status === 'IN-PROGRESS'),
+            PROCESSING: requests.filter(r => r.status === 'PROCESSING'),
+            'TO-BE-INSTALLED': requests.filter(r => r.status === 'TO_BE_INSTALLED'),
             REJECTED: requests.filter(r => r.status === 'REJECTED')
         };
     };
 
-    const currentRequests = activeTab === 'stations' ? stationRequests : connectorRequests;
+    // const currentRequests = activeTab === 'stations' ? stationRequests : connectorRequests;
     
-    const filteredRequests = currentRequests.filter(request => {
-        if (!filter) return true;
-        if (filter.value === 'district') return true;
-        return request.district.toLowerCase() === filter.value.toLowerCase();
+    const filteredRequests = chargerRequests.filter(request => {
+        if (filter && filter !== 'all') {
+            return request.district.toLowerCase() === filter.toLowerCase();
+        }
+        return true;
     });
 
     const sortedRequests = [...filteredRequests].sort((a, b) => {
         if (sort === 'Date requested') {
             return new Date(b.date) - new Date(a.date);
-        } else if (sort === 'No of chargers') {
-            return parseInt(b.chargersRequested) - parseInt(a.chargersRequested);
+        } else if (sort === 'User Type') {
+            return a.userType.localeCompare(b.userType);
+        } else if (sort === 'Status') {
+            return a.status.localeCompare(b.status);
         }
         return 0;
     });
 
     const groupedRequests = groupRequestsByStatus(sortedRequests);
 
-    const requestTabs = [
-        { id: 'stations', label: 'Stations' },
-        { id: 'connectors', label: 'Connectors' }
-    ];
+    // const requestTabs = [
+    //     { id: 'stations', label: 'Stations' },
+    //     { id: 'connectors', label: 'Connectors' }
+    // ];
 
     if (loading) {
         return (
@@ -117,16 +121,16 @@ export default function RequestsPage() {
             padding: '24px',
             backgroundColor: COLORS.background,
         }}>
-            <AdminPageHeader title="Requests"/>
+            <AdminPageHeader title="New Charger Requests"/>
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div className="w-full sm:w-auto">
+                {/* <div className="w-full sm:w-auto">
                     <TabBar
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
                         tabs={requestTabs}
                     />
-                </div>
+                </div> */}
 
                 <div className="w-full sm:w-auto">
                     <DataTableTopBar
@@ -138,7 +142,8 @@ export default function RequestsPage() {
                         setSort={setSort}
                         filterOptions={filterOptions}
                         sortOptions={sortOptions}
-                        showSearchBar={false}
+                        showSearchBar={true}
+                        searchPlaceholder="Search requests..."
                         showExportButton={false}
                     />
                 </div>
@@ -152,7 +157,7 @@ export default function RequestsPage() {
                                 color: COLORS.mainTextColor,
                                 fontFamily: FONTS.family.sans
                             }}>
-                                {status}
+                                {status} ({requests.length})
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {requests.map(request => (
@@ -160,11 +165,10 @@ export default function RequestsPage() {
                                         key={request.id}
                                         request={{
                                             ...request,
-                                            stationAddress: request.type === 'connector'
-                                                ? `Connector Type: ${request.connectorType}`
-                                                : request.stationAddress
+                                            stationAddress: `Type: ${request.powerType} Charger`
                                         }}
-                                        onClick={() => navigate(`/admin/requests/${request.type}/${request.id}`)}
+                                        // onClick={() => navigate(`/admin/requests/${request.type}/${request.id}`)}
+                                        onClick={() => navigate(`/admin/requests/${request.id}`)}
                                     />
                                 ))}
                             </div>
