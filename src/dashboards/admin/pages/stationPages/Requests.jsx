@@ -124,13 +124,6 @@ export default function RequestsPage() {
             <AdminPageHeader title="New Charger Requests"/>
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                {/* <div className="w-full sm:w-auto">
-                    <TabBar
-                        activeTab={activeTab}
-                        setActiveTab={setActiveTab}
-                        tabs={requestTabs}
-                    />
-                </div> */}
 
                 <div className="w-full sm:w-auto">
                     <DataTableTopBar

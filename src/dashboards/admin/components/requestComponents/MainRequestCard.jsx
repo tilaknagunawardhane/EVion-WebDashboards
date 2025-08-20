@@ -1,10 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { COLORS, FONTS } from '../../../../constants';
 import UserIcon from '../../../../assets/connectors.svg';
 
-export default function MainRequestCard({ request }) {
-    const navigate = useNavigate();
+export default function MainRequestCard({ request, onClick }) {
 
     // Status color configuration
     const statusColors = {
@@ -26,19 +24,13 @@ export default function MainRequestCard({ request }) {
     const currentStatus = request.status;
     const statusColor = statusColors[currentStatus] || statusColors['PROCESSING'];
 
-
-    const handleCardClick = () => {
-        // Add type parameter to navigation
-        navigate(`/admin/stations/requests/${request.id}`);
-    };
-
     return (
         <div
             className="rounded-lg bg-white p-4 mb-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
             style={{
                 borderColor: COLORS.stroke
             }}
-            onClick={handleCardClick}
+            onClick={onClick}
         >
             {/* User Info with Icon and Right-aligned New User badge */}
             <div className="flex justify-between items-center mb-4"> {/* Changed from items-start to items-center */}
