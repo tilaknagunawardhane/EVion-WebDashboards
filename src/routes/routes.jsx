@@ -68,7 +68,8 @@ const router = createBrowserRouter([
           { path: 'payments', element: <AdminTransactions />},
           { path: 'users/:id', element: <UserAccountPage/>},
           { path: 'stations/requests', element: <RequestsPage/>},
-          { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
+          // { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
+          { path: 'stations/requests/:id', element: <ViewRequest/>},
           { path: 'stations/:id', element: <ViewStation/>},
           { path: 'chat', element: <ChatPage/>},
           { path: 'stations/chargerprofile/:id', element: <AdminViewCharger /> }
