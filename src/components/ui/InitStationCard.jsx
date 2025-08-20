@@ -44,8 +44,8 @@ export default function StationCard({ station, onEdit, onRemove, onClick }) {
           <h3
             style={{
               fontFamily: FONTS.family.sans,
-              fontWeight: FONTS.weights.normal,
-              fontSize: FONTS.sizes.base,
+              fontWeight: FONTS.weights.medium,
+              fontSize: FONTS.sizes.lg,
               color: COLORS.mainTextColor
             }}
           >
@@ -170,16 +170,19 @@ export default function StationCard({ station, onEdit, onRemove, onClick }) {
                 >
                   {formattedStatus}
                 </span>
-                <h4 className="mb-2" style={{ color: COLORS.mainTextColor }}>
+                <h4 className="mb-2 font-medium text-sm" style={{ color: COLORS.mainTextColor }}>
                   {safeCharger.name}
                 </h4>
-                <p style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
+                <p style={{ fontSize: FONTS.sizes.xs, color: COLORS.mainTextColor }}>
                   <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Power Type:</strong> {safeCharger.powerType}
                 </p>
-                <p style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
+                <p style={{ fontSize: FONTS.sizes.xs, color: COLORS.mainTextColor }}>
                   <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Max Power Output:</strong> {safeCharger.maxPower} kW
                 </p>
-                <p style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor }}>
+                <p style={{ fontSize: FONTS.sizes.xs, color: COLORS.mainTextColor }}>
+                  <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Unit Price:</strong> LKR {safeCharger.price}
+                </p>
+                <p style={{ fontSize: FONTS.sizes.xs, color: COLORS.mainTextColor }}>
                   <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Connectors:</strong> {safeCharger.connectors?.join(', ') || 'None'}
                 </p>
               </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { COLORS, FONTS } from '../../../../constants';
-import UserIcon from '../../../../assets/user_icon.svg';
+import UserIcon from '../../../../assets/connectors.svg';
 
 export default function MainRequestCard({ request }) {
     const navigate = useNavigate();
@@ -47,7 +47,7 @@ export default function MainRequestCard({ request }) {
                         <img
                             src={UserIcon}
                             alt="User"
-                            className="w-4 h-4"
+                            className="w-5 h-5"
                             style={{
                                 filter: `
                                     brightness(0) 
@@ -67,7 +67,7 @@ export default function MainRequestCard({ request }) {
                             color: COLORS.mainTextColor,
                             fontFamily: FONTS.family.sans
                         }}>
-                            {request.userName || 'John Doe'}
+                            {request.chargerData.charger_name || 'John Doe'}
                         </h3>
                         {request.stationType === 'New Station' && (
                             <span className="text-xs px-2 py-1 rounded-full whitespace-nowrap" style={{
@@ -84,24 +84,31 @@ export default function MainRequestCard({ request }) {
 
             {/* Station Info */}
             <div className="mb-4">
-                <h4 className="text-sm font-medium" style={{
+                <h4 className="text-sm font-medium mb-4" style={{
                     color: COLORS.mainTextColor,
                     fontFamily: FONTS.family.sans,
-                    marginBottom: '4px'
                 }}>
                     {request.stationName || 'EV Charging Station'}
                 </h4>
+                <div className="flex justify-between items-center mb-1">
+                    <p className="text-xs" style={{
+                        color: COLORS.secondaryText,
+                        fontFamily: FONTS.family.sans
+                    }}>
+                        {request.powerType} Charger
+                    </p>
+                    <p className="text-xs" style={{
+                        color: COLORS.secondaryText,
+                        fontFamily: FONTS.family.sans
+                    }}>
+                        Power Output: {request.power} kWh
+                    </p>
+                </div>
                 <p className="text-xs" style={{
                     color: COLORS.secondaryText,
                     fontFamily: FONTS.family.sans
                 }}>
-                    {request.powerType} Charger
-                </p>
-                <p className="text-xs" style={{
-                    color: COLORS.secondaryText,
-                    fontFamily: FONTS.family.sans
-                }}>
-                    Max Power Output: {request.power} kWh
+                    Unit Price: LKR {request.chargerData.price}
                 </p>
             </div>
 
