@@ -37,7 +37,7 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
+export default function ViewRequestRightPanel({ request }) {
     const [showDiscardModal, setShowDiscardModal] = useState(false);
     const [discardReason, setDiscardReason] = useState('');
     const [isTextareaFocused, setIsTextareaFocused] = useState(false);
@@ -279,13 +279,13 @@ export default function ViewRequestRightPanel({ request, onStatusUpdate }) {
                         color: COLORS.mainTextColor,
                         fontFamily: FONTS.family.sans
                     }}>
-                        Discard {currentRequest.title.includes('Charger') ? 'Charger' : 'Station'}
+                        Discard Charger
                     </h2>
                     <p className="mb-4 text-sm" style={{ 
                         color: COLORS.mainTextColor,
                         fontFamily: FONTS.family.sans
                     }}>
-                        Do you really want to discard this request to add a new charging {currentRequest.title.includes('Charger') ? 'charger' : 'station'}?
+                        Do you really want to discard this request to add a new charger?
                     </p>
                     
                     <div className="mb-6">

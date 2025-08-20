@@ -168,7 +168,7 @@ export default function RequestsPage() {
                                             stationAddress: `Type: ${request.powerType} Charger`
                                         }}
                                         // onClick={() => navigate(`/admin/requests/${request.type}/${request.id}`)}
-                                        onClick={() => navigate(`/admin/requests/${request.id}`)}
+                                        onClick={() => navigate(`/admin/stations/requests/${request.id}`)}
                                     />
                                 ))}
                             </div>
