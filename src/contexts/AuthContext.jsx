@@ -239,7 +239,7 @@ export function AuthProvider({ children }) {
       // isAdmin: currentUser?.userType === 'admin',
       isAdmin: currentUser === 'admin',
       isSupportOfficer: currentUser?.role === 'support-officer',
-      isStationOwner: currentUser?.userType === 'stationowner'
+      isStationOwner: currentUser === 'station-owner'
     }}>
       {children}
     </AuthContext.Provider>

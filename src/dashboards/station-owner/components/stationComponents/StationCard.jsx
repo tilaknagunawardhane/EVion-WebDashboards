@@ -7,19 +7,19 @@ export default function StationCard({ station, onClick, onPay }) {
     const [expanded, setExpanded] = useState(false); // Reintroduce expanded state
 
     const statusTagBackgroundColors = {
-        'Open': COLORS.bgGreen,          
-        'Approved - Waiting for Payment': COLORS.bgGreen,
-        'To be installed': COLORS.mainTextColor, 
-        'Pending Approval': COLORS.bgYellow,
-        'Closed': COLORS.bgRed,
+        'open': COLORS.bgGreen,          
+        'processing': COLORS.bgYellow,
+        'unavailable': COLORS.mainTextColor, 
+        'deleted': COLORS.mainTextColor,
+        'disabled_by_SO': COLORS.bgRed,
     };
 
     const statusTagFontColors = {
-        'Open': COLORS.primary,
-        'Approved - Waiting for Payment': COLORS.primary,
-        'To be installed': COLORS.background, 
-        'Pending Approval': COLORS.HighlightText,
-        'Closed': COLORS.danger,
+        'open': COLORS.primary,
+        'processing': COLORS.HighlightText,
+        'unavailable': COLORS.background, 
+        'deleted': COLORS.background,
+        'disabled_by_SO': COLORS.danger,
     };
 
     // Correctly determine number of chargers/requested chargers
@@ -70,11 +70,10 @@ export default function StationCard({ station, onClick, onPay }) {
 
             {/* Status Badge */}
             <span
-                className="px-4 py-1.5 rounded-md text-xs font-bold"
+                className="px-4 py-1.5 rounded-md text-xs font-semibold uppercase"
                 style={{
                     backgroundColor: statusTagBackgroundColors[station.status] || '#E5E7EB', // Fallback gray
-                    color: statusTagFontColors[station.status] || COLORS.mainTextColor, // Fallback dark text
-                    fontWeight: FONTS.weights.normal
+                    color: statusTagFontColors[station.status] || COLORS.mainTextColor,
                 }}
             >
                 {station.status}
