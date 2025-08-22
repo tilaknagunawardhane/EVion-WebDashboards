@@ -64,7 +64,7 @@ export function AuthProvider({ children }) {
         // const res = await res1.json();
         // console.log('User role is:', res.data.data.roles);
 
-        // console.log('VerifyToken response:', res.data);
+        console.log('VerifyToken response:', res.data);
         if (!res.data?.data?.user) {
           throw new Error('Invalid user data in response');
         }
@@ -93,7 +93,7 @@ export function AuthProvider({ children }) {
         case 'support-officer':
           endpoint = '/api/auth/admin/login';
           break;
-        case 'station-owner':
+        case 'stationowner':
           endpoint = '/api/auth/station-owner/login';
           break;
         case 'ev-owner':
@@ -126,7 +126,7 @@ export function AuthProvider({ children }) {
         navigate('/admin/dashboard');
       } else if (res.data.userType === 'support-officer') {
         navigate('/support-officer/dashboard');
-      } else if (userType === 'station-owner') {
+      } else if (res.data.userType === 'stationowner') {
         try {
           const stationCheck = await axios.post(
             `${API_BASE_URL}/api/stations/check-stations`,
