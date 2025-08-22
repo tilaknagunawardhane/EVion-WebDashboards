@@ -259,7 +259,11 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
           charger_name: charger.name.trim(),
           power_type: charger.powerType,
           max_power_output: parseFloat(charger.maxPower),
-          connector_types: charger.connectors
+          price: parseFloat(charger.price) || 0,
+          connector_types: charger.connectors.map(connectorId => ({
+            connector: connectorId,
+            status: 'available'
+          }))
         }))
       };
 

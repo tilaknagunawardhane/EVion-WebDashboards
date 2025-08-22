@@ -6,8 +6,15 @@ import Button from '../../../components/ui/Button';
 import StationCard from '../components/stationComponents/StationCard';
 import AddChargingStationForm from '../../station-owner/components/stationComponents/RAddStationForm';
 import { FiSearch } from 'react-icons/fi';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../../../contexts/AuthContext';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function StationsPage() {
+    const { isStationOwner, currentUser } = useAuth();
     const [showForm, setShowForm] = useState(false);
     const [stations, setStations] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -15,157 +22,49 @@ export default function StationsPage() {
     const [stationToEdit, setStationToEdit] = useState(null);
     const [formMode, setFormMode] = useState('add-station');
 
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
-        
-            const mockData = [
-                {
-                    id: 's1',
-                    name: 'EviGO Charging Station Station',
-                    status: 'Open',
-                    address: '45 Peradeniya Road, Kandy',
-                    addressLine: '45 Peradeniya Road', // Added for editing
-                    city: 'Kandy', // Added for editing
-                    district: 'Kandy',
-                    location: { lat: 7.290, lng: 80.634 },
-                    electricityProvider: 'LECO',
-                    powerSource: 'Solar',
-                    chargers: [
-                        { name: 'HyperCharge Dual-Port DC', powerType: 'DC', maxPower: 150, connectors: ['CCS2', 'CHAdeMO'] },
-                        { name: 'FastCharge DC - Bay 01', powerType: 'DC', maxPower: 60, connectors: ['CCS2'] },
-                        { name: 'PowerFlow AC - Bay 02', powerType: 'AC', maxPower: 22, connectors: ['Type2'] },
-                    ],
-                    dateOfRequest: null, // Not applicable for 'Open'
-                },
-                {
-                    id: 's2',
-                    name: 'EVion Station – Galle',
-                    status: 'Open',
-                    address: '78 Lighthouse Street, Galle',
-                    addressLine: '78 Lighthouse Street', // Added for editing
-                    city: 'Galle', // Added for editing
-                    district: 'Galle', // Added for editing
-                    location: { lat: 6.033, lng: 80.217 },
-                    electricityProvider: 'CEB',
-                    powerSource: 'Hybrid',
-                    chargers: [
-                        { name: 'AC Port A', powerType: 'AC', maxPower: 11, connectors: ['Type 2'] },
-                        { name: 'AC Port B', powerType: 'AC', maxPower: 22, connectors: ['Type 2', 'Tesla'] },
-                        { name: 'AC Port C', powerType: 'AC', maxPower: 7, connectors: ['Type 1'] },
-                    ],
-                    dateOfRequest: null, // Not applicable for 'Open'
-                },
-                {
-                    id: 's3',
-                    name: 'EVion Station – Kandy',
-                    status: 'Closed',
-                    address: '45 Peradeniya Road, Kandy',
-                    addressLine: '45 Peradeniya Road',
-                    city: 'Kandy',
-                    district: 'Kandy',
-                    location: { lat: 7.291, lng: 80.635 },
-                    electricityProvider: 'CEB',
-                    powerSource: 'Grid',
-                    chargers: [
-                        { name: 'DC Fast Charger', powerType: 'DC', maxPower: 100, connectors: ['CCS2', 'CHAdeMO', 'Tesla'] },
-                    ],
-                    dateOfRequest: '15 Jun 10:30 AM', // Example date of request for a closed station
-                },
-                {
-                    id: 's4',
-                    name: 'EVion Station – Nugegoda',
-                    status: 'Pending Approval',
-                    address: '123 Highlevel Road, Nugegoda',
-                    addressLine: '123 Highlevel Road',
-                    city: 'Nugegoda',
-                    district: 'Colombo',
-                    location: { lat: 6.877, lng: 79.916 },
-                    electricityProvider: 'LECO',
-                    powerSource: 'Solar',
-                    chargers: [
-                        { name: 'Charger 1', powerType: 'AC', maxPower: 22, connectors: ['Type 2', 'Tesla'] },
-                        { name: 'Charger 2', powerType: 'DC', maxPower: 50, connectors: ['CCS2', 'CHAdeMO'] },
-                    ],
-                    dateOfRequest: '18 Jul 09:00 AM', // Date of request
-                },
-                {
-                    id: 's5',
-                    name: 'Colombo City Station',
-                    status: 'Approved - Waiting for Payment',
-                    address: '100 Galle Road, Colombo 3',
-                    addressLine: '100 Galle Road',
-                    city: 'Colombo 3',
-                    district: 'Colombo',
-                    location: { lat: 6.908, lng: 79.859 },
-                    electricityProvider: 'CEB',
-                    powerSource: 'Grid',
-                    chargers: [
-                        { name: 'Ultra Fast DC', powerType: 'DC', maxPower: 350, connectors: ['CCS2'] },
-                    ],
-                    dateOfRequest: '19 Jul 02:45 PM', // Date of request
-                },
-                {
-                    id: 's6',
-                    name: 'Airport Road Station',
-                    status: 'Pending Approval',
-                    address: '20 Airport Rd, Katunayake',
-                    addressLine: '20 Airport Rd',
-                    city: 'Katunayake',
-                    district: 'Gampaha',
-                    location: { lat: 7.185, lng: 79.870 },
-                    electricityProvider: 'LECO',
-                    powerSource: 'Grid',
-                    chargers: [
-                        { name: 'AC Charger A', powerType: 'AC', maxPower: 22, connectors: ['Type 2'] },
-                        { name: 'AC Charger B', powerType: 'AC', maxPower: 11, connectors: ['Type 2'] },
-                    ],
-                    dateOfRequest: '20 Jul 11:15 AM', // Date of request
-                },
-                {
-                    id: 's7',
-                    name: 'Kottawa Install Site',
-                    status: 'To be installed',
-                    address: 'Kottawa Industrial Zone, Kottawa',
-                    addressLine: 'Kottawa Industrial Zone',
-                    city: 'Kottawa',
-                    district: 'Colombo',
-                    location: { lat: 6.820, lng: 79.957 },
-                    electricityProvider: 'LECO',
-                    powerSource: 'Grid',
-                    chargers: [
-                        { name: 'Future DC Charger', powerType: 'DC', maxPower: 75, connectors: ['CCS2'] },
-                    ],
-                    dateOfRequest: '05 Jul 04:00 PM', // Date of request
-                },
-                {
-                    id: 's8',
-                    name: 'Jaffna New Location',
-                    status: 'To be installed',
-                    address: '15 Main Street, Jaffna',
-                    addressLine: '15 Main Street',
-                    city: 'Jaffna',
-                    district: 'Jaffna',
-                    location: { lat: 9.661, lng: 80.025 },
-                    electricityProvider: 'CEB',
-                    powerSource: 'Solar',
-                    chargers: [
-                        { name: 'Jaffna AC', powerType: 'AC', maxPower: 22, connectors: ['Type 2'] },
-                        { name: 'Jaffna DC', powerType: 'DC', maxPower: 50, connectors: ['CHAdeMO'] },
-                    ],
-                    dateOfRequest: '10 Jul 01:00 PM', // Date of request
-                },
-            ];
+        if (!isStationOwner) {
+            toast.error('You must be a station owner to view this page');
+            navigate('/auth?mode=login');
+            return;
+        }
+        const fetchStations = async () => {
+            try {
+                setLoading(true);
 
-            // Assign unique IDs if missing in mock data (good practice)
-            const stationsWithIds = mockData.map((s, index) => ({
-                ...s,
-                id: s.id || `mock-${index + 1}`
-            }));
+                // console.log('Fetching stations for:', currentUser);
+                const userID = localStorage.getItem('userID');
+                const response = await axios.get(`${API_BASE_URL}/api/stations/owner-stations`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    params: {
+                        stationOwnerId: userID, // Example query parameter
+                    }
+                });
 
-            setStations(stationsWithIds);
-            
-    }, []);
+                if (response.data.success) {
+                setStations(response.data.data);
+                } else {
+                toast.error('Failed to fetch stations');
+                }
+            } catch (error) {
+                console.error('Error fetching stations:', error);
+                toast.error(error.response?.data?.message || 'Error fetching stations');
+                if (error.response?.status === 401) {
+                navigate('/auth?mode=login');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStations();
+    }, [navigate, isStationOwner]);
 
     const handleAddStationClick = () => {
         setStationToEdit(null); // Clear any station being edited
@@ -180,22 +79,10 @@ export default function StationsPage() {
     };
 
     const handleCardClick = (station) => {
-        // Only navigate if the status doesn't use the card's click for expansion
-        if (!['Pending Approval', 'To be installed', 'Approved - Waiting for Payment'].includes(station.status)) {
-            navigate(`/station-owner/stations/stationprofile/${station.id}`);
-        }
-    };
-
-    const handlePayNow = (station) => {
-        console.log('Initiating payment for station:', station.name, station.id);
-        alert(`Payment for ${station.name} initiated! (This is a mock action)`);
-        // In a real app, after successful payment, you'd update the station's status
-        // For mock, let's change status to 'To be installed'
-        setStations(prevStations =>
-            prevStations.map(s =>
-                s.id === station.id ? { ...s, status: 'To be installed' } : s
-            )
-        );
+        // if (!['To be installed'].includes(station.status)) {
+        //   navigate(`/station-owner/stations/stationprofile/${station.id}`);
+        // }
+        navigate(`/station-owner/stations/stationprofile/${station.id}`);
     };
 
     const filteredStations = stations.filter(station => 
@@ -207,12 +94,12 @@ export default function StationsPage() {
 
     const categorizeStations = (stationsList) => {
         const categories = {
-            'Open': [],
-            'Approved - Waiting for Payment': [],
-            'To be installed': [],
-            'Pending Approval': [],
-            'Closed': [],
-            'Other': [],
+            'open': [],
+            'unavailable': [],
+            'disabled_by_SO': [],
+            'deleted': [],
+            'processing': [],
+            'Other': []
         };
 
         stationsList.forEach(station => {
@@ -242,7 +129,6 @@ export default function StationsPage() {
                             key={station.id} // Use station.id for key
                             station={station}
                             onClick={() => handleCardClick(station)}
-                            onPay={handlePayNow}
                             onEditStation={handleEditStation}
                         />
                     ))}
@@ -250,6 +136,15 @@ export default function StationsPage() {
             </div>
         );
     };
+
+    if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen" style={{ fontFamily: FONTS.family.sans, backgroundColor: COLORS.background }}>
+        <p>Loading stations...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 ml-4"></div>
+      </div>
+    );
+  }
 
     const handleFormSubmit = (submissionData) => {
         if (submissionData.type === 'add-station') {
@@ -317,8 +212,8 @@ export default function StationsPage() {
             <StationOwnerPageHeader title="Charging Stations" />
 
             <div className="p-0 w-full max-w-6xl mx-auto space-y-6 ">
-                <div className="flex flex-start items-center justify-between">
-                    <div className="relative flex items-center w-full max-w-sm mr-4"> {/* Added mr-4 for spacing */}
+                <div className="flex items-center justify-between">
+                    <div className="relative flex items-center w-full max-w-sm mr-4">
                         <FiSearch size={16} color={COLORS.secondaryText} className="absolute left-3" />
                         <input
                             type="text"
@@ -340,56 +235,22 @@ export default function StationsPage() {
                 </div>
 
                 
-                <>
-                    {renderStationSection('Open Stations', categorizedStations['Open'])}
-                    {renderStationSection('Approved - Waiting for Payment', categorizedStations['Approved - Waiting for Payment'])}
-                    {renderStationSection('To be installed', categorizedStations['To be installed'])}
-                    {renderStationSection('Pending Approval', categorizedStations['Pending Approval'])}
-                    {renderStationSection('Closed Stations', categorizedStations['Closed'])}
-                    {categorizedStations['Other'].length > 0 && renderStationSection('Other Stations', categorizedStations['Other'])}
-
-                    {stations.length === 0 && (
-                        <div className="text-center py-8" style={{ color: COLORS.secondaryText }}>
-                            No charging stations found. Click "Add Charging Station" to get started!
-                        </div>
-                    )}
-                </>
+                {stations.length === 0 ? (
+                    <div className="text-center py-8" style={{ color: COLORS.secondaryText }}>
+                        No charging stations found. Click "Add Charging Station" to get started!
+                    </div>
+                    ) : (
+                    <>
+                        {renderStationSection('Open Stations', categorizedStations['open'])}
+                        {renderStationSection('Processing Station Requests', categorizedStations['processing'])}
+                        {renderStationSection('Unavailable Stations', categorizedStations['unavailable'])}
+                        {renderStationSection('Disabled by Station Owner', categorizedStations['disabled_by_SO'])}
+                        {renderStationSection('Deleted Stations', categorizedStations['deleted'])}
+                        {categorizedStations['Other'].length > 0 && renderStationSection('Other Stations', categorizedStations['Other'])}
+                    </>
+                )}
             </div>
 
-            {/* {showForm && (
-                <AddChargingStationForm
-                    onClose={() => setShowForm(false)}
-                    onSubmit={(newStation) => {
-                        const newId = `s${stations.length + 1}-${Date.now()}`; // More robust temp ID
-                        const now = new Date();
-                        const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
-                        const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-
-                        setStations((prev) => [
-                            ...prev,
-                            {
-                                ...newStation,
-                                id: newId,
-                                status: 'Pending Approval', // New stations start here
-                                dateOfRequest: `${dateString} ${timeString}`,
-                                name: newStation.name || 'Unnamed Station', // Provide a default if name is missing
-                                address: newStation.address || 'No Address Provided', // Provide a default
-                                
-                                electricityProvider: newStation.electricityProvider || 'N/A', // Add defaults for other expected fields
-                                powerSource: newStation.powerSource || 'N/A',
-                                chargers: newStation.chargers || [], // Ensure it's an array
-                                
-                                ...newStation,
-                                
-                            
-                            }
-                        ]);
-                        setShowForm(false);
-                    }}
-                    mode="add-station"
-                    initialFormData={null}
-                />
-            )} */}
             {showForm && (
                 <AddChargingStationForm
                     onClose={() => {

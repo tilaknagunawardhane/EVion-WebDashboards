@@ -1,18 +1,16 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { COLORS, FONTS } from '../../../../constants';
-import UserIcon from '../../../../assets/user_icon.svg';
+import UserIcon from '../../../../assets/connectors.svg';
 
-export default function MainRequestCard({ request }) {
-    const navigate = useNavigate();
+export default function MainRequestCard({ request, onClick }) {
 
     // Status color configuration
     const statusColors = {
-        'NEW': {
+        'PROCESSING': {
             bg: `${COLORS.primary}20`,
             text: COLORS.primary
         },
-        'IN-PROGRESS': {
+        'TO_BE_INSTALLED': {
             bg: `${COLORS.HighlightText}20`,
             text: COLORS.HighlightText
         },
@@ -22,14 +20,9 @@ export default function MainRequestCard({ request }) {
         }
     };
 
-    const currentStatus = request.status || 'NEW';
-    const statusColor = statusColors[currentStatus] || statusColors['NEW'];
-
-
-    const handleCardClick = () => {
-        // Add type parameter to navigation
-        navigate(`/admin/stations/requests/${request.type}/${request.id}`);
-    };
+    // const currentStatus = request.status || 'NEW';
+    const currentStatus = request.status;
+    const statusColor = statusColors[currentStatus] || statusColors['PROCESSING'];
 
     return (
         <div
@@ -37,7 +30,7 @@ export default function MainRequestCard({ request }) {
             style={{
                 borderColor: COLORS.stroke
             }}
-            onClick={handleCardClick}
+            onClick={onClick}
         >
             {/* User Info with Icon and Right-aligned New User badge */}
             <div className="flex justify-between items-center mb-4"> {/* Changed from items-start to items-center */}
@@ -49,15 +42,15 @@ export default function MainRequestCard({ request }) {
                             className="w-5 h-5"
                             style={{
                                 filter: `
-            brightness(0) 
-            saturate(100%) 
-            invert(67%) 
-            sepia(48%) 
-            saturate(718%) 
-            hue-rotate(123deg) 
-            brightness(95%) 
-            contrast(101%)
-          `,
+                                    brightness(0) 
+                                    saturate(100%) 
+                                    invert(67%) 
+                                    sepia(48%) 
+                                    saturate(718%) 
+                                    hue-rotate(123deg) 
+                                    brightness(95%) 
+                                    contrast(101%)
+                                `,
                             }}
                         />
                     </div>
@@ -66,15 +59,15 @@ export default function MainRequestCard({ request }) {
                             color: COLORS.mainTextColor,
                             fontFamily: FONTS.family.sans
                         }}>
-                            {request.userName || 'John Doe'}
+                            {request.chargerData.charger_name || 'John Doe'}
                         </h3>
-                        {request.userType === 'New User' && (
+                        {request.stationType === 'New Station' && (
                             <span className="text-xs px-2 py-1 rounded-full whitespace-nowrap" style={{
                                 color: COLORS.background,
                                 fontFamily: FONTS.family.sans,
                                 backgroundColor: COLORS.primary,
                             }}>
-                                New User
+                                New Station
                             </span>
                         )}
                     </div>
@@ -83,32 +76,45 @@ export default function MainRequestCard({ request }) {
 
             {/* Station Info */}
             <div className="mb-4">
-                <h4 className="text-sm font-medium" style={{
+                <h4 className="text-sm font-medium mb-4" style={{
                     color: COLORS.mainTextColor,
                     fontFamily: FONTS.family.sans,
-                    marginBottom: '4px'
                 }}>
                     {request.stationName || 'EV Charging Station'}
                 </h4>
+                <div className="flex justify-between items-center mb-1">
+                    <p className="text-xs" style={{
+                        color: COLORS.secondaryText,
+                        fontFamily: FONTS.family.sans
+                    }}>
+                        {request.powerType} Charger
+                    </p>
+                    <p className="text-xs" style={{
+                        color: COLORS.secondaryText,
+                        fontFamily: FONTS.family.sans
+                    }}>
+                        Power Output: {request.power} kWh
+                    </p>
+                </div>
                 <p className="text-xs" style={{
                     color: COLORS.secondaryText,
                     fontFamily: FONTS.family.sans
                 }}>
-                    {request.stationAddress || 'No.24, Joshep Road, Wellpanna'}
+                    Unit Price: LKR {request.chargerData.price}
                 </p>
             </div>
 
-            {/* Chargers Requested */}
+            {/* Connectors Requested */}
             <div className="mb-4">
                 <p className="text-xs" style={{
                     color: COLORS.mainTextColor,
                     fontFamily: FONTS.family.sans
                 }}>
-                    No. of Chargers Requested: <span style={{
+                    Connectors Requested: <span style={{
                         color: COLORS.mainTextColor,
                         fontWeight: FONTS.weights.medium
                     }}>
-                        {request.chargersRequested || '02'}
+                        {request.connectorType || '02'}
                     </span>
                 </p>
             </div>
@@ -121,7 +127,7 @@ export default function MainRequestCard({ request }) {
                     fontFamily: FONTS.family.sans,
                     fontWeight: FONTS.weights.medium
                 }}>
-                    {currentStatus}
+                    {currentStatus.replace('_', ' ').replace('_', '  ')}
                 </span>
 
                 <div className="text-xs" style={{

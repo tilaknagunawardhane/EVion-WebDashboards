@@ -81,37 +81,37 @@ export default function StepOneForm({
         </div>
 
         <div className="w-full relative rounded-lg overflow-hidden border"
-                      style={{ borderColor: errors.location ? COLORS.danger : COLORS.stroke }}>
-                    <img
-                        src={MapPlaceholderImage} // Your map image
-                        alt="Map Placeholder"
-                        className="w-full h-32 object-cover" // Adjust height as needed
-                    />
-                    <button
-                        type="button"
-                        onClick={onSetLocationClick}
-                        style={{color:COLORS.mainTextColor}}
-                        className="absolute inset-0 flex items-center justify-center font-semibold text-lg bg-black/5 bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
-                    >
-                        {locationData ? (
-                            `Location Set: ${locationData.lat.toFixed(3)}, ${locationData.lng.toFixed(3)}`
-                        ) : (
-                            'Set Location on Map'
-                        )}
-                        {/* Optional: Add a checkmark icon if locationData is set */}
-                    </button>
-                    {errors.location && (
-                        <p
-                            className="mt-1 absolute -bottom-6 left-0" // Position error message
-                            style={{
-                                color: COLORS.danger,
-                                fontSize: FONTS.sizes.sm
-                            }}
-                        >
-                            {errors.location}
-                        </p>
-                    )}
-                </div>
+            style={{ borderColor: errors.location ? COLORS.danger : COLORS.stroke }}>
+            <img
+                src={MapPlaceholderImage} // Your map image
+                alt="Map Placeholder"
+                className="w-full h-32 object-cover" // Adjust height as needed
+            />
+            <button
+                type="button"
+                onClick={onSetLocationClick}
+                style={{color:COLORS.mainTextColor}}
+                className="absolute inset-0 flex items-center justify-center font-semibold text-lg bg-black/5 bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
+            >
+                {locationData ? (
+                    `Location Set: ${locationData.lat.toFixed(3)}, ${locationData.lng.toFixed(3)}`
+                ) : (
+                    'Set Location on Map'
+                )}
+                {/* Optional: Add a checkmark icon if locationData is set */}
+            </button>
+            {errors.location && (
+                <p
+                    className="mt-1 absolute -bottom-6 left-0" // Position error message
+                    style={{
+                        color: COLORS.danger,
+                        fontSize: FONTS.sizes.sm
+                    }}
+                >
+                    {errors.location}
+                </p>
+            )}
+        </div>
 
         <div className="flex gap-2">
           <div className="w-full">

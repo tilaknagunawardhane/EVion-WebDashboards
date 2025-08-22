@@ -80,30 +80,41 @@ export default function ChargerForm({
                   )}
                 </div>
 
-                <InputField
-                  label="Maximum Power Output (kW)"
-                  type="number"
-                  value={charger.maxPower}
-                  onChange={(e) => {
-                    // Ensure value stays within bounds
-                    let value = e.target.value;
-                    if (value !== '') {
-                      value = Math.max(1, Math.min(1000, Number(value)));
-                    }
-                    handleChargerChange(index, 'maxPower', value);
-                  }}
-                  placeholder="e.g., 22"
-                  error={errors.chargers?.[index]?.maxPower}
-                  required
-                  min={1}
-                  max={1000}
-                  onBlur={(e) => {
-                    // If field is empty after blur, set to minimum value
-                    if (e.target.value === '') {
-                      handleChargerChange(index, 'maxPower', 1);
-                    }
-                  }}
-                />
+                <div className="flex gap-2">
+                    <InputField
+                      label="Maximum Power Output (kW)"
+                      type="number"
+                      value={charger.maxPower}
+                      onChange={(e) => {
+                        // Ensure value stays within bounds
+                        let value = e.target.value;
+                        if (value !== '') {
+                          value = Math.max(1, Math.min(1000, Number(value)));
+                        }
+                        handleChargerChange(index, 'maxPower', value);
+                      }}
+                      placeholder="e.g., 22"
+                      error={errors.chargers?.[index]?.maxPower}
+                      required
+                      min={1}
+                      max={1000}
+                      onBlur={(e) => {
+                        // If field is empty after blur, set to minimum value
+                        if (e.target.value === '') {
+                          handleChargerChange(index, 'maxPower', 1);
+                        }
+                      }}
+                    />
+
+                    <InputField
+                      label="Price per kWh"
+                      placeholder="Enter price per kWh"
+                      value={charger.price}
+                      onChange={(e) => handleChargerChange(index, 'price', e.target.value)}
+                      error={errors.chargers?.[index]?.price}
+                      required
+                    />
+                </div>
 
                 <div>
                   <div className="flex items-center gap-1 mb-1">
