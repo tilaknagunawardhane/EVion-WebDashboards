@@ -54,7 +54,7 @@ export default function AdminLogins() {
     // const userData = { email, role: 'station-owner' }; // Adjust role based on your logic
     // login(userData);
 
-    loginA(email, password, 'station-owner');
+    loginA(email, password, 'stationowner');
 
     // navigate('/profilesetup');
   };
