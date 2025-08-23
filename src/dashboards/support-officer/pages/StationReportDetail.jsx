@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import { FONTS, COLORS } from "../../../constants";
@@ -10,6 +10,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function StationReportDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { isSupportOfficer } = useAuth();
     const [report, setReport] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -17,6 +18,8 @@ export default function StationReportDetail() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [rejectedReason, setRejectedReason] = useState('');
+
+            const userId = location.state?.userId;
 
     useEffect(() => {
         if (!isSupportOfficer) {
@@ -29,6 +32,7 @@ export default function StationReportDetail() {
 
     const fetchReportDetails = async () => {
         try {
+            console.log("Fetched userId from state:", userId);
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/api/reports/report-details/stations/${id}`, {
                 headers: {
@@ -37,7 +41,7 @@ export default function StationReportDetail() {
             });
 
             if (!response.ok) throw new Error('Failed to fetch report details');
-            
+
             const data = await response.json();
             if (data.success) {
                 setReport(data.data);
@@ -59,7 +63,7 @@ export default function StationReportDetail() {
         setIsSubmitting(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/api/reports/reports/stations/${id}/status`, {
+            const response = await fetch(`${API_BASE_URL}/api/reports/save-report-action/stations/${id}/action`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -67,7 +71,8 @@ export default function StationReportDetail() {
                 },
                 body: JSON.stringify({
                     status: 'resolved',
-                    action
+                    action,
+                    resolved_by: userId || 'Support Officer'
                 })
             });
 
@@ -98,7 +103,7 @@ export default function StationReportDetail() {
         setIsSubmitting(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/api/reports/reports/stations/${id}/status`, {
+            const response = await fetch(`${API_BASE_URL}/api/reports/save-report-action/stations/${id}/action`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -106,7 +111,7 @@ export default function StationReportDetail() {
                 },
                 body: JSON.stringify({
                     status: 'rejected',
-                    action: action || 'Report rejected', // Action is optional for rejection
+                    action: action || 'Report rejected',
                     rejected_reason: rejectedReason
                 })
             });
@@ -137,7 +142,7 @@ export default function StationReportDetail() {
     return (
         <div style={{ fontFamily: FONTS.family.sans, padding: '24px', backgroundColor: COLORS.background }}>
             <PageHeader title={`Station Report - ${report.category}`} />
-            
+
             {/* Reject Modal */}
             {showRejectModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -179,7 +184,7 @@ export default function StationReportDetail() {
                 <div className="lg:col-span-2">
                     <div className="bg-white rounded-lg shadow p-6 mb-6">
                         <h2 className="text-xl font-semibold mb-4">Report Details</h2>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label className="block text-sm font-medium" style={{ color: COLORS.secondaryText }}>Report ID</label>
@@ -214,8 +219,8 @@ export default function StationReportDetail() {
                                 <label className="block text-sm font-medium text-gray-700">Attachments</label>
                                 <div className="mt-2 space-y-2">
                                     {report.attachments.map((attachment, index) => (
-                                        <a key={index} href={attachment} target="_blank" rel="noopener noreferrer" 
-                                           className="text-blue-600 hover:text-blue-800 text-sm block">
+                                        <a key={index} href={attachment} target="_blank" rel="noopener noreferrer"
+                                            className="text-blue-600 hover:text-blue-800 text-sm block">
                                             Attachment {index + 1}
                                         </a>
                                     ))}
@@ -237,7 +242,7 @@ export default function StationReportDetail() {
                 <div className="lg:col-span-1">
                     <div className="bg-white rounded-lg shadow p-6 sticky top-6">
                         <h3 className="text-lg font-semibold mb-4">Resolution Actions</h3>
-                        
+
                         {report.status === 'under-review' && (
                             <>
                                 <div className="mb-4">

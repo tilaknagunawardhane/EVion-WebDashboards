@@ -10,6 +10,7 @@ import FaultReportRightPanel from "../components/FaultReportRightPanel";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../../../contexts/AuthContext';
+import { User } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -205,11 +206,14 @@ export default function FaultReportsPage() {
     };
 
     const handleRowClick = (row) => {
+        const userId = localStorage.getItem('userID');
+        console.log("currentUser id is", userId);
         navigate(`/support-officer/fault-reports/${activeTab}/${row['Report ID']}`, { 
             state: { 
                 reportData: row,
-                reportType: activeTab 
-            } 
+                reportType: activeTab,
+                userId: userId
+            }
         });
     };
 
