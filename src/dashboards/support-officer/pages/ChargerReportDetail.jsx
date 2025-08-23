@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import { FONTS, COLORS } from "../../../constants";
@@ -10,6 +10,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function ChargerReportDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { isSupportOfficer } = useAuth();
     const [report, setReport] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -18,10 +19,12 @@ export default function ChargerReportDetail() {
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [rejectedReason, setRejectedReason] = useState('');
 
+    const userId = location.state?.userId;
+
     useEffect(() => {
         if (!isSupportOfficer) {
             toast.error('Access denied');
-            navigate('/support-officer/fault-reports');
+            navigate('/support-officer/faultReports');
             return;
         }
         fetchReportDetails();
@@ -37,7 +40,7 @@ export default function ChargerReportDetail() {
             });
 
             if (!response.ok) throw new Error('Failed to fetch report details');
-            
+
             const data = await response.json();
             if (data.success) {
                 setReport(data.data);
@@ -59,7 +62,7 @@ export default function ChargerReportDetail() {
         setIsSubmitting(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/api/reports/reports/chargers/${id}/status`, {
+            const response = await fetch(`${API_BASE_URL}/api/reports/save-report-action/chargers/${id}/action`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -67,14 +70,16 @@ export default function ChargerReportDetail() {
                 },
                 body: JSON.stringify({
                     status: 'resolved',
-                    action
+                    action,
+                    resolved_by: userId || 'Support Officer'
+
                 })
             });
 
             const data = await response.json();
             if (data.success) {
                 toast.success('Report marked as resolved');
-                navigate('/support-officer/fault-reports');
+                navigate('/support-officer/faultReports');
             } else {
                 throw new Error(data.message);
             }
@@ -98,7 +103,7 @@ export default function ChargerReportDetail() {
         setIsSubmitting(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/api/reports/reports/chargers/${id}/status`, {
+            const response = await fetch(`${API_BASE_URL}/api/reports/save-report-action/chargers/${id}/action`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -107,14 +112,17 @@ export default function ChargerReportDetail() {
                 body: JSON.stringify({
                     status: 'rejected',
                     action: action || 'Report rejected',
-                    rejected_reason: rejectedReason
+                    rejected_reason: rejectedReason,
+                    resolved_by: userId || 'Support Officer'
+
                 })
             });
 
             const data = await response.json();
             if (data.success) {
                 toast.success('Report rejected successfully');
-                navigate('/support-officer/fault-reports');
+                navigate('/support-officer/faultReports');
+
             } else {
                 throw new Error(data.message);
             }
@@ -137,7 +145,7 @@ export default function ChargerReportDetail() {
     return (
         <div style={{ fontFamily: FONTS.family.sans, padding: '24px', backgroundColor: COLORS.background }}>
             <PageHeader title={`Charger Report - ${report.category}`} />
-            
+
             {/* Reject Modal */}
             {showRejectModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -179,7 +187,7 @@ export default function ChargerReportDetail() {
                 <div className="lg:col-span-2">
                     <div className="bg-white rounded-lg shadow p-6 mb-6">
                         <h2 className="text-xl font-semibold mb-4">Report Details</h2>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label className="block text-sm font-medium" style={{ color: COLORS.secondaryText }}>Report ID</label>
@@ -214,8 +222,8 @@ export default function ChargerReportDetail() {
                                 <label className="block text-sm font-medium" style={{ color: COLORS.secondaryText }}>Attachments</label>
                                 <div className="mt-2 space-y-2">
                                     {report.attachments.map((attachment, index) => (
-                                        <a key={index} href={attachment} target="_blank" rel="noopener noreferrer" 
-                                           className="text-blue-600 hover:text-blue-800 text-sm block">
+                                        <a key={index} href={attachment} target="_blank" rel="noopener noreferrer"
+                                            className="text-blue-600 hover:text-blue-800 text-sm block">
                                             Attachment {index + 1}
                                         </a>
                                     ))}
@@ -254,7 +262,7 @@ export default function ChargerReportDetail() {
                 <div className="lg:col-span-1">
                     <div className="bg-white rounded-lg shadow p-6 sticky top-6">
                         <h3 className="text-lg font-semibold mb-4">Resolution Actions</h3>
-                        
+
                         {report.status === 'under-review' && (
                             <>
                                 <div className="mb-4">

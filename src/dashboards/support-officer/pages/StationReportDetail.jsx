@@ -19,12 +19,12 @@ export default function StationReportDetail() {
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [rejectedReason, setRejectedReason] = useState('');
 
-            const userId = location.state?.userId;
+    const userId = location.state?.userId;
 
     useEffect(() => {
         if (!isSupportOfficer) {
             toast.error('Access denied');
-            navigate('/support-officer/fault-reports');
+            navigate('/support-officer/faultReports');
             return;
         }
         fetchReportDetails();
@@ -32,7 +32,7 @@ export default function StationReportDetail() {
 
     const fetchReportDetails = async () => {
         try {
-            console.log("Fetched userId from state:", userId);
+            // console.log("Fetched userId from state:", userId);
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/api/reports/report-details/stations/${id}`, {
                 headers: {
@@ -79,7 +79,7 @@ export default function StationReportDetail() {
             const data = await response.json();
             if (data.success) {
                 toast.success('Report marked as resolved');
-                navigate('/support-officer/fault-reports');
+                navigate('/support-officer/faultReports');
             } else {
                 throw new Error(data.message);
             }
@@ -112,14 +112,16 @@ export default function StationReportDetail() {
                 body: JSON.stringify({
                     status: 'rejected',
                     action: action || 'Report rejected',
-                    rejected_reason: rejectedReason
+                    rejected_reason: rejectedReason,
+                    resolved_by: userId || 'Support Officer'
                 })
             });
 
             const data = await response.json();
             if (data.success) {
                 toast.success('Report rejected successfully');
-                navigate('/support-officer/fault-reports');
+                navigate('/support-officer/faultReports');
+
             } else {
                 throw new Error(data.message);
             }
