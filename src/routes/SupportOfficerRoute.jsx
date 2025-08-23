@@ -8,7 +8,7 @@ export default function SupportOfficerRoute({ children }) {
     return <Navigate to="/auth?mode=supportofficerlogin" replace />
   }
 
-  if (currentUser.role !== 'support-officer') {
+  if (currentUser !== 'supportofficer') {
     return <Navigate to="/" replace />
   }
 

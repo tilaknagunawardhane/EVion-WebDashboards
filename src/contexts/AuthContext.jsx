@@ -90,8 +90,10 @@ export function AuthProvider({ children }) {
       let endpoint;
       switch (userType) {
         case 'admin':
-        case 'support-officer':
           endpoint = '/api/auth/admin/login';
+          break;
+        case 'supportofficer':
+          endpoint = '/api/auth/support-officer/login';
           break;
         case 'stationowner':
           endpoint = '/api/auth/station-owner/login';
@@ -124,7 +126,7 @@ export function AuthProvider({ children }) {
         // const currentUser = 'admin'
 
         navigate('/admin/dashboard');
-      } else if (res.data.userType === 'support-officer') {
+      } else if (res.data.userType === 'supportofficer') {
         navigate('/support-officer/dashboard');
       } else if (res.data.userType === 'stationowner') {
         try {
@@ -238,7 +240,7 @@ export function AuthProvider({ children }) {
       currentUser, login, logout, loading, loginA,
       // isAdmin: currentUser?.userType === 'admin',
       isAdmin: currentUser === 'admin',
-      isSupportOfficer: currentUser?.role === 'support-officer',
+      isSupportOfficer: currentUser === 'supportofficer',
       isStationOwner: currentUser === 'stationowner'
     }}>
       {children}
