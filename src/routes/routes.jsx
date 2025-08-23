@@ -36,6 +36,9 @@ import FaultReportDetailPage from '../dashboards/support-officer/pages/FaultRepo
 import AfterAcceptedPage from '../dashboards/support-officer/pages/AfterAccepted'
 import CommunityPage from '../dashboards/support-officer/pages/Community'
 import UserChatPage from '../dashboards/support-officer/pages/UserChat'
+import StationReportDetailsPage from '../dashboards/support-officer/pages/StationReportDetail'
+import ChargerReportDetailsPage from '../dashboards/support-officer/pages/ChargerReportDetail'
+import BookingReportDetailPage from '../dashboards/support-officer/pages/BookingReportDetail'
 
 import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/StationProfile'
 import OwnerViewCharger from '../dashboards/station-owner/pages/chargerPages/ChargerProfile'
@@ -102,7 +105,11 @@ const router = createBrowserRouter([
           { path: 'UserChat', element:<UserChatPage /> },
           { path: 'AfterAccepted', element:<AfterAcceptedPage /> },
           { path: 'community', element: <CommunityPage />},
-          { path: 'tasks', element: <TasksPage /> }
+          { path: 'tasks', element: <TasksPage /> },
+          { path: 'fault-reports/stations/:id', element: <StationReportDetailsPage /> },
+          { path: 'fault-reports/chargers/:id', element: <ChargerReportDetailsPage /> },
+          { path: 'fault-reports/bookings/:id', element: <BookingReportDetailPage /> },
+
         ]
       }
     ]
