@@ -1,133 +1,343 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 import ChatList from '../components/chats/ChatList';
 import ChatHeader from '../components/chats/ChatHeader';
 import ChatMessage from '../components/chats/ChatMessage';
 import ChatInput from '../components/chats/ChatInput';
 import { COLORS, FONTS } from '../../../constants';
 import StationOwnerPageHeader from '../components/StationOwnerPageHeader';
+import { useAuth } from '../../../contexts/AuthContext';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ChatPage = () => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [chatList, setChatList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [sending, setSending] = useState(false);
+    const navigate = useNavigate();
+    const { currentUser, isStationOwner, isAdmin, isSupportOfficer } = useAuth();
 
-    // Initialize chat data
+    // Check user authentication and role
     useEffect(() => {
-        setChatList([
-        {
-            id: 1,
-            name: 'Platform Manager',
-            lastMessage: 'You: Request to add a new charger!',
-            category: 'Station and Charger Management',
-            time: '12:38',
-            unread: 3,
-            avatar: 'PM',
-            status: 'online',
-            isUnread: true,
-            messages: [
-            {
-                id: 1,
-                type: 'stationAddition',
-                stationName: 'EVion Station - Colombo 7',
-                address: '123 Green Lane, Colombo 07',
-                stationImage: 'https://images.unsplash.com/photo-1703860271509-b50f5679f2a0?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                time: '12:42',
-                isCurrentUser: true
-            },
-            {
-                id: 3,
-                type: 'text',
-                text: 'Thanks for joining the Evion Network!',
-                time: '12:42',
-                isCurrentUser: false,
-            },
-            {
-                id: 2,
-                type: 'chargerAddition',
-                stationName: 'EVion Station - Colombo 7',
-                address: '123 Green Lane, Colombo 07',
-                stationImage: 'https://images.unsplash.com/photo-1616361715039-11dde2199a21?q=80&w=1746&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                time: '13:28',
-                isCurrentUser: true
-            },
-
-            ]
-        },
-        {
-            id: 2,
-            name: 'Support Officer',
-            lastMessage: 'A new fault was reported!',
-            category: 'Handle Fault Reports',
-            time: '11:45',
-            unread: 0,
-            avatar: 'SO',
-            status: 'offline',
-            isUnread: false,
-            messages: [
-            {
-                id: 1,
-                type: 'faultReport',
-                stationName: 'EVion Station - Kandy',
-                address: '45 Hill Street, Kandy',
-                stationImage: 'https://images.unsplash.com/photo-1616361715039-11dde2199a21?q=80&w=1746&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                time: '11:45',
-                isCurrentUser: false
-            }
-            ]
+        if (!currentUser) {
+            toast.error('Please login to access chats', {
+                position: "top-right",
+                autoClose: 3000
+            });
+            navigate('/auth?mode=login');
+            return;
         }
-        ]);
-    }, []);
 
-    // When a chat is selected, load its messages and mark as read
-    const handleSelectChat = (chat) => {
-        setSelectedChat(chat);
-        setMessages(chat.messages || []);
+        if (!isStationOwner && !isAdmin && !isSupportOfficer) {
+            toast.error('Access denied. Required role not found.', {
+                position: "top-right",
+                autoClose: 3000
+            });
+            navigate('/');
+            return;
+        }
 
-        // Mark as read if there were unread messages
-        if (chat.unread > 0) {
-            setChatList(prevChats =>
-                prevChats.map(c =>
-                    c.id === chat.id
-                        ? { ...c, unread: 0, isUnread: false }
-                        : c
-                )
+        fetchUserChats();
+    }, [currentUser, isStationOwner, isAdmin, isSupportOfficer, navigate]);
+
+    // Fetch user chats from backend
+    const fetchUserChats = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('accessToken');
+            const userId = localStorage.getItem('userID');
+
+            const response = await axios.get(
+                `${API_BASE_URL}/api/chats/user/${userId}`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
             );
+
+            if (response.data.success) {
+                const formattedChats = response.data.data.map(chat => ({
+                    id: chat._id,
+                    name: getChatTitle(chat),
+                    lastMessage: chat.lastMessage?.text || 'No messages yet',
+                    category: getChatCategory(chat.topic),
+                    time: chat.lastMessage?.timestamp 
+                        ? new Date(chat.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : '--:--',
+                    unread: getUnreadCount(chat._id),
+                    avatar: getAvatarInitials(chat),
+                    status: 'online', // You can implement real status later
+                    isUnread: getUnreadCount(chat._id) > 0,
+                    rawChat: chat // Store original chat data for reference
+                }));
+
+                setChatList(formattedChats);
+            } else {
+                toast.error('Failed to load chats');
+            }
+        } catch (error) {
+            console.error('Error fetching chats:', error);
+            if (error.response?.status === 401) {
+                navigate('/auth?mode=login');
+            } else {
+                toast.error('Error loading chats');
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleSendMessage = (text) => {
-        if (!selectedChat) return;
+    // Fetch messages for a specific chat
+    const fetchChatMessages = async (chatId) => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            
+            const response = await axios.get(
+                `${API_BASE_URL}/api/chats/${chatId}/messages`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
 
-        const newMessage = {
-            id: Date.now(), // Better unique ID
-            text,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isCurrentUser: true
-        };
+            if (response.data.success) {
+                const formattedMessages = response.data.data.map(msg => ({
+                    id: msg._id,
+                    type: msg.messageType === 'system' ? 'system' : 'text',
+                    text: msg.message,
+                    time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    isCurrentUser: msg.sender.user_id === localStorage.getItem('userID'),
+                    // For system messages (station/charger additions)
+                    ...(msg.messageType === 'system' && parseSystemMessage(msg.message))
+                }));
 
-        // Update messages for current view
-        setMessages(prev => [...prev, newMessage]);
-
-        // Update the chat list's last message
-        setChatList(prevChats =>
-            prevChats.map(chat =>
-                chat.id === selectedChat.id
-                    ? {
-                        ...chat,
-                        lastMessage: text,
-                        time: 'Just now',
-                        messages: [...chat.messages, newMessage]
-                    }
-                    : chat
-            )
-        );
+                setMessages(formattedMessages);
+                
+                // Mark messages as seen
+                await markMessagesAsSeen(chatId);
+            }
+        } catch (error) {
+            console.error('Error fetching messages:', error);
+            toast.error('Failed to load messages');
+        }
     };
+
+    // Mark messages as seen
+    const markMessagesAsSeen = async (chatId) => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const userId = localStorage.getItem('userID');
+            
+            await axios.put(
+                `${API_BASE_URL}/api/chats/${chatId}/mark-seen`,
+                { userId },
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+
+            // Update local chat list to remove unread indicator
+            setChatList(prev => prev.map(chat => 
+                chat.id === chatId 
+                    ? { ...chat, unread: 0, isUnread: false }
+                    : chat
+            ));
+        } catch (error) {
+            console.error('Error marking messages as seen:', error);
+        }
+    };
+
+    // Get unread message count for a chat
+    const getUnreadCount = async (chatId) => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const userId = localStorage.getItem('userID');
+            
+            // You might want to implement this endpoint in your backend
+            const response = await axios.get(
+                `${API_BASE_URL}/api/chats/${chatId}/unread-count?userId=${userId}`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+
+            return response.data.count || 0;
+        } catch (error) {
+            console.error('Error getting unread count:', error);
+            return 0;
+        }
+    };
+
+    // Helper functions
+    const getChatTitle = (chat) => {
+        const otherParticipant = chat.participants?.find(p => 
+            p.user_id.toString() !== localStorage.getItem('userID')
+        );
+        
+        if (!otherParticipant) return 'Unknown Chat';
+
+        switch (otherParticipant.role) {
+            case 'admin': return 'Platform Manager';
+            case 'supportofficer': return 'Support Officer';
+            case 'stationowner': return 'Station Owner';
+            default: return otherParticipant.role;
+        }
+    };
+
+    const getChatCategory = (topic) => {
+        switch (topic) {
+            case 'stationApproval': return 'Station and Charger Management';
+            case 'support': return 'Handle Fault Reports';
+            case 'reportIssue': return 'Report Issues';
+            default: return 'General';
+        }
+    };
+
+    const getAvatarInitials = (chat) => {
+        const otherParticipant = chat.participants?.find(p => 
+            p.user_id.toString() !== localStorage.getItem('userID')
+        );
+        
+        if (!otherParticipant) return 'UC';
+        
+        switch (otherParticipant.role) {
+            case 'admin': return 'PM';
+            case 'supportofficer': return 'SO';
+            case 'stationowner': return 'SO';
+            default: return otherParticipant.role.substring(0, 2).toUpperCase();
+        }
+    };
+
+    const parseSystemMessage = (message) => {
+        // Parse system messages to extract station/charger info
+        if (message.includes('New station')) {
+            return {
+                type: 'stationAddition',
+                stationName: extractStationName(message),
+                address: extractAddress(message),
+                stationImage: getDefaultStationImage()
+            };
+        } else if (message.includes('charger added')) {
+            return {
+                type: 'chargerAddition',
+                stationName: extractStationName(message),
+                address: extractAddress(message),
+                stationImage: getDefaultStationImage()
+            };
+        } else if (message.includes('Fault Report')) {
+            return {
+                type: 'faultReport',
+                stationName: extractStationName(message),
+                address: extractAddress(message),
+                stationImage: getDefaultStationImage()
+            };
+        }
+        return {};
+    };
+
+    const extractStationName = (message) => {
+        const match = message.match(/"([^"]+)"/);
+        return match ? match[1] : 'Unknown Station';
+    };
+
+    const extractAddress = (message) => {
+        // Simple extraction - you might want to improve this
+        if (message.includes('Location:')) {
+            return message.split('Location:')[1]?.split('\n')[0]?.trim() || 'Unknown location';
+        }
+        return 'Unknown location';
+    };
+
+    const getDefaultStationImage = () => {
+        return 'https://images.unsplash.com/photo-1616361715039-11dde2199a21?q=80&w=1746&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+    };
+
+    // When a chat is selected
+    const handleSelectChat = async (chat) => {
+        setSelectedChat(chat);
+        await fetchChatMessages(chat.id);
+    };
+
+    // Send a message
+    const handleSendMessage = async (text) => {
+        if (!selectedChat || !text.trim()) return;
+
+        try {
+            setSending(true);
+            const token = localStorage.getItem('accessToken');
+            const userId = localStorage.getItem('userID');
+            const userRole = currentUser; // Assuming your auth context provides role
+            // console.log("Chat role: ", currentUser);
+
+            const response = await axios.post(
+                `${API_BASE_URL}/api/chats/${selectedChat.id}/messages`,
+                {
+                    senderId: userId,
+                    senderRole: userRole,
+                    message: text.trim()
+                },
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+
+            if (response.data.success) {
+                // Add new message to local state
+                const newMessage = {
+                    id: response.data.data._id,
+                    type: 'text',
+                    text: text.trim(),
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    isCurrentUser: true
+                };
+
+                setMessages(prev => [...prev, newMessage]);
+                
+                // Update chat list with last message
+                setChatList(prev => prev.map(chat => 
+                    chat.id === selectedChat.id
+                        ? {
+                            ...chat,
+                            lastMessage: `You: ${text.trim()}`,
+                            time: 'Just now',
+                            unread: 0,
+                            isUnread: false
+                        }
+                        : chat
+                ));
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            toast.error('Failed to send message');
+        } finally {
+            setSending(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div style={{
+                fontFamily: FONTS.family.sans,
+                padding: '24px',
+                backgroundColor: COLORS.background,
+                height: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
 
     return (
         <div style={{
             fontFamily: FONTS.family.sans,
             padding: '24px',
             backgroundColor: COLORS.background,
+            minHeight: '100vh'
         }}>
             <StationOwnerPageHeader title="Chats" />
 
@@ -136,6 +346,7 @@ const ChatPage = () => {
                     chats={chatList}
                     onSelectChat={handleSelectChat}
                     selectedChatId={selectedChat?.id}
+                    loading={loading}
                 />
 
                 <div className="flex-1 flex flex-col">
@@ -143,17 +354,12 @@ const ChatPage = () => {
                         <>
                             <ChatHeader user={{
                                 name: selectedChat.name,
-                                location: selectedChat.location,
-                                joinDate: selectedChat.joinDate
+                                category: selectedChat.category
                             }} />
                             <div className="flex-1 overflow-y-auto p-4">
-                                {/* Station request info - only show for specific chats */}
-
-
-                                {/* Messages */}
                                 {messages.map((message) => (
                                     <ChatMessage
-                                        key={`${selectedChat.id}-${message.id}`}
+                                        key={message.id}
                                         message={message}
                                         isCurrentUser={message.isCurrentUser}
                                     />
@@ -161,7 +367,8 @@ const ChatPage = () => {
                             </div>
                             <ChatInput
                                 onSend={handleSendMessage}
-                                disabled={!selectedChat}
+                                disabled={!selectedChat || sending}
+                                sending={sending}
                             />
                         </>
                     ) : (
