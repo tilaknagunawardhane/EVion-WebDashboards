@@ -3,7 +3,7 @@ import { COLORS, FONTS } from '../../../../constants';
 
 const ChatHeader = ({ user }) => {
   return (
-    <div className="p-4 rounded-2xl">
+    <div className="p-4 rounded-2xl w-full">
       <h2 className="text-lg font-semibold" style={{fontSize: FONTS.sizes.xl }}>{user.name}</h2>
       {user.location && (
         <p className="text-sm " style={{color: COLORS.primary }}>{user.location}</p>

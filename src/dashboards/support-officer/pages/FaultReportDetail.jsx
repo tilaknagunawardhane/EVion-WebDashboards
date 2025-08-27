@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { FONTS, COLORS } from "../../../constants";
-import PageHeader from "../../admin/components/AdminPageHeader";
+// import PageHeader from "../../admin/components/AdminPageHeader";
 import OverviewCard from "../../admin/components/OverviewCard";
 import FaultReportDetailRightPanel from "../components/FaultReportDetailRightPanel";
 import { useNavigate } from "react-router-dom";
+import UserPageHeader from '../components/UserPageHeader';
 
 export default function FaultReportDetail() {
     const navigate = useNavigate();
@@ -52,7 +53,7 @@ export default function FaultReportDetail() {
             position: 'relative',
         }}>
             {/* Header Section */}
-            <PageHeader title={`Fault Report #${reportData.reportId}`} />
+            <UserPageHeader title={`Fault Report #${reportData.reportId}`} />
 
             {/* Main Content */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">

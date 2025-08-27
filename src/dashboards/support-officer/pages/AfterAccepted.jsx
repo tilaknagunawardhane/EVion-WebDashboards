@@ -3,6 +3,7 @@ import { FONTS, COLORS } from "../../../constants";
 import PageHeader from "../../admin/components/AdminPageHeader";
 import OverviewCard from "../../admin/components/OverviewCard";
 import FaultReportDetailRightPanel from "../components/FaultReportDetailRightPanel";
+import UserPageHeader from '../components/UserPageHeader';
 
 export default function AfterAccepted() {
     const reportData = {
@@ -56,7 +57,7 @@ export default function AfterAccepted() {
             backgroundColor: COLORS.background,
         }}>
             {/* Header Section */}
-            <PageHeader title="Station Reports & User Complaints – Charging Stations" />
+            <UserPageHeader title="Station Reports & User Complaints – Charging Stations" />
 
             {/* Main Content */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">

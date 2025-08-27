@@ -4,13 +4,15 @@ import { FONTS, COLORS } from "../../../constants";
 import DataTable from "../../../components/ui/DataTable";
 import DataTableTopBar from "../../../components/ui/DataTableTopBar";
 import OverviewCard from "../../admin/components/OverviewCard";
-import PageHeader from "../../admin/components/AdminPageHeader";
+// import PageHeader from "../../admin/components/AdminPageHeader";
 import TabBar from "../../../components/ui/TabBar";
 import FaultReportRightPanel from "../components/FaultReportRightPanel";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../../../contexts/AuthContext';
 import { User } from "lucide-react";
+import UserPageHeader from '../components/UserPageHeader';
+
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -224,7 +226,7 @@ export default function FaultReportsPage() {
             backgroundColor: COLORS.background,
         }}>
             {/* Header Section */}
-            <PageHeader title={`Station Reports & User Complaints`} />
+            <UserPageHeader title={`Station Reports & User Complaints`} />
 
             {/* Tab Bar */}
             <div className="mb-6">

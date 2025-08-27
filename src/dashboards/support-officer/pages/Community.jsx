@@ -1,10 +1,11 @@
 import React, {useState} from "react";
 import { FONTS, COLORS } from "../../../constants";
 import OverviewCard from "../../admin/components/OverviewCard";
-import PageHeader from "../../admin/components/AdminPageHeader";
+// import PageHeader from "../../admin/components/AdminPageHeader";
 import TabBar from "../../../components/ui/TabBar";
 import { CommunityPost } from "../components/CommunityPost";
 import CommunityRightPanel from "../components/CommunityRightPanel";
+import UserPageHeader from '../components/UserPageHeader';
 
 export default function CommunityPage(){
     const [activeTab, setActiveTab] = useState('communityDiscussion');
@@ -183,7 +184,7 @@ export default function CommunityPage(){
             backgroundColor: COLORS.background,
         }}>
             {/* Header Section */}
-            <PageHeader title={`Community Posts & Moderation`} />
+            <UserPageHeader title={`Community Posts & Moderation`} />
 
             {/* Tab Bar */}
             <div className="mb-6">

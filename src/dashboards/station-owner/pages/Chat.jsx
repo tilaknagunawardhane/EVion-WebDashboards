@@ -44,13 +44,37 @@ const ChatPage = () => {
         fetchUserChats();
     }, [currentUser, isStationOwner, isAdmin, isSupportOfficer, navigate]);
 
+    // Get bulk unread counts for all chats
+    const getBulkUnreadCounts = async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const userId = localStorage.getItem('userID');
+
+            const response = await axios.get(
+                `${API_BASE_URL}/api/chats/user/${userId}/unread-counts`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+
+            if (response.data.success) {
+                return response.data.data.perChat || {};
+            }
+        } catch (error) {
+            console.error('Error getting bulk unread counts:', error);
+        }
+        return {};
+    };
+
     // Fetch user chats from backend
+    // Updated fetchUserChats function using individual unread counts
     const fetchUserChats = async () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('accessToken');
             const userId = localStorage.getItem('userID');
 
+            // First get all chats
             const response = await axios.get(
                 `${API_BASE_URL}/api/chats/user/${userId}`,
                 {
@@ -59,22 +83,57 @@ const ChatPage = () => {
             );
 
             if (response.data.success) {
-                const formattedChats = response.data.data.map(chat => ({
-                    id: chat._id,
-                    name: getChatTitle(chat),
-                    lastMessage: chat.lastMessage?.text || 'No messages yet',
-                    category: getChatCategory(chat.topic),
-                    time: chat.lastMessage?.timestamp 
-                        ? new Date(chat.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                        : '--:--',
-                    unread: getUnreadCount(chat._id),
-                    avatar: getAvatarInitials(chat),
-                    status: 'online', // You can implement real status later
-                    isUnread: getUnreadCount(chat._id) > 0,
-                    rawChat: chat // Store original chat data for reference
-                }));
+                // Get unread counts for each chat individually
+                const chatsWithUnreadCounts = await Promise.all(
+                    response.data.data.map(async (chat) => {
+                        try {
+                            const unreadResponse = await axios.get(
+                                `${API_BASE_URL}/api/chats/${chat._id}/unread-count?userId=${userId}`,
+                                {
+                                    headers: { 'Authorization': `Bearer ${token}` }
+                                }
+                            );
 
-                setChatList(formattedChats);
+                            const unreadCount = unreadResponse.data.success
+                                ? unreadResponse.data.data.unreadCount
+                                : 0;
+
+                            return {
+                                id: chat._id,
+                                name: getChatTitle(chat),
+                                lastMessage: chat.lastMessage?.text || 'No messages yet',
+                                category: getChatCategory(chat.topic),
+                                time: chat.lastMessage?.timestamp
+                                    ? new Date(chat.lastMessage.timestamp).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })
+                                    : '--:--',
+                                unread: unreadCount,
+                                avatar: getAvatarInitials(chat),
+                                status: 'online',
+                                isUnread: unreadCount > 0,
+                                rawChat: chat
+                            };
+                        } catch (error) {
+                            console.error(`Error getting unread count for chat ${chat._id}:`, error);
+                            return {
+                                id: chat._id,
+                                name: getChatTitle(chat),
+                                lastMessage: chat.lastMessage?.text || 'No messages yet',
+                                category: getChatCategory(chat.topic),
+                                time: '--:--',
+                                unread: 0,
+                                avatar: getAvatarInitials(chat),
+                                status: 'online',
+                                isUnread: false,
+                                rawChat: chat
+                            };
+                        }
+                    })
+                );
+
+                setChatList(chatsWithUnreadCounts);
             } else {
                 toast.error('Failed to load chats');
             }
@@ -94,7 +153,7 @@ const ChatPage = () => {
     const fetchChatMessages = async (chatId) => {
         try {
             const token = localStorage.getItem('accessToken');
-            
+
             const response = await axios.get(
                 `${API_BASE_URL}/api/chats/${chatId}/messages`,
                 {
@@ -107,14 +166,16 @@ const ChatPage = () => {
                     id: msg._id,
                     type: msg.messageType === 'system' ? 'system' : 'text',
                     text: msg.message,
-                    time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    time: new Date(msg.timestamp).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
                     isCurrentUser: msg.sender.user_id === localStorage.getItem('userID'),
-                    // For system messages (station/charger additions)
                     ...(msg.messageType === 'system' && parseSystemMessage(msg.message))
                 }));
 
                 setMessages(formattedMessages);
-                
+
                 // Mark messages as seen
                 await markMessagesAsSeen(chatId);
             }
@@ -129,7 +190,7 @@ const ChatPage = () => {
         try {
             const token = localStorage.getItem('accessToken');
             const userId = localStorage.getItem('userID');
-            
+
             await axios.put(
                 `${API_BASE_URL}/api/chats/${chatId}/mark-seen`,
                 { userId },
@@ -139,8 +200,8 @@ const ChatPage = () => {
             );
 
             // Update local chat list to remove unread indicator
-            setChatList(prev => prev.map(chat => 
-                chat.id === chatId 
+            setChatList(prev => prev.map(chat =>
+                chat.id === chatId
                     ? { ...chat, unread: 0, isUnread: false }
                     : chat
             ));
@@ -149,13 +210,12 @@ const ChatPage = () => {
         }
     };
 
-    // Get unread message count for a chat
+    // Get unread message count for a specific chat (if needed separately)
     const getUnreadCount = async (chatId) => {
         try {
             const token = localStorage.getItem('accessToken');
             const userId = localStorage.getItem('userID');
-            
-            // You might want to implement this endpoint in your backend
+
             const response = await axios.get(
                 `${API_BASE_URL}/api/chats/${chatId}/unread-count?userId=${userId}`,
                 {
@@ -163,19 +223,20 @@ const ChatPage = () => {
                 }
             );
 
-            return response.data.count || 0;
+            // Fixed: response.data.data.unreadCount instead of response.data.count
+            return response.data.data?.unreadCount || 0;
         } catch (error) {
             console.error('Error getting unread count:', error);
             return 0;
         }
     };
 
-    // Helper functions
+    // Helper functions (keep these the same)
     const getChatTitle = (chat) => {
-        const otherParticipant = chat.participants?.find(p => 
+        const otherParticipant = chat.participants?.find(p =>
             p.user_id.toString() !== localStorage.getItem('userID')
         );
-        
+
         if (!otherParticipant) return 'Unknown Chat';
 
         switch (otherParticipant.role) {
@@ -196,12 +257,12 @@ const ChatPage = () => {
     };
 
     const getAvatarInitials = (chat) => {
-        const otherParticipant = chat.participants?.find(p => 
+        const otherParticipant = chat.participants?.find(p =>
             p.user_id.toString() !== localStorage.getItem('userID')
         );
-        
+
         if (!otherParticipant) return 'UC';
-        
+
         switch (otherParticipant.role) {
             case 'admin': return 'PM';
             case 'supportofficer': return 'SO';
@@ -211,7 +272,6 @@ const ChatPage = () => {
     };
 
     const parseSystemMessage = (message) => {
-        // Parse system messages to extract station/charger info
         if (message.includes('New station')) {
             return {
                 type: 'stationAddition',
@@ -243,7 +303,6 @@ const ChatPage = () => {
     };
 
     const extractAddress = (message) => {
-        // Simple extraction - you might want to improve this
         if (message.includes('Location:')) {
             return message.split('Location:')[1]?.split('\n')[0]?.trim() || 'Unknown location';
         }
@@ -268,8 +327,12 @@ const ChatPage = () => {
             setSending(true);
             const token = localStorage.getItem('accessToken');
             const userId = localStorage.getItem('userID');
-            const userRole = currentUser; // Assuming your auth context provides role
-            // console.log("Chat role: ", currentUser);
+
+            // Get user role from currentUser - fix this based on your auth context structure
+            const userRole = currentUser.role ||
+                (isStationOwner ? 'stationowner' :
+                    isAdmin ? 'admin' :
+                        isSupportOfficer ? 'supportofficer' : 'user');
 
             const response = await axios.post(
                 `${API_BASE_URL}/api/chats/${selectedChat.id}/messages`,
@@ -284,19 +347,20 @@ const ChatPage = () => {
             );
 
             if (response.data.success) {
-                // Add new message to local state
                 const newMessage = {
                     id: response.data.data._id,
                     type: 'text',
                     text: text.trim(),
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    time: new Date().toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
                     isCurrentUser: true
                 };
 
                 setMessages(prev => [...prev, newMessage]);
-                
-                // Update chat list with last message
-                setChatList(prev => prev.map(chat => 
+
+                setChatList(prev => prev.map(chat =>
                     chat.id === selectedChat.id
                         ? {
                             ...chat,
@@ -372,7 +436,7 @@ const ChatPage = () => {
                             />
                         </>
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center" style={{color: COLORS.secondaryText}}>
+                        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center" style={{ color: COLORS.secondaryText }}>
                             <div className="max-w-md">
                                 <h3 className="text-lg font-normal mb-2">No chat selected</h3>
                                 <p className="text-sm font-normal">Select a conversation from the list to start messaging</p>
