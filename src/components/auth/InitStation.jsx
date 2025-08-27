@@ -20,36 +20,43 @@ export default function InitStations() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchStations = async () => {
-            try {
-                const stationOwnerID = localStorage.getItem('userID')
+    const fetchStations = async () => {
+        try {
+            const stationOwnerID = localStorage.getItem('userID')
 
-                const response = await axios.post(`${API_BASE_URL}/api/stations/get-request-stations`, { stationOwnerID }, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    }
-                });
-
-                if (response.data.success) {
-                    setStations(response.data.data);
-                } else {
-                    toast.error('Failed to fetch stations');
+            const response = await axios.post(`${API_BASE_URL}/api/stations/get-request-stations`, { stationOwnerID }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
                 }
-            } catch (error) {
-                console.error('Error fetching stations:', error);
-                toast.error(error.response?.data?.message || 'Error fetching stations');
+            });
 
-                if (error.response?.status === 401) {
-                    navigate('/login');
-                }
-            } finally {
-                setLoading(false);
+            if (response.data.success) {
+                setStations(response.data.data);
+            } else {
+                toast.error('Failed to fetch stations');
             }
-        };
+        } catch (error) {
+            console.error('Error fetching stations:', error);
+            toast.error(error.response?.data?.message || 'Error fetching stations');
 
+            if (error.response?.status === 401) {
+                navigate('/login');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchStations();
     }, [navigate]);
+
+
+    const handleAddStation = () => {
+        fetchStations(); // Refetch all stations
+        setShowForm(false);
+        toast.success('Station added successfully');
+    }
 
     const handleRemoveStation = async (stationId) => {
         try {
@@ -128,10 +135,7 @@ export default function InitStations() {
             {showForm && (
                 <AddChargingStationForm
                     onClose={() => setShowForm(false)}
-                    onSubmit={(newStation) => {
-                        setStations((prev) => [...prev, newStation]);
-                        toast.success('Station added successfully');
-                    }}
+                    onSubmit={handleAddStation}
                 />
             )}
 
