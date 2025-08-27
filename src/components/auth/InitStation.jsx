@@ -1,3 +1,4 @@
+// components/pages/InitStations.jsx (updated)
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -5,10 +6,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import Layout from '../../components/Layout';
 import { COLORS, FONTS } from '../../constants';
 import Button from '../ui/Button';
-import InputField from '../ui/InputField';
-import { FiMessageCircle } from 'react-icons/fi';
 import StationCard from '../ui/InitStationCard';
 import AddChargingStationForm from '../ui/AddStationForm';
+import ChatPopup from '../../dashboards/station-owner/components/chats/ChatPopup'; // Import the new component
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -24,12 +24,15 @@ export default function InitStations() {
         const fetchStations = async () => {
             try {
                 const stationOwnerID = localStorage.getItem('userID')
-
-                const response = await axios.post(`${API_BASE_URL}/api/stations/get-request-stations`, { stationOwnerID }, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                const response = await axios.post(
+                    `${API_BASE_URL}/api/stations/get-request-stations`, 
+                    { stationOwnerID }, 
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        }
                     }
-                });
+                );
 
                 if (response.data.success) {
                     setStations(response.data.data);
@@ -54,13 +57,15 @@ export default function InitStations() {
     const handleRemoveStation = async (stationId) => {
         try {
             const stationOwnerID = localStorage.getItem('userID')
-            console.log(stationOwnerID);
-            const response = await axios.delete(`${API_BASE_URL}/api/stations/delete-station/${stationId}`, {
-                data: { stationOwnerID },
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            const response = await axios.delete(
+                `${API_BASE_URL}/api/stations/delete-station/${stationId}`,
+                {
+                    data: { stationOwnerID },
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
                 }
-            });
+            );
 
             if (response.data.success) {
                 toast.success('Station removed successfully');
@@ -114,15 +119,8 @@ export default function InitStations() {
                 )}
             </div>
 
-            {/* Chat Icon */}
-            <button
-                className="fixed flex gap-1 bottom-6 right-6 shadow-lg p-4 rounded-full"
-                style={{ backgroundColor: COLORS.primary }}
-                onClick={() => navigate('/support')}
-            >
-                <FiMessageCircle size={24} color={COLORS.background} />
-                <span style={{ color: COLORS.background }}>Chat</span>
-            </button>
+            {/* Add ChatPopup component */}
+            <ChatPopup />
 
             {/* Modal Form */}
             {showForm && (
