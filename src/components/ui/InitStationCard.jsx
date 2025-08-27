@@ -10,7 +10,7 @@ export default function StationCard({ station, onEdit, onRemove, onClick }) {
   // Safe defaults for station data
   const safeStation = {
     name: '',
-    status: 'processing',
+    status: '',
     address: '',
     powerTypes: [],
     electricityProvider: '',
@@ -73,7 +73,7 @@ export default function StationCard({ station, onEdit, onRemove, onClick }) {
               className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-50"
               style={{ border: '1px solid #e5e7eb' }}
             >
-              {safeStation.status === 'processing' && (
+              {/* {safeStation.status === 'processing' && ( */}
                 <button
                   className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                   onClick={() => {
@@ -83,7 +83,7 @@ export default function StationCard({ station, onEdit, onRemove, onClick }) {
                 >
                   Edit
                 </button>
-              )}
+              {/* )} */}
               <button
                 className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
                 onClick={() => {
