@@ -32,8 +32,7 @@ export default function AccountSetup() {
   // State for dropdown data
   const [dropdownData, setDropdownData] = useState({
     districts: [],
-    banks: [],
-    branches: []
+    banks: []
   });
 
   const [loading, setLoading] = useState(true);
@@ -66,8 +65,7 @@ export default function AccountSetup() {
         const response = await axios.get(`${API_BASE_URL}/api/common/data`);
         setDropdownData({
           districts: response.data.data.districts,
-          banks: response.data.data.banks,
-          branches: []
+          banks: response.data.data.banks
         });
         setLoading(false);
       } catch (error) {
@@ -78,25 +76,6 @@ export default function AccountSetup() {
 
     fetchInitialData();
   }, [userData, navigate]);
-
-  // Load branches when bank is selected
-  useEffect(() => {
-    if (formData.bank) {
-      const fetchBranches = async () => {
-        try {
-          const response = await axios.get(`${API_BASE_URL}/api/common/branches/${formData.bank}`);
-          setDropdownData(prev => ({
-            ...prev,
-            branches: response.data.data
-          }));
-        } catch (error) {
-          toast.error('Failed to load branches');
-        }
-      };
-
-      fetchBranches();
-    }
-  }, [formData.bank]);
 
 
   const handleInputChange = (field) => (e) => {
