@@ -24,6 +24,13 @@ const ChatList = ({ chats, onSelectChat, selectedChatId, loading }) => {
         );
     }
 
+    // Function to truncate long messages
+    const truncateMessage = (message, maxLength = 25) => {
+        if (!message) return '';
+        if (message.length <= maxLength) return message;
+        return message.substring(0, maxLength) + '...';
+    };
+
     return (
         <div className="w-full md:w-1/3 overflow-y-auto rounded-2xl">
             {/* Header with search */}
@@ -74,7 +81,7 @@ const ChatList = ({ chats, onSelectChat, selectedChatId, loading }) => {
 
                             {/* Chat info */}
                             <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-center mb-1">
                                     <p 
                                         className="font-semibold text-sm truncate"
                                         style={{ 
@@ -84,34 +91,36 @@ const ChatList = ({ chats, onSelectChat, selectedChatId, loading }) => {
                                     >
                                         {chat.name}
                                     </p>
-                                    <div className="flex items-center space-x-1">
+                                    <div className="flex items-center space-x-2">
                                         <span 
-                                            className="text-xs"
+                                            className="text-xs whitespace-nowrap"
                                             style={{ color: COLORS.secondaryText }}
                                         >
                                             {chat.time}
                                         </span>
+                                        {chat.unread > 0 && (
+                                            <span 
+                                                className="text-xs rounded-full min-w-[16px] h-4 flex items-center justify-center px-1"
+                                                style={{
+                                                    backgroundColor: COLORS.primary,
+                                                    color: 'white'
+                                                }}
+                                            >
+                                                {chat.unread > 9 ? '9+' : chat.unread}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="flex justify-between items-center mt-0.5">
+                                
+                                <div className="flex justify-between items-center">
                                     <p 
-                                        className="text-xs truncate pr-2"
+                                        className="text-xs truncate pr-2 flex-1"
                                         style={{ color: COLORS.secondaryText }}
                                     >
-                                        {chat.lastMessage}
+                                        {truncateMessage(chat.lastMessage)}
                                     </p>
-                                    {chat.unread > 0 && (
-                                        <span 
-                                            className="text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]"
-                                            style={{
-                                                backgroundColor: COLORS.primary,
-                                                color: 'white'
-                                            }}
-                                        >
-                                            {chat.unread > 9 ? '9+' : chat.unread}
-                                        </span>
-                                    )}
                                 </div>
+                                
                                 {chat.category && (
                                     <p 
                                         className="text-xs text-gray-400 mt-1"
