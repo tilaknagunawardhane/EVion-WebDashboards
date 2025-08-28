@@ -235,7 +235,7 @@ const ChatPage = () => {
     };
 
     // Helper functions (keep these the same)
-    const getChatTitle = (chat) => {
+        const getChatTitle = async (chat) => {
         const otherParticipant = chat.participants?.find(p =>
             p.user_id.toString() !== localStorage.getItem('userID')
         );
@@ -243,12 +243,39 @@ const ChatPage = () => {
         if (!otherParticipant) return 'Unknown Chat';
 
         switch (otherParticipant.role) {
-            case 'admin': return 'Platform Manager';
-            case 'supportofficer': return 'Support Officer';
-            case 'stationowner': return 'Station Owner';
-            default: return otherParticipant.role;
+            case 'admin':
+                return 'Platform Manager';
+
+            case 'supportofficer':
+                return 'Support Officer';
+
+            case 'stationowner':
+                // Fetch station owner details to get their name
+                try {
+                    const stationownerId = otherParticipant.user_id;
+                    const token = localStorage.getItem('accessToken');
+                    const response = await axios.get(
+                        `${API_BASE_URL}/api/chats/${stationownerId}`,
+                        {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        }
+                    );
+
+                    // console.log("station owner names response: ", response);
+                    if (response.data.success) {
+                        const stationOwner = response.data.data;
+                        return stationOwner.business_name || stationOwner.name || 'Station Owner';
+                    }
+                } catch (error) {
+                    console.error('Error fetching station owner details:', error);
+                }
+                return 'Station Owner';
+
+            default:
+                return otherParticipant.role;
         }
     };
+
 
     const getChatCategory = (topic) => {
         switch (topic) {
