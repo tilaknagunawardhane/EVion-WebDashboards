@@ -15,6 +15,8 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
     name: '',
     powerType: '',
     maxPower: '',
+    price: '',
+    status: 'processing',
     connectors: []
   }]);
   const [districts, setDistricts] = useState([]);
@@ -42,6 +44,7 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
     addressLine: '',
     district: '',
     city: '',
+    _id: '',
     electricityProvider: '',
     powerSource: '',
   });
@@ -93,8 +96,11 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
               name: charger.charger_name || '',
               powerType: charger.power_type || '',
               maxPower: charger.max_power_output?.toString() || '',
+              status: charger.charger_status,
+              price: charger.price || '',
+              _id: charger._id,
               connectors: charger.connector_types || []
-            })) || [{ name: '', powerType: '', maxPower: '', connectors: [] }]);
+            })) || [{ name: '', powerType: '', maxPower: '', price: '', status: '', connectors: [] }]);
           } else {
             toast.error('Failed to load station data');
             onClose();
@@ -111,6 +117,11 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
 
     fetchInitialData();
   }, [isEdit, stationId, onClose]); // Proper dependency array
+
+  // Function to check if a charger is editable
+  const isChargerEditable = (charger) => {
+    return charger.status !== 'to_be_installed';
+  };
 
   const validateStepOne = () => {
     const newErrors = {};
@@ -140,6 +151,11 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
     let isValid = true;
 
     chargers.forEach((charger, index) => {
+
+      if (!isChargerEditable(charger)) {
+        return;
+      }
+
       const chargerErrors = {};
 
       if (!charger.name.trim()) {
@@ -200,6 +216,11 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
   };
 
   const handleChargerChange = (index, field, value) => {
+
+    if (!isChargerEditable(chargers[index])) {
+      return;
+    }
+
     const updated = [...chargers];
     updated[index][field] = value;
 
@@ -217,6 +238,10 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
   };
 
   const handleConnectorChange = (index, selected) => {
+    if (!isChargerEditable(chargers[index])) {
+      return;
+    }
+
     const updated = [...chargers];
     updated[index].connectors = selected;
 
@@ -260,6 +285,8 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
           power_type: charger.powerType,
           max_power_output: parseFloat(charger.maxPower),
           price: parseFloat(charger.price) || 0,
+          _id: charger._id,
+          charger_status: charger.charger_status,
           connector_types: charger.connectors.map(connectorId => ({
             connector: connectorId,
             status: 'available'
@@ -403,6 +430,7 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
               onSubmit={submitStation}
               errors={errors}
               isSubmitting={isSubmitting}
+              isChargerEditable={isChargerEditable}
             />
           )}
         </div>

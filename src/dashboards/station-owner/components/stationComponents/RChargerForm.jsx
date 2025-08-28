@@ -95,6 +95,7 @@ export default function ChargerForm({
             <input
               type="number"
               min={1}
+              max={5}
               value={numChargers}
               onChange={updateNumChargers}
               className="w-full rounded-lg border transition-all duration-200 px-4 py-3 border-neutral-200 focus:border-primary focus:outline-none focus:ring-1"

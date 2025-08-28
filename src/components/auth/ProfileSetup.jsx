@@ -32,8 +32,7 @@ export default function AccountSetup() {
   // State for dropdown data
   const [dropdownData, setDropdownData] = useState({
     districts: [],
-    banks: [],
-    branches: []
+    banks: []
   });
 
   const [loading, setLoading] = useState(true);
@@ -66,8 +65,7 @@ export default function AccountSetup() {
         const response = await axios.get(`${API_BASE_URL}/api/common/data`);
         setDropdownData({
           districts: response.data.data.districts,
-          banks: response.data.data.banks,
-          branches: []
+          banks: response.data.data.banks
         });
         setLoading(false);
       } catch (error) {
@@ -78,25 +76,6 @@ export default function AccountSetup() {
 
     fetchInitialData();
   }, [userData, navigate]);
-
-  // Load branches when bank is selected
-  useEffect(() => {
-    if (formData.bank) {
-      const fetchBranches = async () => {
-        try {
-          const response = await axios.get(`${API_BASE_URL}/api/common/branches/${formData.bank}`);
-          setDropdownData(prev => ({
-            ...prev,
-            branches: response.data.data
-          }));
-        } catch (error) {
-          toast.error('Failed to load branches');
-        }
-      };
-
-      fetchBranches();
-    }
-  }, [formData.bank]);
 
 
   const handleInputChange = (field) => (e) => {
@@ -331,6 +310,7 @@ export default function AccountSetup() {
               errorMessage={errors.accountholder}
               required
             />
+            
             <div className="w-full">
               <label
                 className="block mb-2"
@@ -366,40 +346,15 @@ export default function AccountSetup() {
               )}
             </div>
 
-            <div className="w-full">
-              <label
-                className="block mb-2"
-                style={{
-                  color: COLORS.mainTextColor,
-                  fontSize: FONTS.sizes.xs,
-                  fontWeight: FONTS.weights.normal,
-                }}
-              >
-                Branch
-              </label>
-              <select
-                value={formData.branch}
-                onChange={handleInputChange('branch')}
-                required
-                className={`w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-1 ${errors.branch ? 'border-red-500' : 'border-neutral-200 focus:border-primary'
-                  }`}
-                disabled={!formData.bank || loading}
-              >
-                <option value="" style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
-                  {!formData.bank ? 'Select bank first' : (loading ? 'Loading branches...' : 'Select Branch')}
-                </option>
-                {dropdownData.branches.map((b) => (
-                  <option key={b._id} value={b._id} style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
-                    {b.name}, {b.district?.name || ''}
-                  </option>
-                ))}
-              </select>
-              {errors.branch && (
-                <p className="mt-1 text-sm" style={{ color: COLORS.danger }}>
-                  {errors.branch}
-                </p>
-              )}
-            </div>
+            <InputField
+              label="Branch"
+              placeholder="Enter the branch name"
+              value={formData.branch}
+              onChange={handleInputChange('branch')}
+              error={!!errors.branch}
+              errorMessage={errors.branch}
+              required
+            />
 
             <InputField
               label="Account Number"
