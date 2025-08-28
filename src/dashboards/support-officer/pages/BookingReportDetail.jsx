@@ -4,6 +4,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import { FONTS, COLORS } from "../../../constants";
 import PageHeader from "../../admin/components/AdminPageHeader";
+import UserPageHeader from '../components/UserPageHeader';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -234,7 +235,7 @@ export default function BookingReportDetail() {
 
     return (
         <div style={{ fontFamily: FONTS.family.sans, padding: '24px', backgroundColor: COLORS.background }}>
-            <PageHeader title={`Booking Report - ${report.category}`} />
+            <UserPageHeader title={`Booking Report - ${report.category}`} />
 
             {/* Reject Modal */}
             {showRejectModal && (

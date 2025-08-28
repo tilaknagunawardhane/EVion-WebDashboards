@@ -40,7 +40,7 @@ const PageHeader = ({ title }) => {
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Chat Button */}
         <button
-          onClick={() => handleButtonClick('/station-owner/chat')}
+          onClick={() => handleButtonClick('/support-officer/chat')}
           className={`p-2 rounded-full transition-all ${
             activeButton === 'chat' ? 'bg-[rgba(0,184,148,0.1)]' : 'hover:bg-[rgba(0,184,148,0.1)]'
           }`}
@@ -48,7 +48,7 @@ const PageHeader = ({ title }) => {
         >
           <img 
             src={ChatIcon} 
-            alt="Chat" 
+            alt="Chat"
             className="w-5 h-5"
             style={{ 
               filter: activeButton === 'chat' ? primaryColorFilter : 'brightness(0)',

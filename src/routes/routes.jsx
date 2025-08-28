@@ -35,7 +35,7 @@ import FaultReportsPage from '../dashboards/support-officer/pages/FaultReports'
 import FaultReportDetailPage from '../dashboards/support-officer/pages/FaultReportDetail'
 import AfterAcceptedPage from '../dashboards/support-officer/pages/AfterAccepted'
 import CommunityPage from '../dashboards/support-officer/pages/Community'
-import UserChatPage from '../dashboards/support-officer/pages/UserChat'
+import UserChatPage from '../dashboards/support-officer/pages/Chat'
 import StationReportDetailsPage from '../dashboards/support-officer/pages/StationReportDetail'
 import ChargerReportDetailsPage from '../dashboards/support-officer/pages/ChargerReportDetail'
 import BookingReportDetailPage from '../dashboards/support-officer/pages/BookingReportDetail'
@@ -102,7 +102,7 @@ const router = createBrowserRouter([
           { path: 'chargingStations', element:<ChargingStationsOverview />},
           { path: 'faultReports', element:<FaultReportsPage /> },
           { path: 'FaultReportDetail', element:<FaultReportDetailPage /> },
-          { path: 'UserChat', element:<UserChatPage /> },
+          { path: 'chat', element:<UserChatPage /> },
           { path: 'AfterAccepted', element:<AfterAcceptedPage /> },
           { path: 'community', element: <CommunityPage />},
           { path: 'tasks', element: <TasksPage /> },

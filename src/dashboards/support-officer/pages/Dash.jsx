@@ -9,7 +9,8 @@ import FaultStatusChart from '../components/FaultStatusChart'
 import ActiveUserCard from '../components/ActiveUserCard'
 import ChargingStationComplaintsChart from '../components/ChargingStationComplaintsChart'
 import CommunityPostsChart from '../components/CommunityPostsChart'
-import PageHeader from "../../admin/components/AdminPageHeader";
+// import PageHeader from "../../admin/components/AdminPageHeader";
+import UserPageHeader from '../components/UserPageHeader';
 
 
 export default function SupportOfficerDashboardPage() {
@@ -27,7 +28,7 @@ export default function SupportOfficerDashboardPage() {
         <div style={{ fontFamily: FONTS.family.sans, padding: '24px', backgroundColor:COLORS.background
          }}>
             {/* Header */}
-            <PageHeader title="Platform Overview" />
+            <UserPageHeader title="Platform Overview" />
 
             {/* Platform Overview Section */}
             <section className="mb-8">
