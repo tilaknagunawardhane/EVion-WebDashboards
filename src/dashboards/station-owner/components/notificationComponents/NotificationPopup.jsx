@@ -83,7 +83,7 @@ const NotificationPopup = ({ isOpen, onClose }) => {
                         navigate(`/station-owner/stations`);
                         break;
                     case 'new_report':
-                        navigate(`/reports/${notification.relatedEntity.id}`);
+                        navigate(`/station-owner/stations`);
                         break;
                     default:
                         navigate('/notifications');

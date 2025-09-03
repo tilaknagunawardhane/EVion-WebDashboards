@@ -96,7 +96,7 @@ const NotificationsPage = () => {
                         navigate(`/support-officer/chargingStations`);
                         break;
                     case 'new_report':
-                        navigate(`/reports/${notification.relatedEntity.id}`);
+                        navigate(`/support-officer/faultReports`);
                         break;
                     default:
                         // Stay on notifications page

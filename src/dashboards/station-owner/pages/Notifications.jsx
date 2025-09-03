@@ -96,7 +96,7 @@ const NotificationsPage = () => {
                         navigate(`/station-owner/stations`);
                         break;
                     case 'new_report':
-                        navigate(`/reports/${notification.relatedEntity.id}`);
+                        navigate(`/station-owner/stations`);
                         break;
                     default:
                         // Stay on notifications page
