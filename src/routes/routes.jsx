@@ -39,12 +39,14 @@ import UserChatPage from '../dashboards/support-officer/pages/Chat'
 import StationReportDetailsPage from '../dashboards/support-officer/pages/StationReportDetail'
 import ChargerReportDetailsPage from '../dashboards/support-officer/pages/ChargerReportDetail'
 import BookingReportDetailPage from '../dashboards/support-officer/pages/BookingReportDetail'
+import SupportOfficerNotifications from '../dashboards/support-officer/pages/Notifications'
 
 import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/StationProfile'
 import OwnerViewCharger from '../dashboards/station-owner/pages/chargerPages/ChargerProfile'
 import FaultAlerts from '../dashboards/station-owner/pages/faultsPages/FaultReports'
 import OwnerChatPage from '../dashboards/station-owner/pages/Chat'
 import OwnerEarnings from '../dashboards/station-owner/pages/earningsPages/Earnings'
+import StationOwnerNotifications from '../dashboards/station-owner/pages/Notifications'
 
 
 const router = createBrowserRouter([
@@ -91,6 +93,7 @@ const router = createBrowserRouter([
           { path: 'stations/chargerprofile/:id', element: <OwnerViewCharger />},
           { path: 'alerts', element: <FaultAlerts /> },
           { path: 'chat', element: <OwnerChatPage /> },
+          { path: 'notifications', element: <StationOwnerNotifications /> },
           { path: 'earnings', element: <OwnerEarnings /> },
 
         ]
@@ -110,6 +113,8 @@ const router = createBrowserRouter([
           { path: 'fault-reports/stations/:id', element: <StationReportDetailsPage /> },
           { path: 'fault-reports/chargers/:id', element: <ChargerReportDetailsPage /> },
           { path: 'fault-reports/bookings/:id', element: <BookingReportDetailPage /> },
+          { path: 'notifications', element:<SupportOfficerNotifications /> },
+
 
         ]
       }
