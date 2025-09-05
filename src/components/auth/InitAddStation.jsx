@@ -58,11 +58,6 @@ export default function InitAddStation() {
                 </a>
                 </p>
             </div>
-            {/* Chat Icon */}
-            <button className="fixed flex gap-1 bottom-6 right-6 bg-white shadow-lg p-4 rounded-full" style={{ backgroundColor: COLORS.primary}}>
-                <FiMessageCircle size={24} color={COLORS.background} />
-                <span style={{ color: COLORS.background }}>Chat</span>
-            </button>
         </div>
 
         {/* Modal Form */}

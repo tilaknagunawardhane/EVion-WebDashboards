@@ -9,7 +9,8 @@ import ChatInput from '../components/chats/ChatInput';
 import { COLORS, FONTS } from '../../../constants';
 // import StationOwnerPageHeader from '../components/StationOwnerPageHeader';
 import { useAuth } from '../../../contexts/AuthContext';
-import AdminPageHeader from '../components/AdminPageHeader';
+// import AdminPageHeader from '../components/AdminPageHeader';
+import UserPageHeader from '../components/UserPageHeader';
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -234,8 +235,7 @@ const ChatPage = () => {
     };
 
     // Helper functions (keep these the same)
-    // Helper functions
-    const getChatTitle = async (chat) => {
+        const getChatTitle = async (chat) => {
         const otherParticipant = chat.participants?.find(p =>
             p.user_id.toString() !== localStorage.getItem('userID')
         );
@@ -275,6 +275,7 @@ const ChatPage = () => {
                 return otherParticipant.role;
         }
     };
+
 
     const getChatCategory = (topic) => {
         switch (topic) {
@@ -432,7 +433,7 @@ const ChatPage = () => {
             backgroundColor: COLORS.background,
             minHeight: '100vh'
         }}>
-            <AdminPageHeader title="Chats" />
+            <UserPageHeader title="Chats" />
 
             <div className="flex flex-col w-full md:flex-row h-[calc(100vh-130px)] bg-white rounded-2xl shadow-sm">
                 <ChatList

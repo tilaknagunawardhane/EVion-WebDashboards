@@ -323,6 +323,31 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
           }
         );
         toast.success('Station request submitted successfully!');
+
+        if (response.data.success) {
+          try {
+            const chatResponse = await axios.post(
+              `${API_BASE_URL}/api/chats/auto-create`,
+              { stationOwnerId: stationOwnerID },
+              {
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
+
+            if (chatResponse.data.success) {
+              console.log('Auto chats created successfully:', chatResponse.data);
+            } else {
+              console.warn('Auto chat creation failed:', chatResponse.data.message);
+            }
+          }
+          catch (chatError) {
+            console.error('Error creating auto chats:', chatError);
+            // Don't show error to user - this is a background process
+          }
+        }
       }
 
       onSubmit?.(response.data.data);

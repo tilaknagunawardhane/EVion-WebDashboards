@@ -4,7 +4,8 @@ import { FONTS, COLORS } from "../../../constants";
 import DataTable from "../../../components/ui/DataTable";
 import DataTableTopBar from "../../../components/ui/DataTableTopBar";
 import OverviewCard from "../../admin/components/OverviewCard";
-import PageHeader from "../../admin/components/AdminPageHeader";
+// import PageHeader from "../../admin/components/AdminPageHeader";
+import UserPageHeader from '../components/UserPageHeader';
 
 export default function ChargingStationsOverviewPage(){
     const navigate = useNavigate();
@@ -76,7 +77,7 @@ export default function ChargingStationsOverviewPage(){
             backgroundColor: COLORS.background,
         }}>
             {/* Header Section */}
-            <PageHeader title={`Charging Stations Overview`} />
+            <UserPageHeader title={`Charging Stations Overview`} />
 
             {/* Main Content */}
             <div className="grid grid-colos-1 md:grid-cols-4 gap-4 md:gap-6">
