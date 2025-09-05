@@ -95,10 +95,10 @@ export default function StationsPage() {
     const categorizeStations = (stationsList) => {
         const categories = {
             'open': [],
-            'unavailable': [],
+            'closed': [],
             'disabled_by_SO': [],
             'deleted': [],
-            'processing': [],
+            'reviewing': [],
             'Other': []
         };
 
@@ -242,9 +242,9 @@ export default function StationsPage() {
                     ) : (
                     <>
                         {renderStationSection('Open Stations', categorizedStations['open'])}
-                        {renderStationSection('Processing Station Requests', categorizedStations['processing'])}
-                        {renderStationSection('Unavailable Stations', categorizedStations['unavailable'])}
-                        {renderStationSection('Disabled by Station Owner', categorizedStations['disabled_by_SO'])}
+                        {renderStationSection('Closed Stations', categorizedStations['closed'])}
+                        {renderStationSection('Disabled by Support Officer', categorizedStations['disabled_by_SO'])}
+                        {renderStationSection('Stations Waiting for Approval', categorizedStations['reviewing'])}
                         {renderStationSection('Deleted Stations', categorizedStations['deleted'])}
                         {categorizedStations['Other'].length > 0 && renderStationSection('Other Stations', categorizedStations['Other'])}
                     </>
