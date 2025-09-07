@@ -34,7 +34,7 @@ const NotificationPopup = ({ isOpen, onClose }) => {
             const params = new URLSearchParams({
                 page: '1',
                 limit: '5',
-                unread: true,
+                unread: false,
                 userId: userId,
                 userModel: userModel
             });
@@ -74,7 +74,6 @@ const NotificationPopup = ({ isOpen, onClose }) => {
                 }
             );
 
-            // Navigate based on notification type
             
 
             onClose();
