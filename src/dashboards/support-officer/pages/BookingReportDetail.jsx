@@ -21,9 +21,7 @@ export default function BookingReportDetail() {
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [rejectedReason, setRejectedReason] = useState('');
     const [showRefundConfirm, setShowRefundConfirm] = useState(false);
-    const [showAddRefundModal, setShowAddRefundModal] = useState(false);
-    const [newRefundAmount, setNewRefundAmount] = useState('');
-    const [showUpdateRefundConfirm, setShowUpdateRefundConfirm] = useState(false);
+    const [includeRefund, setIncludeRefund] = useState(false);
 
     const userId = location.state?.userId;
 
@@ -51,8 +49,8 @@ export default function BookingReportDetail() {
             if (data.success) {
                 setReport(data.data);
                 setAction(data.data.action || '');
-                setRefundAmount(data.data.refund_amount || '');
-                setNewRefundAmount(data.data.refund_amount || '');
+                // Auto-load booking cost as refund amount
+                setRefundAmount(data.data.booking_id?.cost || '0.00');
             }
         } catch (error) {
             toast.error('Failed to load report details');
@@ -67,7 +65,7 @@ export default function BookingReportDetail() {
             return;
         }
 
-        if (refundAmount && parseFloat(refundAmount) > 0) {
+        if (includeRefund && parseFloat(refundAmount) > 0) {
             setShowRefundConfirm(true);
             return;
         }
@@ -89,7 +87,7 @@ export default function BookingReportDetail() {
                     status: 'resolved',
                     action,
                     resolved_by: userId || 'Support Officer',
-                    refund_amount: refundAmount ? parseFloat(refundAmount) : undefined
+                    refund_amount: includeRefund && refundAmount ? parseFloat(refundAmount) : undefined
                 })
             });
 
@@ -97,8 +95,6 @@ export default function BookingReportDetail() {
             if (data.success) {
                 toast.success('Report marked as resolved');
                 setReport(data.data);
-                setRefundAmount(data.data.refund_amount || '');
-                setNewRefundAmount(data.data.refund_amount || '');
             } else {
                 throw new Error(data.message);
             }
@@ -152,67 +148,6 @@ export default function BookingReportDetail() {
         }
     };
 
-    const handleAddRefund = () => {
-        setShowAddRefundModal(true);
-        setNewRefundAmount(report.refund_amount || '');
-    };
-
-    const confirmAddRefund = async () => {
-        if (!newRefundAmount || parseFloat(newRefundAmount) <= 0) {
-            toast.error('Please enter a valid refund amount');
-            return;
-        }
-
-        // Check if this is an update to existing refund
-        const hasExistingRefund = report.refund_amount && report.refund_amount > 0;
-        const isChangingAmount = hasExistingRefund && parseFloat(newRefundAmount) !== parseFloat(report.refund_amount);
-
-        if (isChangingAmount) {
-            setShowUpdateRefundConfirm(true);
-            return;
-        }
-
-        await submitAddRefund();
-    };
-
-    const submitAddRefund = async () => {
-        setIsSubmitting(true);
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/api/reports/refund-reports/bookings/${id}/refund`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    refund_amount: parseFloat(newRefundAmount),
-                    is_refunded: true
-                })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                const successMessage = report.refund_amount && report.refund_amount > 0 
-                    ? 'Refund updated successfully' 
-                    : 'Refund added successfully';
-                
-                toast.success(successMessage);
-                setReport(data.data);
-                setRefundAmount(data.data.refund_amount || '');
-                setNewRefundAmount(data.data.refund_amount || '');
-                setShowAddRefundModal(false);
-                setShowUpdateRefundConfirm(false);
-            } else {
-                throw new Error(data.message);
-            }
-        } catch (error) {
-            toast.error('Failed to process refund');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
     const closeRejectModal = () => {
         setShowRejectModal(false);
         setRejectedReason('');
@@ -222,16 +157,8 @@ export default function BookingReportDetail() {
         setShowRefundConfirm(false);
     };
 
-    const closeAddRefundModal = () => {
-        setShowAddRefundModal(false);
-        setShowUpdateRefundConfirm(false);
-    };
-
     if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;
     if (!report) return <div>Report not found</div>;
-
-    const canAddRefund = report.status === 'resolved' && report.status !== 'rejected';
-    const hasExistingRefund = report.refund_amount && report.refund_amount > 0;
 
     return (
         <div style={{ fontFamily: FONTS.family.sans, padding: '24px', backgroundColor: COLORS.background }}>
@@ -296,79 +223,6 @@ export default function BookingReportDetail() {
                                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
                             >
                                 {isSubmitting ? 'Processing...' : 'Confirm Refund & Resolve'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Add Refund Modal */}
-            {showAddRefundModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-96">
-                        <h3 className="text-lg font-semibold mb-4">
-                            {hasExistingRefund ? 'Update Refund' : 'Add Refund'}
-                        </h3>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Refund Amount *
-                            </label>
-                            <input
-                                type="number"
-                                value={newRefundAmount}
-                                onChange={(e) => setNewRefundAmount(e.target.value)}
-                                className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="0.00"
-                                step="0.01"
-                                min="0"
-                            />
-                            {hasExistingRefund && (
-                                <p className="text-sm text-gray-500 mt-1">
-                                    Current refund amount: Rs {report.refund_amount}
-                                </p>
-                            )}
-                        </div>
-                        <div className="flex space-x-3 justify-end">
-                            <button
-                                onClick={closeAddRefundModal}
-                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={confirmAddRefund}
-                                disabled={isSubmitting || !newRefundAmount || parseFloat(newRefundAmount) <= 0}
-                                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
-                            >
-                                {isSubmitting ? 'Processing...' : hasExistingRefund ? 'Update Refund' : 'Add Refund'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Update Refund Confirmation Modal */}
-            {showUpdateRefundConfirm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-96">
-                        <h3 className="text-lg font-semibold mb-4">Confirm Refund Update</h3>
-                        <p className="text-sm text-gray-600 mb-4">
-                            You are about to change the refund amount from <strong>Rs {report.refund_amount}</strong> to <strong>Rs {newRefundAmount}</strong>.
-                            Are you sure you want to update the refund?
-                        </p>
-                        <div className="flex space-x-3 justify-end">
-                            <button
-                                onClick={closeAddRefundModal}
-                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={submitAddRefund}
-                                disabled={isSubmitting}
-                                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
-                            >
-                                {isSubmitting ? 'Updating...' : 'Confirm Update'}
                             </button>
                         </div>
                     </div>
@@ -489,18 +343,38 @@ export default function BookingReportDetail() {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Refund Amount (Optional)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={refundAmount}
-                                        onChange={(e) => setRefundAmount(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="0.00"
-                                        step="0.01"
-                                        min="0"
-                                    />
+                                    <div className="flex items-center mb-2">
+                                        <input
+                                            type="checkbox"
+                                            id="includeRefund"
+                                            checked={includeRefund}
+                                            onChange={(e) => setIncludeRefund(e.target.checked)}
+                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        />
+                                        <label htmlFor="includeRefund" className="ml-2 block text-sm text-gray-900">
+                                            Include refund
+                                        </label>
+                                    </div>
+                                    {includeRefund && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Refund Amount
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={refundAmount}
+                                                onChange={(e) => setRefundAmount(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                                                placeholder="0.00"
+                                                step="0.01"
+                                                min="0"
+                                                readOnly
+                                            />
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                This amount is automatically loaded from the booking cost
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-3">
@@ -550,15 +424,6 @@ export default function BookingReportDetail() {
                                         </p>
                                     )}
                                 </div>
-
-                                {canAddRefund && (
-                                    <button
-                                        onClick={handleAddRefund}
-                                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                                    >
-                                        {report.refund_amount ? 'Update Refund' : 'Add Refund'}
-                                    </button>
-                                )}
                             </div>
                         )}
                     </div>
