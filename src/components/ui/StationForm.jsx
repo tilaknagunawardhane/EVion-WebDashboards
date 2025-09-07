@@ -29,6 +29,7 @@ export default function StepOneForm({
           value={formData.stationName}
           onChange={handleChange('stationName')}
           error={errors.stationName}
+          errorMessage={errors.stationName}
           required
         />
 
@@ -76,12 +77,13 @@ export default function StepOneForm({
             value={formData.city}
             onChange={handleChange('city')}
             error={errors.city}
+            errorMessage={errors.city}
             required
           />
         </div>
 
         <div className="w-full relative rounded-lg overflow-hidden border"
-            style={{ borderColor: errors.location ? COLORS.danger : COLORS.stroke }}>
+            style={{ borderColor: errors.locationData ? COLORS.danger : COLORS.stroke }}>
             <img
                 src={MapPlaceholderImage} // Your map image
                 alt="Map Placeholder"
@@ -100,7 +102,7 @@ export default function StepOneForm({
                 )}
                 {/* Optional: Add a checkmark icon if locationData is set */}
             </button>
-            {errors.location && (
+            {errors.locationData && (
                 <p
                     className="mt-1 absolute -bottom-6 left-0" // Position error message
                     style={{
@@ -108,7 +110,7 @@ export default function StepOneForm({
                         fontSize: FONTS.sizes.sm
                     }}
                 >
-                    {errors.location}
+                    {errors.locationData}
                 </p>
             )}
         </div>

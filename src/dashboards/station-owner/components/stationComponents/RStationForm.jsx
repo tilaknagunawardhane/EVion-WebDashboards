@@ -104,8 +104,8 @@ export default function StepOneForm({
             >
             <option value="">Select District</option>
             {districts.map((d) => (
-              <option key={d} value={d}>
-                {d}
+              <option key={d._id} value={d._id}>
+                {d.name}
               </option>
             ))}
           </select>
