@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react'; // Added useEffect
+import React, { useState, useRef, useEffect } from 'react'; // Added useEffect
 import { COLORS, FONTS } from '../../../../constants';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
 import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
 import DataTable from '../../../../components/ui/DataTable';
@@ -17,7 +17,11 @@ import ViewStationRightPanel from '../../components/stationComponents/ViewStatio
 import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
 import StationSchedule from '../../components/stationComponents/StationSchedule';
 import { FiMoreVertical } from 'react-icons/fi';
-import AddChargingStationForm from '../../components/stationComponents/RAddStationForm'; // Renamed to clarify its actual purpose
+import AddChargingStationForm from '../../components/stationComponents/RAddStationForm';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const stationImages = [
     'https://images.unsplash.com/photo-1703860271509-b50f5679f2a0?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -96,40 +100,143 @@ const OwnerViewStation = () => {
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
-    const [rating] = useState(4.5);
+    const [rating, setRating] = useState(0.0);
     const [stationSchedule, setStationSchedule] = useState(sampleSchedule);
     const [stationTemporaryClosures, setStationTemporaryClosures] = useState(sampleTemporaryClosure);
     const [showAll, setShowAll] = useState(false);
     const [localStationImages, setLocalStationImages] = useState(stationImages);
+    const [loading, setLoading] = useState(true);
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
+     const { id } = useParams(); // Get station ID from URL params
+     const stationId = id; // Use the id directly
+
+     console.log('Station ID from URL:', id);
 
     // Consolidated Station Details State - THIS IS THE MAIN CHANGE
     const [stationDetails, setStationDetails] = useState({
-        id: 'station-001',
-        name: 'EviGO Charging Station',
-        address: '45 Peradeniya Road, Kandy', // Combined address for display
-        addressLine: '45 Peradeniya Road', // For form pre-filling
-        city: 'Kandy', // For form pre-filling
-        district: 'Kandy', // For form pre-filling
-        electricityProvider: 'CEB',
-        powerSource: 'Grid',
-        location: { lat: 6.927, lng: 79.861 }, // Sample location data
-        operator: "A P Perera",
-        email: "perera@gmail.com",
-        operatorJoinedDate: "12 Dec 2024",
-        operatorStatus: "Active",
-        totalEarnings: "LKR 6.45 M",
-        earningsChange: "+6.37%",
-        totalElectricity: "2560 nWh",
-        electricityChange: "-8.3%",
-        reports: "12",
-        status: "Open", // Renamed from 'Station Status' to 'status' for consistency
-        noOfConnectors: "7",
-        noOfReports: "17",
+        id: '',
+        name: '',
+        address: '',
+        addressLine: '',
+        city: '',
+        district: '',
+        electricityProvider: '',
+        powerSource: '',
+        location: { lat: 0, lng: 0 },
+        operator: "",
+        email: "",
+        operatorJoinedDate: "",
+        operatorStatus: "",
+        totalEarnings: "",
+        earningsChange: "+0%",
+        totalElectricity: "0 nWh",
+        electricityChange: "+0%",
+        reports: "0",
+        status: "",
+        noOfConnectors: "0",
+        noOfReports: "0",
+        averageRating: 0,
+        totalRatings: 0
     });
 
     const [showEditStationForm, setShowEditStationForm] = useState(false);
+
+    // Fetch station data from backend
+    useEffect(() => {
+        const fetchStationData = async () => {
+            try {
+                setLoading(true);
+                const stationOwnerID = localStorage.getItem('userID');
+                const accessToken = localStorage.getItem('accessToken');
+
+                console.log('Making API request to:', `${API_BASE_URL}/api/stations/station/${stationId}`);
+                console.log('Station Owner ID:', stationOwnerID);
+                console.log('Access Token exists:', !!accessToken)
+                
+                const response = await axios.get(
+                    `${API_BASE_URL}/api/stations/station/${stationId}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        },
+                        params: {
+                            stationOwnerId: stationOwnerID
+                        }
+                    }
+                    
+                );
+
+                console.log('API Response:', response.data);
+
+                if (response.data.success) {
+                    const stationData = response.data.data;
+
+                    console.log('Station Data from API:', stationData);
+                    
+                    // Update station details with API data
+                    setStationDetails({
+                        id: stationData._id || stationData.id,
+                        name: stationData.station_name || '',
+                        address: stationData.address || '',
+                        addressLine: stationData.address || '',
+                        city: stationData.city || '',
+                        district: stationData.district || '',
+                        electricityProvider: stationData.electricity_provider || '',
+                        powerSource: stationData.power_source || '',
+                        location: stationData.location || { lat: 0, lng: 0 },
+                        operator: stationData.operator || "",
+                        email: stationData.email || "",
+                        operatorJoinedDate: stationData.operatorJoinedDate || "",
+                        operatorStatus: stationData.operatorStatus || "Active",
+                        totalEarnings: stationData.totalEarnings || "LKR 0",
+                        earningsChange: stationData.earningsChange || "+0%",
+                        totalElectricity: stationData.totalElectricity || "0 nWh",
+                        electricityChange: stationData.electricityChange || "+0%",
+                        reports: stationData.reports || "0",
+                        status: stationData.status || "Open",
+                        noOfConnectors: stationData.chargers?.length || "0",
+                        noOfReports: stationData.noOfReports || "0",
+                        averageRating: stationData.averageRating || 0,
+                        totalRatings: stationData.totalRatings || 0
+                    });
+
+                    // Set rating from API data
+                    setRating(stationData.averageRating || 0.0);
+                } else {
+                    toast.error('Failed to fetch station data');
+                }
+            } catch (error) {
+                console.error('Error fetching station data:', error);
+                
+                if (error.response) {
+                    console.error('Response data:', error.response.data);
+                    console.error('Response status:', error.response.status);
+                    console.error('Response headers:', error.response.headers);
+
+                     if (error.response.status === 401) {
+                        toast.error('Authentication failed. Please login again.');
+                    } else if (error.response.status === 404) {
+                        toast.error('Station not found');
+                    } else {
+                        toast.error(error.response.data.message || 'Error loading station data');
+                    }
+                } else if (error.request) {
+                    console.error('Request:', error.request);
+                    toast.error('No response received from server');
+                } else {
+                    console.error('Error message:', error.message);
+                    toast.error('Error configuring request');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (stationId) {
+            fetchStationData();
+        }
+    }, [stationId]);
 
     const initialDisplayCount = 3;
     const imagesToDisplay = showAll ? localStationImages : localStationImages.slice(0, initialDisplayCount);
@@ -140,7 +247,7 @@ const OwnerViewStation = () => {
 
     const handleFormSubmit = (data) => {
         console.log("Station Update Form Submitted:", data);
-        if (data.type === 'add-station' && data.station) { // The form returns 'add-station' mode data when editing station
+        if (data.type === 'edit-station' && data.station) { // The form returns 'add-station' mode data when editing station
             // Update stationDetails state with data from the form
             setStationDetails(prev => ({
                 ...prev,
@@ -148,7 +255,7 @@ const OwnerViewStation = () => {
                 // Reconstruct full address if needed for display, or assume form provides it
                 address: `${data.station.addressLine}, ${data.station.city}`, // Example re-construction
             }));
-            alert('Station details updated (simulated)! Check console.');
+            alert('Station details updated successfully!');
         }
         setShowEditStationForm(false);
     };
@@ -202,10 +309,33 @@ const OwnerViewStation = () => {
     };
 
     // Handler for removing a station
-    const handleRemoveStation = () => {
+    const handleRemoveStation = async () => {
         if (window.confirm("Are you sure you want to remove this station? This action cannot be undone.")) {
-            console.log("Station removed!");
-            navigate('/station-owner/stations'); // Example redirect after removal
+            try {
+                const stationOwnerID = localStorage.getItem('userID');
+                
+                const response = await axios.delete(
+                    `${API_BASE_URL}/api/stations/delete-station/${stationId}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        },
+                        data: {
+                            stationOwnerID: stationOwnerID
+                        }
+                    }
+                );
+
+                if (response.data.success) {
+                    toast.success('Station removed successfully!');
+                    navigate('/station-owner/stations');
+                } else {
+                    toast.error('Failed to remove station');
+                }
+            } catch (error) {
+                console.error('Error removing station:', error);
+                toast.error(error.response?.data?.message || 'Error removing station');
+            }
         }
     };
 
@@ -376,6 +506,14 @@ const OwnerViewStation = () => {
         const currentStatus = stationDetails.status || 'Active';
         const statusStyle = statusColors[currentStatus] || statusColors['Active'];
 
+        if (loading) {
+            return (
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+            );
+        }
+
         return (
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* Left side - Profile info */}
@@ -422,7 +560,7 @@ const OwnerViewStation = () => {
                                 >
                                     Electricity Provider:
                                 </strong>{' '}
-                                {stationDetails.electricityProvider} {/* Use stationDetails */}
+                                {stationDetails.electricityProvider}
                             </div>
                             <div>
                                 <strong
@@ -430,7 +568,7 @@ const OwnerViewStation = () => {
                                 >
                                     Power Source:
                                 </strong>{' '}
-                                {stationDetails.powerSource} {/* Use stationDetails */}
+                                {stationDetails.powerSource}
                             </div>
                         </div>
                     </div>
@@ -547,6 +685,14 @@ const OwnerViewStation = () => {
         </div>
     );
 
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+      
     return (
         <div
             style={{
