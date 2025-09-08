@@ -40,6 +40,7 @@ import StationReportDetailsPage from '../dashboards/support-officer/pages/Statio
 import ChargerReportDetailsPage from '../dashboards/support-officer/pages/ChargerReportDetail'
 import BookingReportDetailPage from '../dashboards/support-officer/pages/BookingReportDetail'
 import SupportOfficerNotifications from '../dashboards/support-officer/pages/Notifications'
+import SupportOfficerStationDetailsPage from '../dashboards/support-officer/pages/StationDetailsPage'
 
 import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/StationProfile'
 import OwnerViewCharger from '../dashboards/station-owner/pages/chargerPages/ChargerProfile'
@@ -114,6 +115,7 @@ const router = createBrowserRouter([
           { path: 'fault-reports/stations/:id', element: <StationReportDetailsPage /> },
           { path: 'fault-reports/chargers/:id', element: <ChargerReportDetailsPage /> },
           { path: 'fault-reports/bookings/:id', element: <BookingReportDetailPage /> },
+          { path: 'station-details/:stationId', element: <SupportOfficerStationDetailsPage /> },
           { path: 'notifications', element:<SupportOfficerNotifications /> },
 
 
