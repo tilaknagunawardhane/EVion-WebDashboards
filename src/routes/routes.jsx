@@ -47,7 +47,7 @@ import FaultAlerts from '../dashboards/station-owner/pages/faultsPages/FaultRepo
 import OwnerChatPage from '../dashboards/station-owner/pages/Chat'
 import OwnerEarnings from '../dashboards/station-owner/pages/earningsPages/Earnings'
 import StationOwnerNotifications from '../dashboards/station-owner/pages/Notifications'
-
+import StationOwnerReportDetails from '../dashboards/station-owner/pages/faultsPages/ReportDetails'
 
 const router = createBrowserRouter([
   {
@@ -94,6 +94,7 @@ const router = createBrowserRouter([
           { path: 'alerts', element: <FaultAlerts /> },
           { path: 'chat', element: <OwnerChatPage /> },
           { path: 'notifications', element: <StationOwnerNotifications /> },
+          { path: 'reportDetails/:type/:reportId', element: <StationOwnerReportDetails /> },
           { path: 'earnings', element: <OwnerEarnings /> },
 
         ]

@@ -128,7 +128,7 @@ const OwnerViewStation = () => {
     };
 
     const handleRowClick = (row) => {
-        navigate(`/station-owner/report-details/${row['Report Type']}/${row['Report ID']}`);
+        navigate(`/station-owner/reportDetails/${row['Report Type']}/${row['Report ID']}`);
     };
 
     const handlePageChange = (newPage) => {
@@ -148,15 +148,15 @@ const OwnerViewStation = () => {
 
     // Format data for the table
     const formattedReports = reports.map(report => ({
-        'Report ID': report._id,
-        'Reported Date': new Date(report.createdAt).toLocaleDateString(),
-        'Reported Time': new Date(report.createdAt).toLocaleTimeString(),
-        'Report Type': report.modelName || (report.booking_id ? 'booking' : report.charger_id ? 'charger' : 'station'),
+        'Report ID': report.reportId,
+        'Reported Date': new Date(report.reportedDate).toLocaleDateString(),
+        'Reported Time': new Date(report.reportedDate).toLocaleTimeString(),
+        'Report Type': report.reportType || (report.booking_id ? 'booking' : report.charger_id ? 'charger' : 'station'),
         'Category': report.category,
         'Description': report.description.length > 100
             ? `${report.description.substring(0, 100)}...`
             : report.description,
-        'Associated Station': report.station_id?.station_name || report.booking_id?.charging_station_id?.station_name || 'N/A',
+        'Associated Station': report.associatedStation,
         'Status': report.status.charAt(0).toUpperCase() + report.status.slice(1).replace('-', ' ')
     }));
 
