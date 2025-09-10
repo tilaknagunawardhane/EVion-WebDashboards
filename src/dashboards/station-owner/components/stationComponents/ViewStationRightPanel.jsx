@@ -104,14 +104,14 @@ export default function ViewStationRightPanel({station}) {
                                 'Authorization': `Bearer ${accessToken}`
                             },
                             params: {
-                                stationOwnerID: stationOwnerID
+                                stationOwnerId: stationOwnerID
                             }
                         }
                     );
 
                     if (response.data.success) {
                         setChargers(response.data.data || []);
-                        toast.success(data.type === 'edit-charger' ? 'Charger updated successfully!' : 'Charger added successfully!');
+                        // toast.success(formMode === 'edit-charger' ? 'Carger updated successfully!' : 'Charger added successfully!');
                     }
                 } catch (error) {
                     console.error('Error refreshing charger data:', error);

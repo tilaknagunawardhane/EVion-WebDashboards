@@ -72,17 +72,22 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
             });
 
             if (mode === 'edit-charger' && initialChargerData) {
+                console.log('Initial Charger Data for Editing:', initialChargerData);
                 // Editing an existing charger
                 setCurrentStep(2);
                 setNumChargers(1); // Force 1 charger for editing
                 setChargers([
                     {
-                        name: initialChargerData.name || '',
-                        maxPower: initialChargerData.maxPower?.toString() || '',
+                        name: initialChargerData.charger_name || '',
+                        maxPower: initialChargerData.max_power_output?.toString() || '',
                         price: initialChargerData.price || '',
-                        status: initialChargerData.chargerStatus || 'processing',
-                        connectors: initialChargerData.connectors || [], // Use connectorTypes for pre-filling checkboxes
-                        powerType: initialChargerData.powerType || '',
+                        status: initialChargerData.charger_status || 'processing',
+                        connectors: initialChargerData.connector_types.map(ct => ct.connector?._id) || [],
+                        // connectors: initialChargerData.connector_types?.map(ct => ({
+                        //     connector: ct.connector?._id,
+                        //     status: ct.status || 'available' // Include status
+                        // })) || [],
+                        powerType: initialChargerData.power_type || '',
                         _id: initialChargerData._id
                     }
                 ]);
@@ -236,8 +241,8 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
                         price: parseFloat(charger.price) || 0,
                         charger_status: 'processing',
                         connector_types: charger.connectors.map(connectorId => ({
-                        connector: connectorId,
-                        status: 'available'
+                            connector: connectorId,
+                            status: 'available'
                         }))
                     }))
                 };
@@ -287,20 +292,23 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
                     price: parseFloat(chargers[0].price) || 0,
                     connector_types: chargers[0].connectors.map(connectorId => ({
                         connector: connectorId,
-                        status: 'available'
-                    }))
+                    })),
+                    // connector_types: chargers[0].connectors.map(connector => ({
+                    //     connector: connector._id || connector,  // if you store full object or just id
+                    //     status: connector.status || 'unavailable'
+                    // })),
+                    charger_status: chargers[0].status
                 };
-
                 response = await axios.put(
-                    `${API_BASE_URL}/api/stations/${stationId}/update-charger/${chargers[0]._id}`,
-                    { stationOwnerID, ...chargerData },
+                    `${API_BASE_URL}/api/stations/station/${stationId}/update-charger/${chargers[0]._id}?stationOwnerId=${stationOwnerID}`,
+                    chargerData,
                     {
                         headers: {
                         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
                         'Content-Type': 'application/json'
                         }
                     }
-                    );
+                );
                 toast.success('Charger updated successfully!');
             }
 
