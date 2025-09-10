@@ -301,7 +301,7 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
           charger_status: charger.charger_status,
           connector_types: charger.connectors.map(connectorId => ({
             connector: connectorId,
-            status: 'available'
+            status: 'unavailable'
           }))
         }))
       };

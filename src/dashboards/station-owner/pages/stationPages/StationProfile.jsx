@@ -178,7 +178,8 @@ const OwnerViewStation = () => {
                     setStationDetails({
                         id: stationData._id || stationData.id,
                         name: stationData.station_name || '',
-                        address: stationData.address || '',
+                        // address: stationData.address || '',
+                        address: `${stationData.address || ''}${', '}${stationData.city}${', '}${stationData.district}`,
                         addressLine: stationData.address || '',
                         city: stationData.city || '',
                         district: stationData.district || '',
@@ -480,23 +481,23 @@ const OwnerViewStation = () => {
     // Profile Tab Content
     const ProfileTab = () => {
         const statusColors = {
-            'Active': {
+            'open': {
                 bg: `${COLORS.primary}20`,
                 text: COLORS.primary
             },
-            'Closed': {
-                bg: `${COLORS.danger}20`,
-                text: COLORS.danger
+            'closed': {
+                bg: `${COLORS.secondaryText}20`,
+                text: COLORS.secondaryText
             },
-            'Under Maintenance': {
+            'reviewing': {
                 bg: `${COLORS.HighlightText}20`,
                 text: COLORS.HighlightText
             },
-            'Disabled': {
+            'disabled_by_so': {
                 bg: `${COLORS.danger}20`,
                 text: COLORS.danger
             },
-            'Deleted': {
+            'deleted': {
                 bg: `${COLORS.mainTextColor}20`,
                 text: COLORS.mainTextColor
             }
@@ -530,7 +531,7 @@ const OwnerViewStation = () => {
                             {renderStars()}
                         </div>
                         <div className="sm:self-start flex items-center gap-2">
-                            <span className="px-3 py-1 rounded-full text-sm inline-block" style={{
+                            <span className="px-3 py-1 rounded-full text-sm inline-block uppercase" style={{
                                 backgroundColor: statusStyle.bg,
                                 color: statusStyle.text
                             }}>

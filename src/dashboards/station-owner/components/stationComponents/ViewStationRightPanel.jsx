@@ -66,9 +66,9 @@ export default function ViewStationRightPanel({station}) {
     }, [station?.id]);
 
     const connectorStateColors = {
-        'in-use': COLORS.primary,
+        'in-use': COLORS.chargerFree,
         'reserved': COLORS.star,
-        'available': COLORS.chargerFree, 
+        'available': COLORS.primary, 
         'unavailable': COLORS.secondaryText
     };
 
@@ -178,13 +178,14 @@ export default function ViewStationRightPanel({station}) {
                             <ConnectorCard
                                 key={charger._id || index}
                                 name={charger.charger_name || 'Unnamed Charger'}
-                                type={`DC Fast Charger (${charger.max_power_output} kW)`}
+                                type={`DC Fast Charger - ${charger.max_power_output} kW`}
+                                price={charger.price || 'N/A'}
                                 connectors={charger.connector_types?.map(connector => ({
                                     name: connector.connector?.type_name || 'N/A',
                                     status: connector.status || 'unavailable',
                                 })) || []}
                                 connectorStateColors={connectorStateColors}
-                                typeColor={COLORS.secondaryText}
+                                typeColor={COLORS.mainTextColor}
                                 onClick={() => handleChargerCardClick(charger._id)}
                                 onEdit={() => handleEditCharger(charger)}
                                 status={charger.charger_status}
@@ -203,13 +204,14 @@ export default function ViewStationRightPanel({station}) {
                             <ConnectorCard
                                 key={charger._id || index}
                                 name={charger.charger_name || 'Unnamed Charger'}
-                                type={`AC Charger (${charger.max_power_output} kW)`}
+                                type={`AC Charger - ${charger.max_power_output} kW`}
+                                price={charger.price || 'N/A'}
                                 connectors={charger.connector_types?.map(connector => ({
                                     name: connector.connector?.type_name || 'N/A',
                                     status: connector.status || 'unavailable',
                                 })) || []}
                                 connectorStateColors={connectorStateColors}
-                                typeColor={COLORS.secondaryText}
+                                typeColor={COLORS.mainTextColor}
                                 onClick={() => handleChargerCardClick(charger._id)}
                                 onEdit={() => handleEditCharger(charger)}
                                 status={charger.charger_status}

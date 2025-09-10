@@ -29,7 +29,7 @@ const statusText = {
   'available': 'Charger Free',
   'unavailable': 'Unavailable',
   'open': 'Open',
-  'to_be_installed': 'To Be Installed',
+  'to_be_installed': 'To be Installed',
   'rejected': 'Rejected',
 };
 
@@ -48,6 +48,7 @@ const connectorStatusColors = {
 const ConnectorCard = ({
     name,
     type,
+    price = 'N/A',
     connectors,
     connectorStateColors =  connectorStatusColors,
     typeColor = COLORS.secondaryText,
@@ -70,7 +71,7 @@ const ConnectorCard = ({
                         e.stopPropagation();
                         onEdit();
                     }}
-                    style={{ color: COLORS.primary }}
+                    style={{ color: COLORS.secondaryText }}
                 >
                     <FiEdit2 size={16} />
                 </button>
@@ -78,11 +79,14 @@ const ConnectorCard = ({
 
             <div className="flex justify-between items-start">
                 <div className="flex-1 gap-4">
-                    <p className="text-sm font-normal mb-1" style={{ color: COLORS.mainTextColor }}>
+                    <p className="text-sm font-medium mb-1" style={{ color: COLORS.mainTextColor }}>
                         {name}
                     </p>
-                    <p className="text-xs mb-2" style={{ color: typeColor }}>
+                    <p className="text-xs mb-0 font-normal" style={{ color: typeColor }}>
                         {type}
+                    </p>
+                    <p className="text-xs mb-2" style={{ color: COLORS.secondaryText }}>
+                        LKR {price} /kWh
                     </p>
                     <div 
                         className="px-2 py-1 rounded-full text-xs mt-2 w-fit"
