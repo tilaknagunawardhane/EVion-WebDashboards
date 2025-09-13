@@ -181,6 +181,18 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
         isValid = false;
       }
 
+      const priceNum = parseFloat(charger.price);
+      if (!charger.price || charger.price.toString().trim() === '') {
+        chargerErrors.price = 'Unit price is required';
+        isValid = false;
+      } else if (isNaN(priceNum)) {
+        chargerErrors.price = 'Must be a valid number';
+        isValid = false;
+      } else if (priceNum < 1) {
+        chargerErrors.maxPower = 'Must be greater than LKR 1';
+        isValid = false;
+      }
+
       if (charger.connectors.length === 0) {
         chargerErrors.connectors = 'At least one connector is required';
         isValid = false;
@@ -289,7 +301,7 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
           charger_status: charger.charger_status,
           connector_types: charger.connectors.map(connectorId => ({
             connector: connectorId,
-            status: 'available'
+            status: 'unavailable'
           }))
         }))
       };

@@ -1,40 +1,44 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { COLORS, FONTS } from '../../../../constants';
 import Button from '../../../../components/ui/Button';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'; // Import chevron icons
+import StationIcon from '../../../../assets/stations_icon.svg'
+import { FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
 
-export default function StationCard({ station, onClick, onPay }) {
-    const [expanded, setExpanded] = useState(false); // Reintroduce expanded state
+export default function StationCard({ station, onClick }) {
+    
 
     const statusTagBackgroundColors = {
         'open': COLORS.bgGreen,          
-        'processing': COLORS.bgYellow,
-        'unavailable': COLORS.mainTextColor, 
+        'reviewing': COLORS.bgYellow,
+        'closed': COLORS.background, 
         'deleted': COLORS.mainTextColor,
         'disabled_by_SO': COLORS.bgRed,
     };
 
     const statusTagFontColors = {
         'open': COLORS.primary,
-        'processing': COLORS.HighlightText,
-        'unavailable': COLORS.background, 
+        'reviewing': COLORS.HighlightText,
+        'closed': COLORS.secondaryText, 
         'deleted': COLORS.background,
         'disabled_by_SO': COLORS.danger,
     };
 
     // Correctly determine number of chargers/requested chargers
     const numberOfChargers = station.chargers ? station.chargers.length : 0;
-    const isRequestedChargers = ['Pending Approval', 'Approved - Waiting for Payment', 'To be installed'].includes(station.status);
-    const chargerCountLabel = isRequestedChargers ? 'Number of Requested Chargers:' : 'Number of Chargers:';
+    const averageRating = station.averageRating ? station.averageRating : 0.0;
+    const isRequestedChargers = ['reviewing'].includes(station.status);
+    const chargerCountLabel = isRequestedChargers ? 'Requested Chargers:' : 'Number of Chargers:';
 
 
     // Determine if the card should be expandable
     // Now 'To be installed' should also be expandable
     const isExpandable = ['Pending Approval', 'To be installed', 'Approved - Waiting for Payment'].includes(station.status);
+    const showRating = ['open', 'closed', 'deleted', 'disabled_by_SO'].includes(station.status);
 
     return (
         <div
-            className="rounded-xl p-6 shadow-md"
+            className="rounded-xl p-4 shadow-md"
             style={{
                 backgroundColor: 'white',
                 overflow: 'hidden',
@@ -46,16 +50,38 @@ export default function StationCard({ station, onClick, onPay }) {
         >
             <div className="flex flex-col gap-0 mb-2">
                 {/* Station Name */}
-                <h3
-                    style={{
-                        fontFamily: FONTS.family.sans,
-                        fontWeight: FONTS.weights.normal,
-                        fontSize: FONTS.sizes.base,
-                        color: COLORS.mainTextColor
-                    }}
-                >
-                    {station.name}
-                </h3>
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: COLORS.bgGreen }}>
+                        <img
+                            src={StationIcon}
+                            alt="Station"
+                            className="w-5 h-5"
+                            style={{
+                                filter: `
+                                    brightness(0) 
+                                    saturate(100%) 
+                                    invert(67%) 
+                                    sepia(48%) 
+                                    saturate(718%) 
+                                    hue-rotate(123deg) 
+                                    brightness(95%) 
+                                    contrast(101%)
+                                `,
+                            }}
+                        />
+                    </div>
+                    <h3
+                        style={{
+                            fontFamily: FONTS.family.sans,
+                            fontWeight: FONTS.weights.normal,
+                            fontSize: FONTS.sizes.base,
+                            color: COLORS.mainTextColor
+                        }}
+                    >
+                        {station.name}
+                    </h3>
+
+                </div>
 
                 {/* Station Address */}
                 <p
@@ -66,21 +92,44 @@ export default function StationCard({ station, onClick, onPay }) {
                 >
                     {station.address}
                 </p>
+
+                {showRating &&
+                    <div className="flex items-center justify-start gap-0 mt-1">
+                
+                        {/* Star icons */}
+                        <div style={{ display: 'flex', alignItems: 'left', margin: '0' }}>
+                            {[1, 2, 3, 4, 5].map((star) => {
+                                if (averageRating >= star) {
+                                    return <FaStar key={star} color="#FFD700" size={14} />;
+                                } else if (averageRating >= star - 0.5) {
+                                    return <FaStarHalfAlt key={star} color="#FFD700" size={14} />;
+                                } else {
+                                    return <FaRegStar key={star} color="#FFD700" size={14} />;
+                                }
+                            })}
+                        </div>
+                        
+                        <span style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.medium, marginLeft: '8px'}}>
+                            {averageRating} / 5.0
+                        </span>
+                    </div>
+                }
             </div>
-
-            {/* Status Badge */}
-            <span
-                className="px-4 py-1.5 rounded-md text-xs font-semibold uppercase"
-                style={{
-                    backgroundColor: statusTagBackgroundColors[station.status] || '#E5E7EB', // Fallback gray
-                    color: statusTagFontColors[station.status] || COLORS.mainTextColor,
-                }}
-            >
-                {station.status}
-            </span>
-
+            
             {/* Additional Details */}
-            <div className="mt-4 flex flex-col gap-2">
+            <div className="mt-4 flex justify-between gap-2">
+                {/* Status Badge */}
+                <div>
+                    <span
+                        className="px-4 py-1.5 rounded-full text-xs font-medium uppercase"
+                        style={{
+                            backgroundColor: statusTagBackgroundColors[station.status] || '#E5E7EB', // Fallback gray
+                            color: statusTagFontColors[station.status] || COLORS.mainTextColor,
+                        }}
+                    >
+                        {station.status}
+                    </span>
+                </div>
                 <div>
                     <strong
                         style={{ fontWeight: FONTS.weights.normal, color: COLORS.mainTextColor, fontSize: FONTS.sizes.xs }}
@@ -92,83 +141,6 @@ export default function StationCard({ station, onClick, onPay }) {
                     </span>
                 </div>
             </div>
-
-
-            {/* Bottom Section: Pay Now and Date of Request */}
-            <div className="flex justify-between items-end mt-6">
-                {/* Pay Now Button */}
-                {station.status === 'Approved - Waiting for Payment' && (
-                    <div className="flex w-full justify-start items-end">
-                        <Button 
-                          variant="primary" 
-                          onClick={(e) => { e.stopPropagation(); onPay?.(station); }}
-                        >
-                            Pay Now
-                        </Button>
-                        
-                    </div>
-                )}
-               
-            </div>
-
-            {/* Expandable Section */}
-            {isExpandable && (
-                <>
-                    <div className="flex w-full items-center justify-between mt-4">
-                      {station.dateOfRequest && ['Pending Approval', 'Approved - Waiting for Payment', 'To be installed'].includes(station.status) && (
-                          <p className="text-right text-xs" style={{ color: COLORS.secondaryText }}>
-                              {station.dateOfRequest} {/* This will now correctly display the full string */}
-                          </p>
-                      )}
-                      <button
-                          className="flex items-center gap-1 underline"
-                          style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                          onClick={(e) => {
-                              e.stopPropagation(); // Prevent card onClick from firing
-                              setExpanded(!expanded);
-                          }}
-                      >
-                          {expanded ? 'Hide Details' : 'View Details'}
-                          {expanded ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
-                      </button>
-                      
-                    </div>
-
-                    {expanded && (
-                        <div className="mt-4 space-y-4">
-                            {/* Individual Charger Details */}
-                            {station.chargers && station.chargers.map((charger, idx) => ( // Added null check for chargers
-                                <div key={idx} className="rounded-lg p-4" style={{ backgroundColor: COLORS.background }}>
-                                    <h4 className="mb-2 rounded-xl" style={{ color: COLORS.mainTextColor, fontWeight: FONTS.weights.medium, fontSize: FONTS.sizes.sm }}>
-                                        {charger.name}
-                                    </h4>
-                                    <p style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.medium, color: COLORS.mainTextColor }}>
-                                        <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Power Type:</strong> {charger.powerType}
-                                    </p>
-                                    <p style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.medium, color: COLORS.mainTextColor }}>
-                                        <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Max Power Output:</strong> {charger.maxPower} kW
-                                    </p>
-                                    <p style={{ fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.medium, color: COLORS.mainTextColor }}>
-                                        <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Connectors:</strong> {charger.connectors.join(', ')}
-                                    </p>
-                                </div>
-                            ))}
-
-                            {/* Electricity Provider & Power Source */}
-                            <div className="flex flex-col gap-2 text-sm">
-                                <div>
-                                    <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Electricity Provider:</strong>{' '}
-                                    <span style={{ color: COLORS.mainTextColor, fontWeight: FONTS.weights.medium, fontSize: FONTS.sizes.xs }}>{station.electricityProvider}</span>
-                                </div>
-                                <div>
-                                    <strong style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>Power Source:</strong>{' '}
-                                    <span style={{ color: COLORS.mainTextColor, fontWeight: FONTS.weights.medium, fontSize: FONTS.sizes.xs }}>{station.powerSource}</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </>
-            )}
 
         </div>
     );

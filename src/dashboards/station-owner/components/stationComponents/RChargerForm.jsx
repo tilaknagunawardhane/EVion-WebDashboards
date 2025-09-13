@@ -19,6 +19,7 @@ export default function ChargerForm({
   chargers,
   handleChargerChange,
   handleConnectorChange,
+  getAvailableConnectors,
   goBack,
   onSubmit,
   formMode,
@@ -54,6 +55,10 @@ export default function ChargerForm({
             // Power output cannot be null or empty string
             if (charger.maxPower === null || charger.maxPower === '' || parseFloat(charger.maxPower) <= 0) {
                 chargerSpecificErrors.maxPower = 'Power Output is required and must be a positive number.';
+                allChargersValid = false;
+            }
+            if (charger.price === null || charger.price === '' || parseFloat(charger.price) <= 0) {
+                chargerSpecificErrors.price = 'Price is required and must be a positive number.';
                 allChargersValid = false;
             }
             if (charger.connectors.length === 0 && formMode !== 'edit-charger') {
@@ -161,18 +166,30 @@ export default function ChargerForm({
                                         </p>
                                     )}
                     </div>
-
-                    <InputField
-                      label="Maximum Power Output (kW)"
-                      type="number"
-                      value={charger.maxPower}
-                      onChange={(e) => handleChargerChange(index, 'maxPower', e.target.value)}
-                      placeholder="e.g., 22"
-                      className="mt-3"
-                      error={!!chargerErrors[index]?.maxPower}
-                      errorMessage={chargerErrors[index]?.maxPower}
-                      required
-                    />
+                    
+                    <div className="flex gap-2">
+                      <InputField
+                        label="Maximum Power Output (kW)"
+                        type="number"
+                        value={charger.maxPower}
+                        onChange={(e) => handleChargerChange(index, 'maxPower', e.target.value)}
+                        placeholder="e.g., 22"
+                        min={1}
+                        max={1000}
+                        error={!!chargerErrors[index]?.maxPower}
+                        errorMessage={chargerErrors[index]?.maxPower}
+                        required
+                      />
+                      <InputField
+                        label="Price per kWh"
+                        placeholder="Enter price per kWh"
+                        value={charger.price}
+                        onChange={(e) => handleChargerChange(index, 'price', e.target.value)}
+                        error={!!chargerErrors[index]?.price}
+                        errorMessage={chargerErrors[index]?.price}
+                        required
+                      />
+                    </div>
 
                     <div className="mt-3">
                       <div className="flex items-center gap-0 mb-0">
@@ -182,24 +199,21 @@ export default function ChargerForm({
                         <span style={{ color: COLORS.danger }}>*</span>
                       </div>
                       <div className="flex flex-wrap gap-6 mt-4">
-                        {(charger.powerType === 'AC' ? ACconnectors
-                          : charger.powerType === 'DC' ? DCconnectors
-                            : [])
-                          .map((connector) => (
-                            <label key={connector} className="flex items-center space-x-2 text-sm" style={{ color: COLORS.mainTextColor }}>
+                        {getAvailableConnectors(charger.powerType).map((connector) => (
+                            <label key={connector._id} className="flex items-center space-x-2 text-sm" style={{ color: COLORS.mainTextColor }}>
                               <input
                                 type="checkbox"
-                                value={connector}
+                                value={connector._id}
                                 required
-                                checked={charger.connectors.includes(connector)}
+                                checked={charger.connectors.includes(connector._id)}
                                 onChange={(e) => {
                                   const checked = e.target.checked;
                                   const updated = [...charger.connectors];
 
                                   if (checked) {
-                                    updated.push(connector);
+                                    updated.push(connector._id);
                                   } else {
-                                    const i = updated.indexOf(connector);
+                                    const i = updated.indexOf(connector._id);
                                     if (i > -1) updated.splice(i, 1);
                                   }
 
@@ -209,7 +223,7 @@ export default function ChargerForm({
                                 style={{ accentColor: COLORS.primary }}
                                 disabled={isDisabled}
                               />
-                              <span>{connector}</span>
+                              <span>{connector.type_name}</span>
                             </label>
                           ))}
                       </div>

@@ -65,6 +65,7 @@ export default function ChargerForm({
                     value={charger.name}
                     onChange={(e) => handleChargerChange(index, 'name', e.target.value)}
                     error={errors.chargers?.[index]?.name}
+                    errorMessage={errors.chargers?.[index]?.name}
                     required
                   />
 
@@ -106,6 +107,7 @@ export default function ChargerForm({
                         }}
                         placeholder="e.g., 22"
                         error={errors.chargers?.[index]?.maxPower}
+                        errorMessage={errors.chargers?.[index]?.maxPower}
                         required
                         min={1}
                         max={1000}
@@ -123,6 +125,7 @@ export default function ChargerForm({
                         value={charger.price}
                         onChange={(e) => handleChargerChange(index, 'price', e.target.value)}
                         error={errors.chargers?.[index]?.price}
+                        errorMessage={errors.chargers?.[index]?.price}
                         required
                       />
                   </div>
