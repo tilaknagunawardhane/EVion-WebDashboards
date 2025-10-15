@@ -358,47 +358,47 @@ const OwnerViewStation = () => {
     };
 
     // Sample data for tables (no changes here, as they are separate data sets)
-    const chargersData = [
-        {
-            'chargerID': 'EVDC0001',
-            'Charger Name': 'HyperCharge Dual-Port',
-            'Joined On': '2023-01-15',
-            'Power Type': 'DC Fast Charger',
-            'Maximum Power Output(kW)': '150 kW',
-            'Connectors': ['CCS1', 'CHAdeMO'],
-            'Unit Price(per kW)': '55.00',
-            'Total Sessions': '232',
-            'Revenue': '3,300,500',
-            'No of Active Reports': '0',
-            'Charger Status': 'Active',
-        },
-        {
-            'chargerID': 'EVDC0002',
-            'Charger Name': 'FastCharge DC',
-            'Joined On': '2022-11-10',
-            'Power Type': 'DC Fast Charger',
-            'Maximum Power Output(kW)': '60 kW',
-            'Connectors': ['CCS2'],
-            'Unit Price(per kW)': '55.00',
-            'Total Sessions': '560',
-            'Revenue': '5,000,000',
-            'No of Active Reports': '0',
-            'Charger Status': 'Disabled',
-        },
-        {
-            'chargerID': 'EVAC0003',
-            'Charger Name': 'AC Charger 1',
-            'Joined On': '',
-            'Power Type': 'AC Charger',
-            'Maximum Power Output(kW)': '12 kW',
-            'Connectors': ['Type1'],
-            'Unit Price(per kW)': '42.00',
-            'Total Sessions': '',
-            'Revenue': '',
-            'No of Active Reports': '',
-            'Charger Status': 'Pending-Approval',
-        }
-    ];
+    // const chargersData = [
+    //     {
+    //         'chargerID': 'EVDC0001',
+    //         'Charger Name': 'HyperCharge Dual-Port',
+    //         'Joined On': '2023-01-15',
+    //         'Power Type': 'DC Fast Charger',
+    //         'Maximum Power Output(kW)': '150 kW',
+    //         'Connectors': ['CCS1', 'CHAdeMO'],
+    //         'Unit Price(per kW)': '55.00',
+    //         'Total Sessions': '232',
+    //         'Revenue': '3,300,500',
+    //         'No of Active Reports': '0',
+    //         'Charger Status': 'Active',
+    //     },
+    //     {
+    //         'chargerID': 'EVDC0002',
+    //         'Charger Name': 'FastCharge DC',
+    //         'Joined On': '2022-11-10',
+    //         'Power Type': 'DC Fast Charger',
+    //         'Maximum Power Output(kW)': '60 kW',
+    //         'Connectors': ['CCS2'],
+    //         'Unit Price(per kW)': '55.00',
+    //         'Total Sessions': '560',
+    //         'Revenue': '5,000,000',
+    //         'No of Active Reports': '0',
+    //         'Charger Status': 'Disabled',
+    //     },
+    //     {
+    //         'chargerID': 'EVAC0003',
+    //         'Charger Name': 'AC Charger 1',
+    //         'Joined On': '',
+    //         'Power Type': 'AC Charger',
+    //         'Maximum Power Output(kW)': '12 kW',
+    //         'Connectors': ['Type1'],
+    //         'Unit Price(per kW)': '42.00',
+    //         'Total Sessions': '',
+    //         'Revenue': '',
+    //         'No of Active Reports': '',
+    //         'Charger Status': 'Pending-Approval',
+    //     }
+    // ];
 
     const transactionsData = [
         {

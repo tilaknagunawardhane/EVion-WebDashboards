@@ -50,6 +50,7 @@ export default function StepOneForm({
     }
   };
 
+  const isDisabled = mode === 'edit-station';
 
   return (
     <div>
@@ -88,7 +89,7 @@ export default function StepOneForm({
           </div>
 
           <select
-            value={formData.district}
+            value={'formData.district'}
             onChange={handleChange('district')}
             required
             className={`w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-1 ${
@@ -101,6 +102,7 @@ export default function StepOneForm({
                             borderColor: errors.district ? COLORS.danger : COLORS.stroke,
                             backgroundColor: COLORS.background,
                         }}
+            disabled={isDisabled} // Disable in edit mode
             >
             <option value="">Select District</option>
             {districts.map((d) => (
@@ -131,6 +133,7 @@ export default function StepOneForm({
             onChange={handleChange('addressLine')}
             error={!!errors.addressLine}
             errorMessage={errors.addressLine}
+            disabled={isDisabled} // Disable in edit mode
           />
           <InputField
             label="City"
@@ -140,6 +143,7 @@ export default function StepOneForm({
             required
             error={!!errors.city}
             errorMessage={errors.city}
+            disabled={isDisabled} // Disable in edit mode
           />
         </div>
 
@@ -155,6 +159,7 @@ export default function StepOneForm({
             <button
                 type="button"
                 onClick={onSetLocationClick}
+                disabled={isDisabled} // Disable in edit mode
                 style={{color:COLORS.mainTextColor}}
                 className="absolute inset-0 flex items-center justify-center font-semibold text-lg bg-black/5 bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
             >

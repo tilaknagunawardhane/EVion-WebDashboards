@@ -267,13 +267,13 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
                     price: parseFloat(chargers[0].price) || 0,
                     connector_types: chargers[0].connectors.map(connectorId => ({
                         connector: connectorId,
-                        status: 'available'
+                        status: 'unavailable'
                     })),
                     charger_status: 'processing'
                 };
 
                 response = await axios.post(
-                    `${API_BASE_URL}/api/stations/${stationId}/add-charger`,
+                    `${API_BASE_URL}/api/stations/station/${stationId}/add-charger`,
                     { stationOwnerID, ...chargerData },
                     {
                         headers: {
@@ -361,7 +361,7 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
                                 locationData,      // Pass location data
                                 onSetLocationClick: handleSetLocationOnMap, // Pass map setter function
                                 mode, // Pass the mode to StepOneForm
-                                submit // Pass submit directly for 'edit-station'
+                                onSubmit : submit // Pass submit directly for 'edit-station'
                             }} />
                     ) : (
                         <StepTwoForm {...{
