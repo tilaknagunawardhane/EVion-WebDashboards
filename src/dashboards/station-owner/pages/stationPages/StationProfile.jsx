@@ -101,8 +101,10 @@ const OwnerViewStation = () => {
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
     const [rating, setRating] = useState(0.0);
-    const [stationSchedule, setStationSchedule] = useState(sampleSchedule);
-    const [stationTemporaryClosures, setStationTemporaryClosures] = useState(sampleTemporaryClosure);
+    const [stationSchedule, setStationSchedule] = useState(null); 
+    const [stationTemporaryClosures, setStationTemporaryClosures] = useState([]); // No default closures
+    // const [stationSchedule, setStationSchedule] = useState(sampleSchedule);
+    // const [stationTemporaryClosures, setStationTemporaryClosures] = useState(sampleTemporaryClosure);
     const [showAll, setShowAll] = useState(false);
     const [localStationImages, setLocalStationImages] = useState(stationImages);
     const [loading, setLoading] = useState(true);
@@ -202,6 +204,12 @@ const OwnerViewStation = () => {
                         totalRatings: stationData.totalRatings || 0
                     });
 
+                    // Set Schedule Data from API
+                    setStationSchedule(stationData.station_schedule || null);
+
+                    // Set Temporary Closures from API
+                    setStationTemporaryClosures(stationData.temporary_closures || []);
+
                     // Set rating from API data
                     setRating(stationData.averageRating || 0.0);
                 } else {
@@ -244,6 +252,36 @@ const OwnerViewStation = () => {
 
     const handleUpdateStationDetails = () => {
         setShowEditStationForm(true);
+    };
+
+    // Handler to update the schedule via API
+    const handleScheduleSubmit = async (newScheduleData) => {
+        try {
+            const stationOwnerID = localStorage.getItem('userID');
+            
+            await axios.put(
+                `${API_BASE_URL}/api/stations/update-station-schedule/${stationId}`,
+                { 
+                    stationOwnerID,
+                    station_schedule: newScheduleData // Send the entire updated schedule object
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            toast.success('Schedule updated successfully!');
+            
+            // Re-fetch the data to ensure the UI reflects the persisted state
+            // await fetchStationData(); 
+
+        } catch (error) {
+            console.error('Error updating schedule:', error);
+            toast.error(error.response?.data?.message || 'Failed to save schedule.');
+        }
     };
 
     const handleFormSubmit = (data) => {
@@ -719,6 +757,8 @@ const OwnerViewStation = () => {
                 {activeTab === 'schedule' && <StationSchedule
                     initialSchedule={stationSchedule}
                     initialTemporaryClosure={stationTemporaryClosures}
+                    onScheduleSave={handleScheduleSubmit}
+                    stationId={stationId}
                 />}
 
                 {activeTab === 'chargers' && (

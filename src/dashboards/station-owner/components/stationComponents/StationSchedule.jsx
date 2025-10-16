@@ -44,13 +44,12 @@ function Modal({ isOpen, onClose, title, children }) {
 
 // Default schedule structure for the form
 const defaultDaySchedule = {
-    selected: false,
     open24Hours: false,
     closed: false,
     timeBlocks: [{ from: '09:00', to: '17:00' }],
 };
 
-export default function StationAvailabilityManager({ initialSchedule = null, initialTemporaryClosure = null }) {
+export default function StationAvailabilityManager({ initialSchedule = null, initialTemporaryClosure = null, onScheduleSave, stationId }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [schedule, setSchedule] = useState(initialSchedule); // The current schedule displayed
     const [formSchedule, setFormSchedule] = useState({}); // Schedule data for the form
@@ -87,20 +86,6 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
 
     const handleEditClick = () => {
         setIsModalOpen(true);
-    };
-
-    const handleDayToggle = (day) => {
-        setFormSchedule(prev => {
-            const dayKey = day.toLowerCase();
-            const newDayState = { ...prev[dayKey], selected: !prev[dayKey].selected };
-            if (!newDayState.selected) {
-                // Reset state if day is unselected
-                newDayState.open24Hours = false;
-                newDayState.closed = false;
-                newDayState.timeBlocks = [{ from: '09:00', to: '17:00' }];
-            }
-            return { ...prev, [dayKey]: newDayState };
-        });
     };
 
     const handleOpen24HoursToggle = (day) => {
@@ -288,74 +273,74 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
         let isValid = true;
 
         Object.entries(formSchedule).forEach(([dayKey, dayData]) => {
-            if (dayData.selected) {
-                newErrors[dayKey] = {}; // Initialize error object for the day
+            
+            newErrors[dayKey] = {}; // Initialize error object for the day
 
-                if (!dayData.open24Hours && !dayData.closed) {
-                    if (dayData.timeBlocks.length === 0) {
-                        newErrors[dayKey].general = "Please add at least one time block or select 24 hours/closed.";
-                        isValid = false;
-                    } else {
-                        newErrors[dayKey].blocks = [];
-                        dayData.timeBlocks.forEach((block, index) => {
-                            const blockErrors = {};
-                            const fromTime = block.from;
-                            const toTime = block.to;
+            if (!dayData.open24Hours && !dayData.closed) {
+                if (dayData.timeBlocks.length === 0) {
+                    newErrors[dayKey].general = "Please add at least one time block or select 24 hours/closed.";
+                    isValid = false;
+                } else {
+                    newErrors[dayKey].blocks = [];
+                    dayData.timeBlocks.forEach((block, index) => {
+                        const blockErrors = {};
+                        const fromTime = block.from;
+                        const toTime = block.to;
 
-                            if (!fromTime) {
-                                blockErrors.from = "Required";
-                                isValid = false;
-                            }
-                            if (!toTime) {
-                                blockErrors.to = "Required";
-                                isValid = false;
-                            }
-
-                            if (fromTime && toTime) {
-                                const [fromH, fromM] = fromTime.split(':').map(Number);
-                                const [toH, toM] = toTime.split(':').map(Number);
-
-                                const fromMinutes = fromH * 60 + fromM;
-                                const toMinutes = toH * 60 + toM;
-
-                                if (fromMinutes >= toMinutes) {
-                                    blockErrors.to = "End time must be after start time.";
-                                    isValid = false;
-                                }
-                            }
-                            newErrors[dayKey].blocks[index] = blockErrors;
-                        });
-
-                        // Check for overlapping time blocks for the same day
-                        for (let i = 0; i < dayData.timeBlocks.length; i++) {
-                            for (let j = i + 1; j < dayData.timeBlocks.length; j++) {
-                                const blockA = dayData.timeBlocks[i];
-                                const blockB = dayData.timeBlocks[j];
-
-                                if (!blockA.from || !blockA.to || !blockB.from || !blockB.to) continue; // Skip if times are missing, validation already caught this
-
-                                const [aFromH, aFromM] = blockA.from.split(':').map(Number);
-                                const [aToH, aToM] = blockA.to.split(':').map(Number);
-                                const [bFromH, bFromM] = blockB.from.split(':').map(Number);
-                                const [bToH, bToM] = blockB.to.split(':').map(Number);
-
-                                const aFromMinutes = aFromH * 60 + aFromM;
-                                const aToMinutes = aToH * 60 + aToM;
-                                const bFromMinutes = bFromH * 60 + bFromM;
-                                const bToMinutes = bToH * 60 + bToM;
-
-                                // Overlap condition: (A_start < B_end) AND (B_start < A_end)
-                                if (aFromMinutes < bToMinutes && bFromMinutes < aToMinutes) {
-                                    newErrors[dayKey].overlap = "Time blocks cannot overlap.";
-                                    isValid = false;
-                                    break; // Found an overlap, no need to check further for this day
-                                }
-                            }
-                            if (newErrors[dayKey].overlap) break; // If overlap found, exit outer loop too
+                        if (!fromTime) {
+                            blockErrors.from = "Required";
+                            isValid = false;
                         }
+                        if (!toTime) {
+                            blockErrors.to = "Required";
+                            isValid = false;
+                        }
+
+                        if (fromTime && toTime) {
+                            const [fromH, fromM] = fromTime.split(':').map(Number);
+                            const [toH, toM] = toTime.split(':').map(Number);
+
+                            const fromMinutes = fromH * 60 + fromM;
+                            const toMinutes = toH * 60 + toM;
+
+                            if (fromMinutes >= toMinutes) {
+                                blockErrors.to = "End time must be after start time.";
+                                isValid = false;
+                            }
+                        }
+                        newErrors[dayKey].blocks[index] = blockErrors;
+                    });
+
+                    // Check for overlapping time blocks for the same day
+                    for (let i = 0; i < dayData.timeBlocks.length; i++) {
+                        for (let j = i + 1; j < dayData.timeBlocks.length; j++) {
+                            const blockA = dayData.timeBlocks[i];
+                            const blockB = dayData.timeBlocks[j];
+
+                            if (!blockA.from || !blockA.to || !blockB.from || !blockB.to) continue; // Skip if times are missing, validation already caught this
+
+                            const [aFromH, aFromM] = blockA.from.split(':').map(Number);
+                            const [aToH, aToM] = blockA.to.split(':').map(Number);
+                            const [bFromH, bFromM] = blockB.from.split(':').map(Number);
+                            const [bToH, bToM] = blockB.to.split(':').map(Number);
+
+                            const aFromMinutes = aFromH * 60 + aFromM;
+                            const aToMinutes = aToH * 60 + aToM;
+                            const bFromMinutes = bFromH * 60 + bFromM;
+                            const bToMinutes = bToH * 60 + bToM;
+
+                            // Overlap condition: (A_start < B_end) AND (B_start < A_end)
+                            if (aFromMinutes < bToMinutes && bFromMinutes < aToMinutes) {
+                                newErrors[dayKey].overlap = "Time blocks cannot overlap.";
+                                isValid = false;
+                                break; // Found an overlap, no need to check further for this day
+                            }
+                        }
+                        if (newErrors[dayKey].overlap) break; // If overlap found, exit outer loop too
                     }
                 }
             }
+            
         });
 
         setFormErrors(newErrors);
@@ -365,21 +350,21 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validateForm()) {
-            // Filter out unselected days and format the schedule for submission
+            
             const newSchedule = {};
             Object.entries(formSchedule).forEach(([dayKey, dayData]) => {
-                if (dayData.selected) {
-                    newSchedule[dayKey] = {
-                        open24Hours: dayData.open24Hours,
-                        closed: dayData.closed,
-                        timeBlocks: dayData.open24Hours || dayData.closed ? [] : dayData.timeBlocks,
-                    };
-                }
+                newSchedule[dayKey] = {
+                    open24Hours: dayData.open24Hours,
+                    closed: dayData.closed,
+                    timeBlocks: dayData.open24Hours || dayData.closed ? [] : dayData.timeBlocks,
+                };
             });
+            onScheduleSave(newSchedule); // Call the provided callback with the new schedule
+
             setSchedule(newSchedule); // Update the displayed schedule
             setIsModalOpen(false);
+
             console.log("Schedule submitted:", newSchedule);
-            // Here you would typically send newSchedule to your backend API
         } else {
             console.error("Form has errors:", formErrors);
         }
@@ -440,7 +425,6 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
                     {daysOfWeek.map(day => {
                         const dayKey = day.toLowerCase();
                         const daySchedule = schedule[dayKey];
-                        if (!daySchedule) return null; // Don't display unselected days
 
                         return (
                             <div key={day} className="flex justify-between items-start">
@@ -498,34 +482,10 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Set Station Availability">
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-4">
-                    <div className="flex flex-wrap gap-2 justify-center">
-                        {daysOfWeek.map(day => (
-                            <button
-                                type="button"
-                                key={day}
-                                onClick={() => handleDayToggle(day)}
-                                className={`px-4 py-2 rounded-full text-sm font-medium ${formSchedule[day.toLowerCase()]?.selected
-                                    ? ' text-white'
-                                    : ''
-                                    }`}
-                                style={{
-                                    backgroundColor: formSchedule[day.toLowerCase()]?.selected
-                                    ? COLORS.primary
-                                    : COLORS.background,
-                                    color: formSchedule[day.toLowerCase()]?.selected
-                                    ? '#ffffff'
-                                    : COLORS.mainTextColor
-                                }}
-                              >
-                                {day.substring(0, 3)}
-                            </button>
-                        ))}
-                    </div>
 
                     {daysOfWeek.map(day => {
                         const dayKey = day.toLowerCase();
                         const dayData = formSchedule[dayKey];
-                        const isDaySelected = dayData?.selected;
                         const is24Hours = dayData?.open24Hours;
                         const isClosed = dayData?.closed;
 
@@ -533,90 +493,89 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
                         const currentDayErrors = formErrors[dayKey] || {};
 
                         return (
-                            isDaySelected && (
-                                <div key={day} className="border p-4 rounded-lg flex flex-col gap-3" style={{ borderColor: COLORS.stroke }}>
-                                    <h4 className="font-semibold" style={{ color: COLORS.mainTextColor }}>{day}</h4>
+                            <div key={day} className="border p-4 rounded-lg flex flex-col gap-3" style={{ borderColor: COLORS.stroke }}>
+                                <h4 className="font-semibold" style={{ color: COLORS.mainTextColor }}>{day}</h4>
 
-                                    <div className="flex items-center gap-4">
-                                        <label className="flex items-center cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                className="form-checkbox h-4 w-4"
-                                                checked={is24Hours}
-                                                onChange={() => handleOpen24HoursToggle(day)}
-                                                style={{ accentColor: COLORS.primary }}
-                                            />
-                                            <span className="ml-2 text-sm">Open 24 Hours</span>
-                                        </label>
-                                        <label className="flex items-center cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                className="form-checkbox h-4 w-4"
-                                                checked={isClosed}
-                                                onChange={() => handleClosedToggle(day)}
-                                                style={{ accentColor: COLORS.primary }}
-                                            />
-                                            <span className="ml-2 text-sm">Closed</span>
-                                        </label>
-                                    </div>
+                                <div className="flex items-center gap-4">
+                                    <label className="flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="form-checkbox h-4 w-4"
+                                            checked={is24Hours}
+                                            onChange={() => handleOpen24HoursToggle(day)}
+                                            style={{ accentColor: COLORS.primary }}
+                                        />
+                                        <span className="ml-2 text-sm">Open 24 Hours</span>
+                                    </label>
+                                    <label className="flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="form-checkbox h-4 w-4"
+                                            checked={isClosed}
+                                            onChange={() => handleClosedToggle(day)}
+                                            style={{ accentColor: COLORS.primary }}
+                                        />
+                                        <span className="ml-2 text-sm">Closed</span>
+                                    </label>
+                                </div>
 
-                                    {!is24Hours && !isClosed && (
-                                        <div className="flex flex-col gap-3">
-                                            {dayData?.timeBlocks.map((block, index) => (
-                                                <div key={index} className="flex flex-col gap-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <label className="text-xs flex-shrink-0">From:</label>
-                                                        <input
-                                                            type="time"
-                                                            value={block.from}
-                                                            onChange={(e) => handleTimeChange(day, index, 'from', e.target.value)}
-                                                            className={`border rounded-md px-2 py-1 w-full ${currentDayErrors.blocks?.[index]?.from ? 'border-red-500' : ''}`}
-                                                            style={{ borderColor: COLORS.stroke, color: COLORS.mainTextColor, fontSize: FONTS.sizes.sm }}
-                                                        />
-                                                        <label className="text-xs flex-shrink-0">To:</label>
-                                                        <input
-                                                            type="time"
-                                                            value={block.to}
-                                                            onChange={(e) => handleTimeChange(day, index, 'to', e.target.value)}
-                                                            className={`border rounded-md px-2 py-1 w-full ${currentDayErrors.blocks?.[index]?.to ? 'border-red-500' : ''}`}
-                                                            style={{ borderColor: COLORS.stroke, color: COLORS.mainTextColor, fontSize: FONTS.sizes.sm }}
-                                                        />
-                                                        {dayData.timeBlocks.length > 1 && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemoveBlock(day, index)}
-                                                                className="ml-2 text-red-500 hover:text-red-700 text-lg"
-                                                            >
-                                                                &times;
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                    {currentDayErrors.blocks?.[index]?.from && (
-                                                        <p className="text-red-500 text-xs ml-auto pr-8">{currentDayErrors.blocks[index].from}</p>
-                                                    )}
-                                                    {currentDayErrors.blocks?.[index]?.to && (
-                                                        <p className="text-red-500 text-xs ml-auto pr-8">{currentDayErrors.blocks[index].to}</p>
+                                {!is24Hours && !isClosed && (
+                                    <div className="flex flex-col gap-3">
+                                        {dayData?.timeBlocks.map((block, index) => (
+                                            <div key={index} className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2">
+                                                    <label className="text-xs flex-shrink-0">From:</label>
+                                                    <input
+                                                        type="time"
+                                                        value={block.from}
+                                                        onChange={(e) => handleTimeChange(day, index, 'from', e.target.value)}
+                                                        className={`border rounded-md px-2 py-1 w-full ${currentDayErrors.blocks?.[index]?.from ? 'border-red-500' : ''}`}
+                                                        style={{ borderColor: COLORS.stroke, color: COLORS.mainTextColor, fontSize: FONTS.sizes.sm }}
+                                                    />
+                                                    <label className="text-xs flex-shrink-0">To:</label>
+                                                    <input
+                                                        type="time"
+                                                        value={block.to}
+                                                        onChange={(e) => handleTimeChange(day, index, 'to', e.target.value)}
+                                                        className={`border rounded-md px-2 py-1 w-full ${currentDayErrors.blocks?.[index]?.to ? 'border-red-500' : ''}`}
+                                                        style={{ borderColor: COLORS.stroke, color: COLORS.mainTextColor, fontSize: FONTS.sizes.sm }}
+                                                    />
+                                                    {dayData.timeBlocks.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveBlock(day, index)}
+                                                            className="ml-2 text-red-500 hover:text-red-700 text-lg"
+                                                        >
+                                                            &times;
+                                                        </button>
                                                     )}
                                                 </div>
-                                            ))}
-                                            <button
-                                                type="button"
-                                                onClick={() => handleAddBlock(day)}
-                                                className="mt-2 px-3 py-1 text-white rounded-md text-sm self-start underline bg-transparent"
-                                                style={{color: COLORS.primary}}
-                                            >
-                                                + Add Time Block
-                                            </button>
-                                        </div>
-                                    )}
-                                    {currentDayErrors.general && (
-                                        <p className="text-red-500 text-xs mt-1">{currentDayErrors.general}</p>
-                                    )}
-                                    {currentDayErrors.overlap && (
-                                        <p className="text-red-500 text-xs mt-1">{currentDayErrors.overlap}</p>
-                                    )}
-                                </div>
-                            )
+                                                {currentDayErrors.blocks?.[index]?.from && (
+                                                    <p className="text-red-500 text-xs ml-auto pr-8">{currentDayErrors.blocks[index].from}</p>
+                                                )}
+                                                {currentDayErrors.blocks?.[index]?.to && (
+                                                    <p className="text-red-500 text-xs ml-auto pr-8">{currentDayErrors.blocks[index].to}</p>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleAddBlock(day)}
+                                            className="mt-2 px-3 py-1 text-white rounded-md text-sm self-start underline bg-transparent"
+                                            style={{color: COLORS.primary}}
+                                        >
+                                            + Add Time Block
+                                        </button>
+                                    </div>
+                                )}
+                                {currentDayErrors.general && (
+                                    <p className="text-red-500 text-xs mt-1">{currentDayErrors.general}</p>
+                                )}
+                                {currentDayErrors.overlap && (
+                                    <p className="text-red-500 text-xs mt-1">{currentDayErrors.overlap}</p>
+                                )}
+                            </div>
+                          
                         );
                     })}
 
