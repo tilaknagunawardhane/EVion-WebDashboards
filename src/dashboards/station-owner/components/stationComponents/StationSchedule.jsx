@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { COLORS, FONTS } from '../../../../constants'; // Adjust this path if needed
 import Button from '../../../../components/ui/Button';
+import { toast } from 'react-toastify';
 
 // Helper to format time for display
 const formatTime = (time) => {
@@ -49,13 +50,14 @@ const defaultDaySchedule = {
     timeBlocks: [{ from: '09:00', to: '17:00' }],
 };
 
-export default function StationAvailabilityManager({ initialSchedule = null, initialTemporaryClosure = null, onScheduleSave, stationId }) {
+export default function StationAvailabilityManager({ initialSchedule = null, initialTemporaryClosure = null, onScheduleSave, onTemporaryCloseCreate, onTemporaryCloseRemove, stationId }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     const [schedule, setSchedule] = useState(initialSchedule); // The current schedule displayed
     const [formSchedule, setFormSchedule] = useState({}); // Schedule data for the form
     const [formErrors, setFormErrors] = useState({});
 
-    const [temporaryClosures, setTemporaryClosures] = useState(initialTemporaryClosure); // Renamed to plural and initialized with array
+    const [temporaryClosures, setTemporaryClosures] = useState([]); // Renamed to plural and initialized with array
     const [isTempCloseModalOpen, setIsTempCloseModalOpen] = useState(false);
     const [editingClosureIndex, setEditingClosureIndex] = useState(null); // New state to track which closure is being edited
     const [tempCloseForm, setTempCloseForm] = useState({
@@ -66,6 +68,33 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
     const [tempCloseErrors, setTempCloseErrors] = useState({});
 
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    // Initialize schedule state when initialSchedule prop changes
+    useEffect(() => {
+        setSchedule(initialSchedule);
+    }, [initialSchedule]);
+
+    // Sync and Parse Temporary Closures when parent prop changes
+    useEffect(() => {
+        // Ensure that closure dates are converted to Date objects when received from API
+        const closuresArray = initialTemporaryClosure || [];
+        
+        const formattedClosures = closuresArray
+            // Filter out any closure objects where date fields might be missing or null 
+            .filter(c => c.from_date_time && c.to_date_time) 
+            .map(c => ({
+                ...c,
+                // Ensure the string is correctly converted to a Date object
+                from: new Date(c.from_date_time), 
+                to: new Date(c.to_date_time),     
+                _id: c._id 
+            }));
+        
+        formattedClosures.sort((a, b) => a.from.getTime() - b.from.getTime());
+        
+        setTemporaryClosures(formattedClosures);
+        
+    }, [initialTemporaryClosure]);
 
     // Initialize formSchedule when the modal opens or initialSchedule changes
     useEffect(() => {
@@ -211,50 +240,56 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
     const handleTemporaryCloseSubmit = (e) => {
         e.preventDefault();
         if (validateTempCloseForm(tempCloseForm, temporaryClosures, editingClosureIndex)) {
-            const newClosure = {
-                from: new Date(tempCloseForm.fromDateTime),
-                to: new Date(tempCloseForm.toDateTime),
-                reason: tempCloseForm.reason.trim()
-            };
+            
+            onTemporaryCloseCreate(tempCloseForm);
 
-            let updatedClosures;
-            if (editingClosureIndex !== null) {
-                // Editing existing closure
-                updatedClosures = temporaryClosures.map((closure, idx) =>
-                    idx === editingClosureIndex ? newClosure : closure
-                );
-            } else {
-                // Adding new closure
-                updatedClosures = [...temporaryClosures, newClosure];
-            }
+            // const newClosure = {
+            //     from: new Date(tempCloseForm.fromDateTime),
+            //     to: new Date(tempCloseForm.toDateTime),
+            //     reason: tempCloseForm.reason.trim()
+            // };
 
-            // Sort closures by start date for easier display and management
-            updatedClosures.sort((a, b) => a.from.getTime() - b.from.getTime());
+            // let updatedClosures;
+            // if (editingClosureIndex !== null) {
+            //     // Editing existing closure
+            //     updatedClosures = temporaryClosures.map((closure, idx) =>
+            //         idx === editingClosureIndex ? newClosure : closure
+            //     );
+            // } else {
+            //     // Adding new closure
+            //     updatedClosures = [...temporaryClosures, newClosure];
+            // }
 
-            setTemporaryClosures(updatedClosures);
+            // // Sort closures by start date for easier display and management
+            // updatedClosures.sort((a, b) => a.from.getTime() - b.from.getTime());
+
+            // setTemporaryClosures(updatedClosures);
+            // setIsTempCloseModalOpen(false);
+            // setEditingClosureIndex(null); // Reset editing index
+            // // Here you would typically send updatedClosures to your backend API
+            // console.log("Temporary Closures Submitted:", updatedClosures);
             setIsTempCloseModalOpen(false);
-            setEditingClosureIndex(null); // Reset editing index
-            // Here you would typically send updatedClosures to your backend API
-            console.log("Temporary Closures Submitted:", updatedClosures);
+            setEditingClosureIndex(null); 
+            setTempCloseForm({ fromDateTime: '', toDateTime: '', reason: '' });
         }
     };
 
     const handleRemoveTemporaryClosure = (indexToRemove) => {
-        const updatedClosures = temporaryClosures.filter((_, index) => index !== indexToRemove);
-        setTemporaryClosures(updatedClosures);
-        // Also, inform backend that this closure is removed
-        console.log("Temporary Closure Removed:", temporaryClosures[indexToRemove]);
-    };
+        // const updatedClosures = temporaryClosures.filter((_, index) => index !== indexToRemove);
+        // setTemporaryClosures(updatedClosures);
+        // // Also, inform backend that this closure is removed
+        // console.log("Temporary Closure Removed:", temporaryClosures[indexToRemove]);
 
-    const handleEditTemporaryClose = (indexToEdit) => {
-        const closureToEdit = temporaryClosures[indexToEdit];
-        setTempCloseForm({
-            fromDateTime: closureToEdit.from.toISOString().slice(0, 16),
-            toDateTime: closureToEdit.to.toISOString().slice(0, 16),
-            reason: closureToEdit.reason
-        });
-        setEditingClosureIndex(indexToEdit);
-        setIsTempCloseModalOpen(true);
+        const closureToRemove = temporaryClosures[indexToRemove];
+
+        if (closureToRemove?._id) {
+            // Use the MongoDB _id for API deletion
+            onTemporaryCloseRemove(closureToRemove._id); 
+        } else {
+            // Local removal fallback/error if _id is missing
+            console.error("Cannot remove closure: Missing MongoDB ID.");
+            toast.error("Failed to cancel closure: ID not found.");
+        }
     };
 
     const handleOpenNewTempCloseModal = () => {
@@ -384,19 +419,19 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
 
             {temporaryClosures.length > 0  && (
                 temporaryClosures.map((closure, index) => (
-                    <div key={index} className="rounded-xl px-8 py-4 mb-0" style={{ backgroundColor: COLORS.bgGreen }}>
+                    <div key={closure._id || index} className="rounded-xl px-8 py-4 mb-0" style={{ backgroundColor: COLORS.bgGreen }}>
                         <div className="flex w-full justify-between mb-2">
                             <p className="font-medium text-base" style={{ color: COLORS.mainTextColor }}>
-                                Temporary Closure Active
+                                Temporary Closure {closure.status === 'active' ? 'Active' : 'Scheduled'} 
                             </p>
                             <div className="flex justify-end space-x-0">
-                                <button
+                                {/* <button
                                     onClick={() => handleEditTemporaryClose(index)}
                                     className="px-3 py-1 text-sm rounded-lg underline bg-transparent"
                                     style={{ color: COLORS.mainTextColor }}
                                 >
                                     Edit
-                                </button>
+                                </button> */}
                                 <button
                                     onClick={() => handleRemoveTemporaryClosure(index)}
                                     className="px-3 py-1 text-sm rounded-lg bg-transparent underline"
