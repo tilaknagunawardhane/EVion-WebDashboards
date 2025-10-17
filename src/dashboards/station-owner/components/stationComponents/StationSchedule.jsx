@@ -240,37 +240,21 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
     const handleTemporaryCloseSubmit = (e) => {
         e.preventDefault();
         if (validateTempCloseForm(tempCloseForm, temporaryClosures, editingClosureIndex)) {
+
+            const isConfirmed = window.confirm(
+                "WARNING: This action will cancel all existing UPCOMING bookings within this closure period. The affected EV users will be notified. Do you wish to proceed?"
+            );
             
-            onTemporaryCloseCreate(tempCloseForm);
+            if (isConfirmed) {
+                onTemporaryCloseCreate(tempCloseForm);
 
-            // const newClosure = {
-            //     from: new Date(tempCloseForm.fromDateTime),
-            //     to: new Date(tempCloseForm.toDateTime),
-            //     reason: tempCloseForm.reason.trim()
-            // };
-
-            // let updatedClosures;
-            // if (editingClosureIndex !== null) {
-            //     // Editing existing closure
-            //     updatedClosures = temporaryClosures.map((closure, idx) =>
-            //         idx === editingClosureIndex ? newClosure : closure
-            //     );
-            // } else {
-            //     // Adding new closure
-            //     updatedClosures = [...temporaryClosures, newClosure];
-            // }
-
-            // // Sort closures by start date for easier display and management
-            // updatedClosures.sort((a, b) => a.from.getTime() - b.from.getTime());
-
-            // setTemporaryClosures(updatedClosures);
-            // setIsTempCloseModalOpen(false);
-            // setEditingClosureIndex(null); // Reset editing index
-            // // Here you would typically send updatedClosures to your backend API
-            // console.log("Temporary Closures Submitted:", updatedClosures);
-            setIsTempCloseModalOpen(false);
-            setEditingClosureIndex(null); 
-            setTempCloseForm({ fromDateTime: '', toDateTime: '', reason: '' });
+                setIsTempCloseModalOpen(false);
+                setEditingClosureIndex(null); 
+                setTempCloseForm({ fromDateTime: '', toDateTime: '', reason: '' });
+            } else {
+                // User cancelled the operation
+                toast.info("Temporary closure setup cancelled by user.");
+            }
         }
     };
 
@@ -385,21 +369,30 @@ export default function StationAvailabilityManager({ initialSchedule = null, ini
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validateForm()) {
+
+            const isConfirmed = window.confirm(
+                "WARNING: Updating the schedule may affect future bookings or station visibility. Please confirm you wish to save these changes."
+            );
+
+            if (isConfirmed) {
             
-            const newSchedule = {};
-            Object.entries(formSchedule).forEach(([dayKey, dayData]) => {
-                newSchedule[dayKey] = {
-                    open24Hours: dayData.open24Hours,
-                    closed: dayData.closed,
-                    timeBlocks: dayData.open24Hours || dayData.closed ? [] : dayData.timeBlocks,
-                };
-            });
-            onScheduleSave(newSchedule); // Call the provided callback with the new schedule
+                const newSchedule = {};
+                Object.entries(formSchedule).forEach(([dayKey, dayData]) => {
+                    newSchedule[dayKey] = {
+                        open24Hours: dayData.open24Hours,
+                        closed: dayData.closed,
+                        timeBlocks: dayData.open24Hours || dayData.closed ? [] : dayData.timeBlocks,
+                    };
+                });
+                onScheduleSave(newSchedule); // Call the provided callback with the new schedule
 
-            setSchedule(newSchedule); // Update the displayed schedule
-            setIsModalOpen(false);
+                setSchedule(newSchedule); // Update the displayed schedule
+                setIsModalOpen(false);
 
-            console.log("Schedule submitted:", newSchedule);
+                console.log("Schedule submitted:", newSchedule);
+            } else {
+                console.log("Schedule submission cancelled by user.");
+            }
         } else {
             console.error("Form has errors:", formErrors);
         }

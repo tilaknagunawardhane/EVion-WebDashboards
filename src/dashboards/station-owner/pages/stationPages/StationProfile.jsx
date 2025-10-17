@@ -367,11 +367,21 @@ const OwnerViewStation = () => {
         // { id: 'stats', label: 'Stats' }
     ];
 
-    const canViewSchedule = stationDetails.chargers?.some(charger =>
+    const GLOBAL_RESTRICTED_STATUSES = [
+        'disabled_by_so', // Station Owner disabled
+        'deleted'         // Station is marked for deletion
+    ];
+
+    const isStationGloballyDisabled = GLOBAL_RESTRICTED_STATUSES.includes(stationDetails.status.toLowerCase());
+
+
+    const hasOperationalCharger = stationDetails.chargers?.some(charger =>
         // The opposite of the restricted list: is it 'open' OR is it 'unavailable'?
         charger.charger_status === 'open' || charger.charger_status === 'unavailable'
     ) || false;
 
+    const canViewSchedule = !isStationGloballyDisabled && hasOperationalCharger;
+    
     // Mobile labels for tabs
     const mobileLabels = {
         profile: 'Profile',
