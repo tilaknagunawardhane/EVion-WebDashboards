@@ -30,6 +30,7 @@ import AdminViewCharger from '../dashboards/admin/pages/stationPages/ViewCharger
 import AdminTransactions from '../dashboards/admin/pages/transactionsPages/Transactions'
 import AdminNotifications from '../dashboards/admin/pages/Notifications'
 import ChatPage from '../dashboards/admin/pages/Chat'
+import AdminPayouts from '../dashboards/admin/pages/transactionsPages/Payouts'
 
 import FaultReportsPage from '../dashboards/support-officer/pages/FaultReports'
 import FaultReportDetailPage from '../dashboards/support-officer/pages/FaultReportDetail'
@@ -79,7 +80,8 @@ const router = createBrowserRouter([
           { path: 'stations/:id', element: <ViewStation/>},
           { path: 'chat', element: <ChatPage/>},
           { path: 'notifications', element: <AdminNotifications/>},
-          { path: 'stations/chargerprofile/:id', element: <AdminViewCharger /> }
+          { path: 'stations/chargerprofile/:id', element: <AdminViewCharger /> },
+          { path: 'payouts', element: <AdminPayouts /> }
 
         ]
       },
