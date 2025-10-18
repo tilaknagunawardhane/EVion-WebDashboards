@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'; // Added useEffect
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
 import { useNavigate, useParams } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
@@ -20,8 +20,10 @@ import { FiMoreVertical } from 'react-icons/fi';
 import AddChargingStationForm from '../../components/stationComponents/RAddStationForm';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { LoadScript, GoogleMap, Marker } from '@react-google-maps/api'; // Add these imports
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // Add this
 
 const stationImages = [
     'https://images.unsplash.com/photo-1703860271509-b50f5679f2a0?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -30,6 +32,49 @@ const stationImages = [
     'https://images.unsplash.com/photo-1710025582119-e133fb11e10a?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     'https://images.unsplash.com/photo-1737312272830-f445719b7ed9?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 ];
+
+// Map configuration
+const mapContainerStyle = {
+    width: '100%',
+    height: '300px'
+};
+
+const defaultCenter = {
+    lat: 6.9271, // Colombo, Sri Lanka
+    lng: 79.8612
+};
+
+// Station Map Component
+const StationMap = ({ location, stationName }) => {
+    const mapCenter = location && location.latitude && location.longitude 
+        ? { 
+            lat: location.latitude || location.lat, 
+            lng: location.longitude || location.lng 
+          }
+        : defaultCenter;
+
+    return (
+        <div className="map-container rounded-xl overflow-hidden">
+            <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={mapCenter}
+                zoom={15}
+                options={{
+                    streetViewControl: false,
+                    mapTypeControl: false,
+                    fullscreenControl: true,
+                }}
+            >
+                {location && (location.latitude || location.lat) && (location.longitude || location.lng) && (
+                    <Marker
+                        position={mapCenter}
+                        title={stationName || "Charging Station"}
+                    />
+                )}
+            </GoogleMap>
+        </div>
+    );
+};
 
 // Dropdown component for Station Actions (no changes needed)
 const StationActionsDropdown = ({ onRemoveStation }) => {
@@ -79,18 +124,16 @@ const OwnerViewStation = () => {
     const [sort, setSort] = useState(null);
     const [rating, setRating] = useState(0.0);
     const [stationSchedule, setStationSchedule] = useState(null); 
-    const [stationTemporaryClosures, setStationTemporaryClosures] = useState([]); // No default closures
+    const [stationTemporaryClosures, setStationTemporaryClosures] = useState([]);
     const [showAll, setShowAll] = useState(false);
     const [localStationImages, setLocalStationImages] = useState(stationImages);
     const [loading, setLoading] = useState(true);
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
-     const { id } = useParams(); // Get station ID from URL params
-     const stationId = id; // Use the id directly
+    const { id } = useParams();
+    const stationId = id;
 
-     console.log('Station ID from URL:', id);
-
-    // Consolidated Station Details State - THIS IS THE MAIN CHANGE
+    // Consolidated Station Details State
     const [stationDetails, setStationDetails] = useState({
         id: '',
         name: '',
@@ -156,7 +199,6 @@ const OwnerViewStation = () => {
                     setStationDetails({
                         id: stationData._id || stationData.id,
                         name: stationData.station_name || '',
-                        // address: stationData.address || '',
                         address: `${stationData.address || ''}${', '}${stationData.city}${', '}${stationData.district}`,
                         addressLine: stationData.address || '',
                         city: stationData.city || '',
@@ -228,7 +270,6 @@ const OwnerViewStation = () => {
             fetchStationData();
         }
     }, [stationId]);
-
 
     // Separate useEffect to call the function on mount/ID change
     // useEffect(() => {
@@ -633,145 +674,156 @@ const OwnerViewStation = () => {
         }
 
         return (
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Left side - Profile info */}
-                <div className="lg:col-span-3 space-y-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-                        style={{ borderColor: COLORS.stroke }}>
-                        <div>
-                            <h1 className="text-xl font-medium" style={{ color: COLORS.mainTextColor }}>
-                                {stationDetails.name} {/* Use stationDetails */}
-                            </h1>
-                            <p className="text-sm mt-1" style={{ color: COLORS.secondaryText }}>
-                                {stationDetails.address} {/* Use stationDetails */}
-                            </p>
-                            {renderStars()}
-                        </div>
-                        <div className="sm:self-start flex items-center gap-2">
-                            <span className="px-3 py-1 rounded-full text-sm inline-block uppercase" style={{
-                                backgroundColor: statusStyle.bg,
-                                color: statusStyle.text
-                            }}>
-                                {currentStatus}
-                            </span>
-                            <StationActionsDropdown onRemoveStation={handleRemoveStation} />
-                        </div>
-                    </div>
-
-                    <div className="mb-4">
-                        <OverviewCard padding="p-4">
-                            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                                <img
-                                    src={MapImage}
-                                    alt="Charging Stations Map"
-                                    className="absolute inset-0 w-full h-full object-cover rounded-xl"
-                                />
-                            </div>
-                        </OverviewCard>
-                    </div>
-
-                    <div className="flex-col gap-4 mt-4 bg-white p-8 rounded-xl">
-                        <div className="flex flex-wrap justify-between gap-4 text-sm">
+            <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Left side - Profile info */}
+                    <div className="lg:col-span-3 space-y-6">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                            style={{ borderColor: COLORS.stroke }}>
                             <div>
-                                <strong
-                                    style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                                >
-                                    Electricity Provider:
-                                </strong>{' '}
-                                {stationDetails.electricityProvider}
+                                <h1 className="text-xl font-medium" style={{ color: COLORS.mainTextColor }}>
+                                    {stationDetails.name}
+                                </h1>
+                                <p className="text-sm mt-1" style={{ color: COLORS.secondaryText }}>
+                                    {stationDetails.address}
+                                </p>
+                                {renderStars()}
                             </div>
-                            <div>
-                                <strong
-                                    style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                                >
-                                    Power Source:
-                                </strong>{' '}
-                                {stationDetails.powerSource}
+                            <div className="sm:self-start flex items-center gap-2">
+                                <span className="px-3 py-1 rounded-full text-sm inline-block uppercase" style={{
+                                    backgroundColor: statusStyle.bg,
+                                    color: statusStyle.text
+                                }}>
+                                    {currentStatus}
+                                </span>
+                                <StationActionsDropdown onRemoveStation={handleRemoveStation} />
                             </div>
                         </div>
-                    </div>
 
-                    <div className="flex justify-center">
-                        <p
-                            className="underline cursor-pointer"
-                            style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                            onClick={handleUpdateStationDetails}
-                        >
-                            Update Station Details
-                        </p>
-                    </div>
-
-                    <div className="flex-col gap-4 mt-8 bg-transparent p-0 rounded-xl">
-                        <h3 className="mb-4" style={{ fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.normal, color: COLORS.mainTextColor }}>Station Gallery</h3>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                            {imagesToDisplay.map((src, idx) => (
-                                <div key={idx} className="relative">
-                                    <img
-                                        src={src}
-                                        alt={`station ${idx}`}
-                                        className="w-full h-32 object-cover rounded-lg shadow"
+                        <div className="mb-4">
+                            <OverviewCard padding="p-4">
+                                <div className="relative w-full">
+                                    <StationMap 
+                                        location={stationDetails.location} 
+                                        stationName={stationDetails.name}
                                     />
-                                    <button
-                                        onClick={() => handleRemoveImage(idx)}
-                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
-                                        aria-label="Remove image"
+                                    {(!stationDetails.location || !stationDetails.location.latitude) && (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-80">
+                                            <p className="text-gray-500 text-sm">Location not set</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </OverviewCard>
+                            {stationDetails.location && (stationDetails.location.latitude || stationDetails.location.lat) && (
+                                <div className="mt-2 text-center text-sm" style={{ color: COLORS.secondaryText }}>
+                                    Coordinates: {stationDetails.location.latitude?.toFixed(6) || stationDetails.location.lat?.toFixed(6)}, {stationDetails.location.longitude?.toFixed(6) || stationDetails.location.lng?.toFixed(6)}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex-col gap-4 mt-4 bg-white p-8 rounded-xl">
+                            <div className="flex flex-wrap justify-between gap-4 text-sm">
+                                <div>
+                                    <strong
+                                        style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
                                     >
-                                        X
+                                        Electricity Provider:
+                                    </strong>{' '}
+                                    {stationDetails.electricityProvider}
+                                </div>
+                                <div>
+                                    <strong
+                                        style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
+                                    >
+                                        Power Source:
+                                    </strong>{' '}
+                                    {stationDetails.powerSource}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center">
+                            <p
+                                className="underline cursor-pointer"
+                                style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
+                                onClick={handleUpdateStationDetails}
+                            >
+                                Update Station Details
+                            </p>
+                        </div>
+
+                        <div className="flex-col gap-4 mt-8 bg-transparent p-0 rounded-xl">
+                            <h3 className="mb-4" style={{ fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.normal, color: COLORS.mainTextColor }}>Station Gallery</h3>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {imagesToDisplay.map((src, idx) => (
+                                    <div key={idx} className="relative">
+                                        <img
+                                            src={src}
+                                            alt={`station ${idx}`}
+                                            className="w-full h-32 object-cover rounded-lg shadow"
+                                        />
+                                        <button
+                                            onClick={() => handleRemoveImage(idx)}
+                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
+                                            aria-label="Remove image"
+                                        >
+                                            X
+                                        </button>
+                                    </div>
+                                ))}
+                                <div
+                                    className="w-full h-32 flex items-center justify-center rounded-lg border-2 border-dashed"
+                                    style={{ borderColor: COLORS.stroke }}
+                                >
+                                    <button
+                                        onClick={() => fileInputRef.current.click()}
+                                        className="text-center"
+                                        style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
+                                    >
+                                        Add New Image
+                                    </button>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleAddImage}
+                                        className="hidden"
+                                        accept="image/*"
+                                    />
+                                </div>
+                            </div>
+
+                            {localStationImages.length > initialDisplayCount && (
+                                <div className="flex justify-center mt-4 text-right">
+                                    <button
+                                        onClick={() => setShowAll(!showAll)}
+                                        className="underline"
+                                        style={{ color: COLORS.secondaryText, fontWeight: FONTS.weights.normal, fontSize: FONTS.sizes.sm }}
+                                    >
+                                        {showAll ? 'Show Less' : 'View All'}
                                     </button>
                                 </div>
-                            ))}
-                            <div
-                                className="w-full h-32 flex items-center justify-center rounded-lg border-2 border-dashed"
-                                style={{ borderColor: COLORS.stroke }}
-                            >
-                                <button
-                                    onClick={() => fileInputRef.current.click()}
-                                    className="text-center"
-                                    style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                                >
-                                    Add New Image
-                                </button>
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    onChange={handleAddImage}
-                                    className="hidden"
-                                    accept="image/*"
-                                />
-                            </div>
+                            )}
                         </div>
 
-                        {localStationImages.length > initialDisplayCount && (
-                            <div className="flex justify-center mt-4 text-right">
-                                <button
-                                    onClick={() => setShowAll(!showAll)}
-                                    className="underline"
-                                    style={{ color: COLORS.secondaryText, fontWeight: FONTS.weights.normal, fontSize: FONTS.sizes.sm }}
-                                >
-                                    {showAll ? 'Show Less' : 'View All'}
-                                </button>
-                            </div>
+                        {showEditStationForm && (
+                            <AddChargingStationForm
+                                onClose={handleCloseForm}
+                                onSubmit={handleFormSubmit}
+                                mode="edit-station"
+                                initialFormData={stationDetails}
+                            />
                         )}
                     </div>
 
-                    {showEditStationForm && (
-                        <AddChargingStationForm
-                            onClose={handleCloseForm}
-                            onSubmit={handleFormSubmit}
-                            mode="edit-station" // This form is designed for 'add-station', but we pass initial data
-                            initialFormData={stationDetails} // Pass the consolidated stationDetails
+                    {/* Right side panel - Only for profile tab */}
+                    <div className="lg:col-span-1 space-y-4">
+                        <ViewStationRightPanel
+                            station={stationDetails}
                         />
-                    )}
+                    </div>
                 </div>
-
-                {/* Right side panel - Only for profile tab */}
-                <div className="lg:col-span-1 space-y-4">
-                    <ViewStationRightPanel
-                        station={stationDetails} // Use stationDetails
-                    />
-                </div>
-            </div>
+            </LoadScript>
         );
     };
 
@@ -819,7 +871,7 @@ const OwnerViewStation = () => {
                 backgroundColor: COLORS.background,
             }}>
 
-            <StationOwnerPageHeader title={`${stationDetails.name}`} /> {/* Use stationDetails */}
+            <StationOwnerPageHeader title={`${stationDetails.name}`} />
 
             {/* Tab Navigation */}
             <TabBar
