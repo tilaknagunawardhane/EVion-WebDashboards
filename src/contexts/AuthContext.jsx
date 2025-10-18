@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use((config) => {
       const token = localStorage.getItem('accessToken')
-      if (token) config.headers.Authorization = `Bearer ${token}`
+      if (token) config.headers = { ...config.headers, Authorization: `Bearer ${token}` }
       return config
     })
 
@@ -22,17 +22,18 @@ export function AuthProvider({ children }) {
       (response) => response,
       async (error) => {
         const originalRequest = error.config
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest?._retry) {
           originalRequest._retry = true
           try {
             const refreshToken = localStorage.getItem('refreshToken')
             const res = await axios.post(`${API_BASE_URL}/api/auth/refresh-token`, { refreshToken })
             localStorage.setItem('accessToken', res.data.accessToken)
             if (res.data.refreshToken) localStorage.setItem('refreshToken', res.data.refreshToken)
-            originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`
+            originalRequest.headers = { ...originalRequest.headers, Authorization: `Bearer ${res.data.accessToken}` }
             return axios(originalRequest)
           } catch (err) {
-            logout()
+            // If refresh failed, perform logout flow
+            await doLogoutLocal()
             return Promise.reject(err)
           }
         }
@@ -44,6 +45,7 @@ export function AuthProvider({ children }) {
       axios.interceptors.request.eject(requestInterceptor)
       axios.interceptors.response.eject(responseInterceptor)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const verifyToken = async () => {
@@ -51,13 +53,14 @@ export function AuthProvider({ children }) {
       const token = localStorage.getItem('accessToken')
       if (token) {
         const res = await axios.get(`${API_BASE_URL}/api/auth/me`)
+        // Expecting response shape: { data: { user: {...}, roles: 'roleString' } } or similar
         if (!res.data?.data?.user) throw new Error('Invalid user data in response')
-        const userRole = res.data.data.roles
+        const userRole = res.data.data.roles ?? res.data.data.user?.userType ?? res.data.data.user?.role
         setCurrentUser(userRole)
       }
     } catch (err) {
       console.log('verify token error: ', err)
-      logout()
+      await doLogoutLocal()
     } finally {
       setLoading(false)
     }
@@ -87,18 +90,22 @@ export function AuthProvider({ children }) {
 
       localStorage.setItem('accessToken', res.data.accessToken)
       localStorage.setItem('refreshToken', res.data.refreshToken)
-      localStorage.setItem('userID', res.data.user._id)
-      setCurrentUser(userType)
+      if (res.data.user?._id) localStorage.setItem('userID', res.data.user._id)
 
-      toast.success(`Welcome back, ${res.data.user.name || res.data.user.email}!`, { position: 'top-right', autoClose: 3000 })
+      // Determine role reliably
+      const roleFromResponse = res.data.userType ?? res.data.user?.userType ?? userType
+      setCurrentUser(roleFromResponse)
 
-      if (res.data.userType === 'admin') navigate('/admin/dashboard')
-      else if (res.data.userType === 'supportofficer') navigate('/support-officer/dashboard')
-      else if (res.data.userType === 'stationowner') {
+      toast.success(`Welcome back, ${res.data.user?.name || res.data.user?.email || 'User'}!`, { position: 'top-right', autoClose: 3000 })
+
+      // Redirects based on role (use roleFromResponse)
+      if (roleFromResponse === 'admin') navigate('/admin/dashboard')
+      else if (roleFromResponse === 'supportofficer') navigate('/support-officer/dashboard')
+      else if (roleFromResponse === 'stationowner') {
         try {
           const stationCheck = await axios.post(
             `${API_BASE_URL}/api/stations/check-stations`,
-            { userId: res.data.user._id },
+            { userId: res.data.user?._id },
             { headers: { Authorization: `Bearer ${res.data.accessToken}`, 'Content-Type': 'application/json' } }
           )
 
@@ -114,17 +121,16 @@ export function AuthProvider({ children }) {
           }
         } catch (error) {
           console.error('Station check failed:', error)
-          if (!error.config?._retry) toast.error(error.response?.data?.message || 'Failed to verify station status', { position: 'top-right', autoClose: 5000 })
+          if (!error?.config?._retry) toast.error(error.response?.data?.message || 'Failed to verify station status', { position: 'top-right', autoClose: 5000 })
           navigate('/initaddstation')
-          throw error
         }
       }
 
       return res.data.user
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed'
-      toast.error(error.response?.data?.message || 'Failed to check station status', { position: 'top-right', autoClose: 5000 })
-      throw errorMessage
+      toast.error(errorMessage, { position: 'top-right', autoClose: 5000 })
+      throw new Error(errorMessage)
     }
   }
 
@@ -135,23 +141,29 @@ export function AuthProvider({ children }) {
     else if (userData.role === 'support-officer') navigate('/support-officer/dashboard')
   }
 
+  const doLogoutLocal = async () => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('userID')
+    setCurrentUser(null)
+    navigate('/auth?mode=login')
+  }
+
   const logout = async () => {
     try {
       await axios.post(`${API_BASE_URL}/api/auth/logout`)
       toast.info('You have been logged out', { position: 'top-right', autoClose: 3000 })
     } catch (error) {
+      // still clear local session even if server logout failed
       toast.error('Failed to logout properly', { position: 'top-right', autoClose: 5000 })
     } finally {
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
-      localStorage.removeItem('userID')
-      setCurrentUser(null)
-      navigate('/auth?mode=login')
+      await doLogoutLocal()
     }
   }
 
   useEffect(() => {
     verifyToken()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -172,244 +184,6 @@ export function AuthProvider({ children }) {
       }}
     >
       {children}
-    </AuthContext.Provider>
-  )
-}
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const requestInterceptor = axios.interceptors.request.use(config => {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-      return config;
-    });
-
-    const responseInterceptor = axios.interceptors.response.use(
-      response => response,
-      async error => {
-        const originalRequest = error.config;
-
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-
-          try {
-            const refreshToken = localStorage.getItem('refreshToken');
-            const res = await axios.post(`${API_BASE_URL}/api/auth/refresh-token`, { refreshToken });
-
-            localStorage.setItem('accessToken', res.data.accessToken);
-            if (res.data.refreshToken) {
-              localStorage.setItem('refreshToken', res.data.refreshToken);
-            }
-
-            originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
-            return axios(originalRequest);
-
-          } catch (err) {
-            logout();
-            return Promise.reject(err);
-          }
-        }
-        return Promise.reject(error);
-      }
-    );
-    return () => {
-      axios.interceptors.request.eject(requestInterceptor);
-      axios.interceptors.response.eject(responseInterceptor);
-    };
-  }, []);
-
-  const verifyToken = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        const res = await axios.get(`${API_BASE_URL}/api/auth/me`);
-        // const res = await res1.json();
-        // console.log('User role is:', res.data.data.roles);
-
-        console.log('VerifyToken response:', res.data);
-        if (!res.data?.data?.user) {
-          throw new Error('Invalid user data in response');
-        }
-        // setCurrentUser(res.data.user.userType);
-        const userRole = res.data.data.roles; 
-        // console.log('User role is:', userRole);
-        setCurrentUser(userRole);
-        // setCurrentUser(res.data.data.roles);
-        // console.log('User verified:',currentUser);
-        // console.log('Setting user role to:', userRole);
-
-      }
-    } catch (err) {
-      console.log('verify token error: ', err);
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const loginA = async (email, password, userType) => {
-    try {
-      let endpoint;
-      switch (userType) {
-        case 'admin':
-          endpoint = '/api/auth/admin/login';
-          break;
-        case 'supportofficer':
-          endpoint = '/api/auth/support-officer/login';
-          break;
-        case 'stationowner':
-          endpoint = '/api/auth/station-owner/login';
-          break;
-        case 'ev-owner':
-          endpoint = '/api/auth/evOwner/login';
-          break;
-        default:
-          throw new Error('Invalid user type');
-      }
-
-      const res = await axios.post(`${API_BASE_URL}${endpoint}`, { email, password });
-
-      localStorage.setItem('accessToken', res.data.accessToken);
-      localStorage.setItem('refreshToken', res.data.refreshToken);
-      localStorage.setItem('userID', res.data.user._id);
-      setCurrentUser(userType);
-      console.log('res: ', res);
-      console.log('current user:', res.data.userType);
-
-      // Show success toast
-      toast.success(`Welcome back, ${res.data.user.name || res.data.user.email}!`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
-
-      // Redirect based on role
-      if (res.data.userType === 'admin') {
-        // console.log('.... Is it here??', currentUser);
-        // const currentUser = 'admin'
-
-        navigate('/admin/dashboard');
-      } else if (res.data.userType === 'supportofficer') {
-        navigate('/support-officer/dashboard');
-      } else if (res.data.userType === 'stationowner') {
-        try {
-          const stationCheck = await axios.post(
-            `${API_BASE_URL}/api/stations/check-stations`,
-            { userId: res.data.user._id },
-            {
-              headers: {
-                'Authorization': `Bearer ${res.data.accessToken}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-
-          console.log('Station check response:', stationCheck.data);
-
-          if (!stationCheck.data.hasStations) {
-            // Case 1: No stations at all
-            navigate('/initaddstation');
-            toast.info('Please add your first charging station', {
-              position: "top-right",
-              autoClose: 3000
-            });
-          } else if (stationCheck.data.hasApprovedStation) {
-            // Case 2: Has at least one approved station
-            navigate('/station-owner/dashboards');
-            toast.success('Accessing your station dashboard', {
-              position: "top-right",
-              autoClose: 3000
-            });
-          } else {
-            // Case 3: Has stations but none approved
-            navigate('/initstation');
-            toast.warning('Your stations are pending approval', {
-              position: "top-right",
-              autoClose: 4000
-            });
-          }
-
-        } catch (error) {
-          console.error('Station check failed:', error);
-
-          if (!error.config._retry) {
-            toast.error(
-              error.response?.data?.message || 'Failed to verify station status',
-              { position: "top-right", autoClose: 5000 }
-            );
-          }
-
-          // Default navigation when check fails
-          navigate('/initaddstation');
-          throw error;
-        }
-      } else {
-        // console.log('.... Came here');
-        // navigate('/');
-      }
-
-      return res.data.user;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Login failed';
-      toast.error(
-        error.response?.data?.message || 'Failed to check station status',
-        {
-          position: "top-right",
-          autoClose: 5000,
-        }
-      );
-      throw errorMessage;
-    }
-  };
-
-  const login = (userData) => {
-    setCurrentUser(userData)
-    if (userData.role === 'admin') navigate('/admin/dashboard')
-    else if (userData.role === 'station-owner') navigate('/station-owner')
-    else if (userData.role === 'support-officer') navigate('/support-officer/dashboard')
-  }
-
-  const logout = async () => {
-    try {
-      await axios.post(`${API_BASE_URL}/api/auth/logout`);
-      toast.info('You have been logged out', {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    } catch (error) {
-      toast.error('Failed to logout properly', {
-        position: "top-right",
-        autoClose: 5000,
-      });
-    } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userID');
-      setCurrentUser(null);
-      navigate('/auth?mode=login');
-    }
-  };
-
-  useEffect(() => {
-    verifyToken();
-  }, []);
-
-  useEffect(() => {
-  console.log('Current user updated:', currentUser);
-}, [currentUser]);
-
-  return (
-    <AuthContext.Provider value={{
-      currentUser, login, logout, loading, loginA,
-      // isAdmin: currentUser?.userType === 'admin',
-      isAdmin: currentUser === 'admin',
-      isSupportOfficer: currentUser === 'supportofficer',
-      isStationOwner: currentUser === 'stationowner'
-    }}>
-      {children}
->>>>>>> origin/main
     </AuthContext.Provider>
   )
 }
