@@ -5,8 +5,22 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import StepOneForm from '../ui/StationForm';
 import StepTwoForm from '../ui/ChargerForm';
+import { MapModal } from '../ui/MapComponents';
+import { LoadScript } from '@react-google-maps/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+// Default form data structure
+const defaultFormData = {
+  stationName: '',
+  addressLine: '',
+  district: '',
+  city: '',
+  _id: '',
+  electricityProvider: '',
+  powerSource: '',
+};
 
 export default function AddChargingStationForm({ onClose, onSubmit, isEdit = false, stationId: propStationId, stationToEdit }) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -24,30 +38,34 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
-  const { id: paramStationId } = useParams(); // Only used in edit mode if prop not provided
+  const [showMapModal, setShowMapModal] = useState(false);
+  const { id: paramStationId } = useParams();
   const [locationData, setLocationData] = useState(null);
-  // Handler for setting location (simulated map)
+
+  // Initialize formData with default values
+  const [formData, setFormData] = useState(defaultFormData);
+
+  // Handler for setting location from map
   const handleSetLocationOnMap = () => {
-    alert('Opening map to set location...');
-    const dummyLat = 6.90 + Math.random() * 0.1;
-    const dummyLng = 79.90 + Math.random() * 0.1;
-    setLocationData({ lat: dummyLat, lng: dummyLng });
+    setShowMapModal(true);
+  };
+
+  const handleLocationSelect = (location, address = '') => {
+    setLocationData(location);
+
+    // Auto-fill address if available
+    if (address) {
+      setFormData(prev => ({
+        ...prev,
+        addressLine: address
+      }));
+    }
   };
 
   // Prefer propStationId over paramStationId
   const stationId = propStationId || paramStationId;
 
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    stationName: '',  // Ensure this is initialized as empty string
-    addressLine: '',
-    district: '',
-    city: '',
-    _id: '',
-    electricityProvider: '',
-    powerSource: '',
-  });
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -82,14 +100,27 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
 
           if (response.data.success) {
             const station = response.data.data;
-            setFormData({
+
+            // Safely update formData with station data
+            const updatedFormData = {
               stationName: station.station_name || '',
               addressLine: station.address || '',
               district: station.district || '',
               city: station.city || '',
               electricityProvider: station.electricity_provider || '',
               powerSource: station.power_source || '',
-            });
+              _id: station._id || '',
+            };
+
+            setFormData(updatedFormData);
+
+            // Set location data if coordinates exist
+            if (station.location && station.location.longitude && station.location.latitude) {
+              setLocationData({
+                lat: station.location.latitude,
+                lng: station.location.longitude
+              });
+            }
 
             setNumChargers(station.chargers?.length || 1);
             setChargers(station.chargers?.map(charger => ({
@@ -116,7 +147,7 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
     };
 
     fetchInitialData();
-  }, [isEdit, stationId, onClose]); // Proper dependency array
+  }, [isEdit, stationId, onClose]);
 
   // Function to check if a charger is editable
   const isChargerEditable = (charger) => {
@@ -126,7 +157,10 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
   const validateStepOne = () => {
     const newErrors = {};
 
-    const stationName = formData.stationName || ''; // Fallback to empty string if undefined
+    // Safely access formData properties with fallbacks
+    const stationName = formData?.stationName || '';
+    const district = formData?.district || '';
+    const city = formData?.city || '';
 
     if (!stationName.trim()) {
       newErrors.stationName = 'Station name is required';
@@ -134,12 +168,16 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
       newErrors.stationName = 'Station name must be at least 3 characters';
     }
 
-    if (!formData.district) {
+    if (!district) {
       newErrors.district = 'District is required';
     }
 
-    if (!formData.city?.trim()) {  // Optional chaining here as well
+    if (!city.trim()) {
       newErrors.city = 'City is required';
+    }
+
+    if (!locationData) {
+      newErrors.location = 'Please select a location on the map';
     }
 
     setErrors(newErrors);
@@ -151,7 +189,6 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
     let isValid = true;
 
     chargers.forEach((charger, index) => {
-
       if (!isChargerEditable(charger)) {
         return;
       }
@@ -208,9 +245,13 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
   };
 
   const handleChange = (field) => (e) => {
-    setFormData({ ...formData, [field]: e.target.value });
+    setFormData(prev => ({
+      ...prev,
+      [field]: e.target.value
+    }));
+
     if (errors[field]) {
-      setErrors({ ...errors, [field]: '' });
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -228,7 +269,6 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
   };
 
   const handleChargerChange = (index, field, value) => {
-
     if (!isChargerEditable(chargers[index])) {
       return;
     }
@@ -285,13 +325,18 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
     setIsSubmitting(true);
 
     try {
+      // Safely access formData properties
       const stationData = {
-        station_name: formData.stationName.trim(),
-        address: formData.addressLine.trim(),
-        district: formData.district,
-        city: formData.city.trim(),
-        electricity_provider: formData.electricityProvider || undefined,
-        power_source: formData.powerSource || undefined,
+        station_name: formData?.stationName?.trim() || '',
+        address: formData?.addressLine?.trim() || '',
+        district: formData?.district || '',
+        city: formData?.city?.trim() || '',
+        electricity_provider: formData?.electricityProvider || undefined,
+        power_source: formData?.powerSource || undefined,
+        location: locationData ? {
+          longitude: locationData.lng,
+          latitude: locationData.lat
+        } : undefined,
         chargers: chargers.map(charger => ({
           charger_name: charger.name.trim(),
           power_type: charger.powerType,
@@ -310,7 +355,6 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
       let response;
 
       if (isEdit) {
-        // Update existing station
         response = await axios.put(
           `${API_BASE_URL}/api/stations/update-station/${stationId}`,
           { stationOwnerID, ...stationData },
@@ -323,7 +367,6 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
         );
         toast.success('Station updated successfully!');
       } else {
-        // Create new station
         response = await axios.post(
           `${API_BASE_URL}/api/stations/create-station`,
           { stationOwnerID, ...stationData },
@@ -351,20 +394,15 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
 
             if (chatResponse.data.success) {
               console.log('Auto chats created successfully:', chatResponse.data);
-            } else {
-              console.warn('Auto chat creation failed:', chatResponse.data.message);
             }
-          }
-          catch (chatError) {
+          } catch (chatError) {
             console.error('Error creating auto chats:', chatError);
-            // Don't show error to user - this is a background process
           }
         }
       }
 
       onSubmit?.(response.data.data);
 
-      // Navigate based on backend response
       if (!isEdit && response.data.shouldNavigateToDashboard) {
         navigate('/station-owner');
       } else if (!isEdit) {
@@ -402,51 +440,61 @@ export default function AddChargingStationForm({ onClose, onSubmit, isEdit = fal
   }
 
   return (
-    <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/10 flex items-center justify-center">
-      <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-md max-h-[90vh] flex flex-col">
-        <div className="flex-1 overflow-y-auto">
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-4 text-3xl font-extralight hover:text-gray-600"
-            disabled={isSubmitting}
-          >
-            ×
-          </button>
+    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={['places']}>
+      <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/10 flex items-center justify-center">
+        <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-md max-h-[90vh] flex flex-col">
+          <div className="flex-1 overflow-y-auto">
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-4 text-3xl font-extralight hover:text-gray-600"
+              disabled={isSubmitting}
+            >
+              ×
+            </button>
 
-          <h2 className="text-2xl font-bold mb-6 text-center">
-            {currentStep === 1 ? 'Station Information' : 'Charger Configuration'}
-          </h2>
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              {currentStep === 1 ? 'Station Information' : 'Charger Configuration'}
+            </h2>
 
-          {currentStep === 1 ? (
-            <StepOneForm
-              formData={formData}
-              handleChange={handleChange}
-              nextStep={handleNextStep}
-              districts={districts}
-              errors={errors}
-              elecProviders={['CEB', 'LECO', 'Private']}
-              sources={['Grid', 'Solar', 'Hybrid']}
-              supportedPowerTypes={['AC', 'DC']}
-              locationData={locationData}
-              onSetLocationClick={handleSetLocationOnMap}
-            />
-          ) : (
-            <StepTwoForm
-              numChargers={numChargers}
-              updateNumChargers={updateNumChargers}
-              chargers={chargers}
-              handleChargerChange={handleChargerChange}
-              handleConnectorChange={handleConnectorChange}
-              getAvailableConnectors={getAvailableConnectors}
-              goBack={handlePrevStep}
-              onSubmit={submitStation}
-              errors={errors}
-              isSubmitting={isSubmitting}
-              isChargerEditable={isChargerEditable}
-            />
-          )}
+            {currentStep === 1 ? (
+              <StepOneForm
+                formData={formData}
+                handleChange={handleChange}
+                nextStep={handleNextStep}
+                districts={districts}
+                errors={errors}
+                elecProviders={['CEB', 'LECO', 'Private']}
+                sources={['Grid', 'Solar', 'Hybrid']}
+                supportedPowerTypes={['AC', 'DC']}
+                locationData={locationData}
+                onSetLocationClick={handleSetLocationOnMap}
+              />
+            ) : (
+              <StepTwoForm
+                numChargers={numChargers}
+                updateNumChargers={updateNumChargers}
+                chargers={chargers}
+                handleChargerChange={handleChargerChange}
+                handleConnectorChange={handleConnectorChange}
+                getAvailableConnectors={getAvailableConnectors}
+                goBack={handlePrevStep}
+                onSubmit={submitStation}
+                errors={errors}
+                isSubmitting={isSubmitting}
+                isChargerEditable={isChargerEditable}
+              />
+            )}
+          </div>
         </div>
+
+        {/* Map Modal */}
+        <MapModal
+          isOpen={showMapModal}
+          onClose={() => setShowMapModal(false)}
+          onLocationSelect={handleLocationSelect}
+          initialLocation={locationData}
+        />
       </div>
-    </div>
+    </LoadScript>
   );
 }

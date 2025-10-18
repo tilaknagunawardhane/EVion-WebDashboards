@@ -1,134 +1,182 @@
-import {  useEffect, useState } from 'react';
-import { COLORS, FONTS } from '../../../../constants'
-import { useNavigate } from 'react-router-dom';
-import StationOwnerPageHeader from '../../components/StationOwnerPageHeader'
-import Button from '../../../../components/ui/Button';
-import StationCard from '../../components/stationComponents/StationCard';
-import AddChargingStationForm from '../../../../components/ui/AddStationForm';
-import WeeklyPayoutSummary from '../../components/earningsComponents/WeeklyPayoutSummary';
-import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
-import DataTable from '../../../../components/ui/DataTable';
+import React, { useEffect, useState } from 'react';
+import { COLORS, FONTS } from '../../../../constants';
+import { useAuth } from '../../../../contexts/AuthContext';
+import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
+import EarningsSummary from '../../components/earningsComponents/EarningsSummary';
+import EarningsTable from '../../components/earningsComponents/EarningsTable';
+import PayoutHistory from '../../components/earningsComponents/PayoutHistory';
+import RevenueBreakdownModal from '../../components/earningsComponents/RevenueBreakdownModal';
+import TabBar from '../../../../components/ui/TabBar';
+import axios from 'axios';
 
-const payoutData = {
-  thisWeek: {
-    amount: '45,000',
-    payoutDate: 'July 27, 2025',
-  },
-  previousWeeks: [
-    {
-      period: 'July 1 - July 7',
-      amount: '38,500',
-      status: 'Sent',
-    },
-    {
-      period: 'June 24 - June 30',
-      amount: '41,200',
-      status: 'Pending',
-    },
-  ],
-};
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const earningsColumns = ['revenueID', 'Week Range', 'Total Revenue(LKR)', 'Due Date', 'Date Received', 'Status', 'Revenue Breakdown', 'Quick Actions', ]
-const earningsData = [
-  {
-    revenueID: 'REV00130',
-    'Week Range': 'July 15–21, 2025',
-    'Total Revenue(LKR)': 21000.75,
-    'Due Date': '2025-07-22',
-    'Date Received': null,
-    Status: 'Unpaid',
-    'Revenue Breakdown': ['View Revenue Breakdown'],
-    'Quick Actions': ['View Receipt'],
-  },
-  {
-    revenueID: 'REV00129',
-    'Week Range': 'July 8–14, 2025',
-    'Total Revenue(LKR)': 18250.75,
-    'Due Date': '2025-07-15',
-    'Date Received': '2025-07-15',
-    Status: 'Success',
-    'Revenue Breakdown': ['View Revenue Breakdown'],
-    'Quick Actions': ['View Receipt']
-  },
-  {
-    revenueID: 'REV00128',
-    'Week Range': 'July 1–7, 2025',
-    'Total Revenue(LKR)': 15500.75,
-    'Due Date': '2025-07-08',
-    'Date Received': '2025-07-08',
-    Status: 'Success',
-    'Revenue Breakdown': ['View Revenue Breakdown'],
-    'Quick Actions': ['View Receipt']
-  },
-  {
-    revenueID: 'REV00127',
-    'Week Range': 'June 24–30, 2025',
-    'Total Revenue(LKR)': 13000.75,
-    'Due Date': '2025-07-01',
-    'Date Received': '2025-07-01',
-    Status: 'Success',
-    'Revenue Breakdown': ['View Revenue Breakdown'],
-    'Quick Actions': ['View Receipt']
-  },
+const api = axios.create({ baseURL: API_BASE_URL });
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
+
+const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'earnings', label: 'Earnings History' },
+    { id: 'payouts', label: 'Payout History' },
 ];
 
-export default function StationsPage() {
+export default function EarningsPage() {
+    const { isStationOwner } = useAuth();
+    const [activeTab, setActiveTab] = useState('overview');
+    const [loading, setLoading] = useState(true);
+    const [dashboardData, setDashboardData] = useState(null);
+    const [earningsHistory, setEarningsHistory] = useState([]);
+    const [payoutHistory, setPayoutHistory] = useState([]);
+    const [selectedPeriod, setSelectedPeriod] = useState(null);
+    const [isBreakdownModalOpen, setIsBreakdownModalOpen] = useState(false);
+    const [breakdownData, setBreakdownData] = useState(null);
 
-    const [search, setSearch] = useState('');
-    const [filter, setFilter] = useState(null);
-    const [sort, setSort] = useState(null);
+     useEffect(() => {
+        if (isStationOwner) {
+            fetchDashboardData();
+        } else {
+            setLoading(false);
+        }
+    }, [isStationOwner, activeTab]);
 
-//   const navigate = useNavigate();
-    const TableTab = ({ title, columns, data, onRowClick }) => (
-        <div className="grid grid-cols-1 gap-0 bg-transparent rounded-lg p-0">
-            <DataTableTopBar
-                search={search}
-                setSearch={setSearch}
-                filter={filter}
-                setFilter={setFilter}
-                sort={sort}
-                setSort={setSort}
-                filterOptions={[
-                    { value: 'Status', label: 'Open' },
-                    { value: 'Fault Type', label: 'Charger'},
-                ]}
-                sortOptions={columns.map(col => ({ value: col, label: col }))}
-                searchPlaceholder={`Search ${title.toLowerCase()}...`}
-            />
-            <DataTable
-                columns={columns}
-                data={data}
-                filter={filter}
-                sort={sort}
-                search={search}
-                onRowClick={onRowClick}
+
+    const fetchDashboardData = async () => {
+        try {
+            setLoading(true);
+            console.log('Fetching data for tab:', activeTab);
+            const userID = localStorage.getItem('userID');
+            if (activeTab === 'overview') {
+                const [statsRes, currentEarningsRes] = await Promise.all([
+                    api.get(`/api/station-owner/earnings/current/${userID}`),
+                    api.get(`/api/station-owner/payouts/${userID}`)
+                ]);
+
+                if (statsRes.data.success && currentEarningsRes.data.success) {
+                    setDashboardData({
+                        currentEarnings: statsRes.data.summary,
+                        payoutHistory: currentEarningsRes.data.payouts.slice(0, 3)
+                    });
+                }
+            } else if (activeTab === 'earnings') {
+                const response = await api.get(`/api/station-owner/earnings/${userID}`);
+                if (response.data.success) {
+                    setEarningsHistory(response.data.earnings);
+                }
+            } else if (activeTab === 'payouts') {
+                const response = await api.get(`/api/station-owner/payouts/${userID}`);
+                if (response.data.success) {
+                    setPayoutHistory(response.data.payouts);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleViewBreakdown = async (month, year) => {
+        try {
+            const userID = localStorage.getItem('userID');
+
+            const response = await api.get(
+                `/api/station-owner/earnings/detailed/${userID}?month=${month}&year=${year}`
+            );
+            
+            if (response.data.success) {
+                setBreakdownData({
+                    month,
+                    year,
+                    earnings: response.data.earnings
+                });
+                setIsBreakdownModalOpen(true);
+            }
+        } catch (error) {
+            console.error('Error fetching breakdown:', error);
+        }
+    };
+
+    const getMonthName = (month) => {
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        return months[month - 1] || 'Unknown';
+    };
+
+    if (loading && activeTab === 'overview') {
+        return (
+            <div style={{ fontFamily: FONTS.family.sans, padding: '24px', backgroundColor: COLORS.background }}>
+                <StationOwnerPageHeader title="Earnings & Payouts" />
+                <div className="flex justify-center items-center h-64">
+                    <div className="text-lg">Loading earnings data...</div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ fontFamily: FONTS.family.sans, padding: '24px', backgroundColor: COLORS.background }}>
+            <StationOwnerPageHeader title="Earnings & Payouts" />
+            
+            {/* Tab Navigation */}
+            <div className="mb-6">
+                <TabBar 
+                    activeTab={activeTab} 
+                    setActiveTab={setActiveTab} 
+                    tabs={tabs} 
+                />
+            </div>
+
+            {/* Tab Content */}
+            {activeTab === 'overview' && dashboardData && (
+                <div className="space-y-6">
+                    <EarningsSummary 
+                        data={dashboardData.currentEarnings}
+                        onViewBreakdown={() => handleViewBreakdown(
+                            new Date().getMonth() + 1,
+                            new Date().getFullYear()
+                        )}
+                    />
+                    
+                    <PayoutHistory 
+                        payouts={dashboardData.payoutHistory}
+                        onViewAll={() => setActiveTab('payouts')}
+                    />
+                </div>
+            )}
+
+            {activeTab === 'earnings' && (
+                <EarningsTable 
+                    earnings={earningsHistory}
+                    onViewBreakdown={handleViewBreakdown}
+                    getMonthName={getMonthName}
+                    loading={loading}
+                />
+            )}
+
+            {activeTab === 'payouts' && (
+                <PayoutHistory 
+                    payouts={payoutHistory}
+                    showAll={true}
+                    loading={loading}
+                />
+            )}
+
+            {/* Revenue Breakdown Modal */}
+            <RevenueBreakdownModal
+                isOpen={isBreakdownModalOpen}
+                onClose={() => {
+                    setIsBreakdownModalOpen(false);
+                    setBreakdownData(null);
+                }}
+                data={breakdownData}
+                getMonthName={getMonthName}
             />
         </div>
     );
-
-  return (
-    <div
-      style={{
-        fontFamily: FONTS.family.sans,
-        padding: '24px',
-        backgroundColor: COLORS.background,
-      }}
-    >
-        <StationOwnerPageHeader title="Earnings" />
-        <WeeklyPayoutSummary data={payoutData} />
-
-        <TableTab
-            title="Earnings"
-            columns={earningsColumns}
-            data={earningsData}
-        />
-
-        {/* {showBreakdown && (
-            <RevenueBreakdownPopup
-            onClose={() => setShowBreakdown(false)}
-            revenueData={selectedRevenueData}
-            />
-        )} */}
-    </div>
-  )
 }
