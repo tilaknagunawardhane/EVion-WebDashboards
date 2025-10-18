@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@fontsource/plus-jakarta-sans": "^5.2.6",
+    "@googlemaps/react-wrapper": "^1.2.0",
     "@heroicons/react": "^2.2.0",
+    "@react-google-maps/api": "^2.20.7",
     "@tailwindcss/vite": "^4.1.10",
     "axios": "^1.10.0",
     "chart.js": "^4.5.0",
