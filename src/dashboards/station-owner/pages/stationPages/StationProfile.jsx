@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'; // Added useEffect
+import React, { useState, useRef, useEffect, useCallback } from 'react'; // Added useEffect
 import { COLORS, FONTS } from '../../../../constants';
 import { useNavigate, useParams } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
@@ -29,29 +29,6 @@ const stationImages = [
     'https://images.unsplash.com/photo-1729229078656-268bae113975?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     'https://images.unsplash.com/photo-1710025582119-e133fb11e10a?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     'https://images.unsplash.com/photo-1737312272830-f445719b7ed9?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-];
-
-const sampleSchedule = {
-    monday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '08:00', to: '18:00' }] },
-    tuesday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '09:00', to: '17:00' }] },
-    wednesday: { selected: true, open24Hours: true, closed: false, timeBlocks: [] },
-    thursday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '07:00', to: '12:00' }, { from: '14:00', to: '20:00' }] },
-    friday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '10:00', to: '22:00' }] },
-    saturday: { selected: true, open24Hours: false, closed: true, timeBlocks: [] }, // Closed
-    sunday: { selected: false, open24Hours: false, closed: false, timeBlocks: [] }, // Not set
-};
-
-const sampleTemporaryClosure = [
-    {
-        from: new Date('2025-07-20T10:00:00'),
-        to: new Date('2025-07-20T14:00:00'),
-        reason: 'Scheduled infrastructure upgrade.'
-    },
-    {
-        from: new Date('2025-07-25T09:00:00'),
-        to: new Date('2025-07-25T17:00:00'),
-        reason: 'Annual safety inspection.'
-    },
 ];
 
 // Dropdown component for Station Actions (no changes needed)
@@ -101,8 +78,8 @@ const OwnerViewStation = () => {
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
     const [rating, setRating] = useState(0.0);
-    const [stationSchedule, setStationSchedule] = useState(sampleSchedule);
-    const [stationTemporaryClosures, setStationTemporaryClosures] = useState(sampleTemporaryClosure);
+    const [stationSchedule, setStationSchedule] = useState(null); 
+    const [stationTemporaryClosures, setStationTemporaryClosures] = useState([]); // No default closures
     const [showAll, setShowAll] = useState(false);
     const [localStationImages, setLocalStationImages] = useState(stationImages);
     const [loading, setLoading] = useState(true);
@@ -137,7 +114,8 @@ const OwnerViewStation = () => {
         noOfConnectors: "0",
         noOfReports: "0",
         averageRating: 0,
-        totalRatings: 0
+        totalRatings: 0,
+        chargers: []
     });
 
     const [showEditStationForm, setShowEditStationForm] = useState(false);
@@ -145,6 +123,9 @@ const OwnerViewStation = () => {
     // Fetch station data from backend
     useEffect(() => {
         const fetchStationData = async () => {
+            
+            if (!stationId) return;
+            
             try {
                 setLoading(true);
                 const stationOwnerID = localStorage.getItem('userID');
@@ -153,24 +134,21 @@ const OwnerViewStation = () => {
                 console.log('Making API request to:', `${API_BASE_URL}/api/stations/station/${stationId}`);
                 console.log('Station Owner ID:', stationOwnerID);
                 console.log('Access Token exists:', !!accessToken)
+
+                const headers = { 'Authorization': `Bearer ${accessToken}` };
+                const params = { stationOwnerId: stationOwnerID };
                 
-                const response = await axios.get(
-                    `${API_BASE_URL}/api/stations/station/${stationId}`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                        },
-                        params: {
-                            stationOwnerId: stationOwnerID
-                        }
-                    }
-                    
+                const [stationResponse, closuresResponse] = await Promise.all([
+                    axios.get(`${API_BASE_URL}/api/stations/station/${stationId}`, { headers, params }),
+                    axios.get(`${API_BASE_URL}/api/stations/${stationId}/temporary-closure`, { headers, params }) 
+                ]   
                 );
 
-                console.log('API Response:', response.data);
+                console.log('Main Station API Response:', stationResponse.data);
+                console.log('Closures API Response:', closuresResponse.data);
 
-                if (response.data.success) {
-                    const stationData = response.data.data;
+                if (stationResponse.data.success) {
+                    const stationData = stationResponse.data.data;
 
                     console.log('Station Data from API:', stationData);
                     
@@ -199,16 +177,28 @@ const OwnerViewStation = () => {
                         noOfConnectors: stationData.chargers?.length || "0",
                         noOfReports: stationData.noOfReports || "0",
                         averageRating: stationData.averageRating || 0,
-                        totalRatings: stationData.totalRatings || 0
+                        totalRatings: stationData.totalRatings || 0,
+                        chargers: stationData.chargers || [],
                     });
+
+                    // Set Schedule Data from API
+                    setStationSchedule(stationData.station_schedule || null);
 
                     // Set rating from API data
                     setRating(stationData.averageRating || 0.0);
                 } else {
                     toast.error('Failed to fetch station data');
                 }
+
+
+                if (closuresResponse.data.success) {
+                    setStationTemporaryClosures(closuresResponse.data.data || []);
+                } else {
+                    toast.error('Failed to fetch temporary closures');
+                }
+
             } catch (error) {
-                console.error('Error fetching station data:', error);
+                console.error('Error in combined fetch:', error);
                 
                 if (error.response) {
                     console.error('Response data:', error.response.data);
@@ -239,11 +229,114 @@ const OwnerViewStation = () => {
         }
     }, [stationId]);
 
+
+    // Separate useEffect to call the function on mount/ID change
+    // useEffect(() => {
+    //     if (stationId) {
+    //         fetchStationData();
+    //     }
+    // }, [stationId, fetchStationData]);
+
     const initialDisplayCount = 3;
     const imagesToDisplay = showAll ? localStationImages : localStationImages.slice(0, initialDisplayCount);
 
     const handleUpdateStationDetails = () => {
         setShowEditStationForm(true);
+    };
+
+    // Handler to update the schedule via API
+    const handleScheduleSubmit = async (newScheduleData) => {
+        try {
+            const stationOwnerID = localStorage.getItem('userID');
+            
+            await axios.put(
+                `${API_BASE_URL}/api/stations/update-station-schedule/${stationId}`,
+                { 
+                    stationOwnerID,
+                    station_schedule: newScheduleData // Send the entire updated schedule object
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            toast.success('Schedule updated successfully!');
+            
+            // Re-fetch the data to ensure the UI reflects the persisted state
+            // await fetchStationData(); 
+
+        } catch (error) {
+            console.error('Error updating schedule:', error);
+            toast.error(error.response?.data?.message || 'Failed to save schedule.');
+        }
+    };
+
+    // API Handler for Temporary Closure Creation
+    const handleTemporaryCloseCreate = async (closureData) => {
+        try {
+            const stationOwnerID = localStorage.getItem('userID');
+            
+            const payload = {
+                owner_id: stationOwnerID, 
+                fromDateTime: closureData.fromDateTime,
+                toDateTime: closureData.toDateTime,
+                reason: closureData.reason
+            };
+
+            await axios.post(
+                `${API_BASE_URL}/api/stations/${stationId}/create-temporary-closure`,
+                payload,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            toast.success('Temporary closure applied.');
+            // Re-fetch all station data, including the new closure list and updated station status
+            // await fetchStationData(); 
+
+        } catch (error) {
+            console.error('Error creating temporary closure:', error);
+            toast.error(error.response?.data?.message || 'Failed to apply temporary closure.');
+        }
+    };
+
+    // Temporary Closure Removal
+    const handleTemporaryCloseRemove = async (closureId) => {
+        try {
+            const stationOwnerID = localStorage.getItem('userID');
+
+            const requestBody = {
+                stationOwnerID: stationOwnerID
+            };
+
+           const config = {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                    'Content-Type': 'application/json' // Good practice to specify
+                }
+            }; 
+
+            // Send DELETE request, passing owner ID and closure ID in the request body (Axios requirement)
+            await axios.put(
+                `${API_BASE_URL}/api/stations/${stationId}/remove-temporary-closure/${closureId}`,
+                requestBody, // Correctly passes { stationOwnerID: '...' } as the body
+                config
+            );
+
+            toast.success('Temporary closure successfully cancelled.');
+            // await fetchStationData();
+
+        } catch (error) {
+            console.error('Error cancelling temporary closure:', error);
+            toast.error(error.response?.data?.message || 'Failed to cancel temporary closure.');
+        }
     };
 
     const handleFormSubmit = (data) => {
@@ -274,6 +367,21 @@ const OwnerViewStation = () => {
         // { id: 'stats', label: 'Stats' }
     ];
 
+    const GLOBAL_RESTRICTED_STATUSES = [
+        'disabled_by_so', // Station Owner disabled
+        'deleted'         // Station is marked for deletion
+    ];
+
+    const isStationGloballyDisabled = GLOBAL_RESTRICTED_STATUSES.includes(stationDetails.status.toLowerCase());
+
+
+    const hasOperationalCharger = stationDetails.chargers?.some(charger =>
+        // The opposite of the restricted list: is it 'open' OR is it 'unavailable'?
+        charger.charger_status === 'open' || charger.charger_status === 'unavailable'
+    ) || false;
+
+    const canViewSchedule = !isStationGloballyDisabled && hasOperationalCharger;
+    
     // Mobile labels for tabs
     const mobileLabels = {
         profile: 'Profile',
@@ -282,6 +390,15 @@ const OwnerViewStation = () => {
         transactions: 'Transactions Related to Station',
         // stats: 'Stats'
     };
+
+    const visibleTabs = tabs.filter(tab => {
+        if (tab.id === 'schedule') {
+            // Only include the 'schedule' tab if the condition is met
+            return canViewSchedule;
+        }
+        // Always include other tabs
+        return true; 
+    });
 
     // Render stars based on rating
     const renderStars = () => {
@@ -708,7 +825,7 @@ const OwnerViewStation = () => {
             <TabBar
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
-                tabs={tabs}
+                tabs={visibleTabs}
                 mobileLabels={mobileLabels}
             />
 
@@ -716,9 +833,13 @@ const OwnerViewStation = () => {
             <div className="mt-6">
                 {activeTab === 'profile' && <ProfileTab />}
 
-                {activeTab === 'schedule' && <StationSchedule
+                {activeTab === 'schedule' && canViewSchedule && <StationSchedule
                     initialSchedule={stationSchedule}
                     initialTemporaryClosure={stationTemporaryClosures}
+                    onScheduleSave={handleScheduleSubmit}
+                    onTemporaryCloseCreate={handleTemporaryCloseCreate}
+                    onTemporaryCloseRemove={handleTemporaryCloseRemove}
+                    stationId={stationId}
                 />}
 
                 {activeTab === 'chargers' && (
