@@ -1,3 +1,4 @@
+import { color } from 'chart.js/helpers'
 import { COLORS, FONTS } from '../../constants'
 
 export default function Button({
@@ -24,7 +25,7 @@ export default function Button({
     },
     secondary: {
       backgroundColor: COLORS.bgGreen,
-      color: COLORS.mainTextColor,
+      color: COLORS.primary,
     },
     danger: {
       backgroundColor: COLORS.danger,
@@ -32,8 +33,12 @@ export default function Button({
     },
     outline: {
       // backgroundColor: COLORS.background,
-      color: COLORS.mainTextColor,
+      color: COLORS.secondaryText,
       border: `1px solid ${COLORS.stroke}`,
+    },
+    danger_outline: {
+      color: COLORS.danger,
+      border: `1px solid ${COLORS.danger}`,
     }
   }
 

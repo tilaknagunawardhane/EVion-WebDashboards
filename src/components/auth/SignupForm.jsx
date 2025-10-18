@@ -17,26 +17,28 @@ export default function SignupForm() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const [errors, setErrors] = useState({
     name: '',
     email: '',
     phone: '',
-    password: ''
+    password: '',
+    confirmPassword: '',
   });
 
 
   const handleSignup = (e) => {
     e.preventDefault();
-    
-    const newErrors = { name: '', email: '', phone: '', password: '' };
+
+    const newErrors = { name: '', email: '', phone: '', password: '', confirmPassword: '' };
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10,15}$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
     let valid = true;
-    
+
     if (!name.trim()) {
       newErrors.name = 'Please enter your name';
       valid = false;
@@ -62,14 +64,28 @@ export default function SignupForm() {
       newErrors.password = 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character';
       valid = false;
     }
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Please enter your confirm password';
+      valid = false;
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+      valid = false;
+    }
+
     setErrors(newErrors);
 
     if (!valid) return;
 
-    const userData = { email, role: 'station-owner' }; // Adjust role based on your logic
-    login(userData);
-
-    navigate('/profilesetup');
+    navigate('/profilesetup', {
+    state: {
+      userData: {
+        name,
+        email,
+        phone,
+        password
+      }
+    }
+  });
   };
 
   const handleSignin = () => {
@@ -87,12 +103,12 @@ export default function SignupForm() {
         {/* Left Section */}
         <div className="flex-1 flex flex-col justify-center items-start text-left">
           <div className="flex mb-4">
-                <img 
-                  src={evionLogo} 
-                  alt="EVion Logo" 
-                  className="h-10 w-auto"
-                />
-              </div>
+            <img
+              src={evionLogo}
+              alt="EVion Logo"
+              className="h-10 w-auto"
+            />
+          </div>
           <h1 style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes['3xl'], fontFamily: FONTS.family.sans, fontWeight: FONTS.weights['500'] }}>
             Join the Evion Network
           </h1>
@@ -106,90 +122,101 @@ export default function SignupForm() {
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-md p-12 bg-white rounded-lg shadow-md h-[600px] overflow-hidden">
             <div className="h-full overflow-y-auto">
-            <div className="mb-6">
-              <h2 style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes['2xl'], fontFamily: FONTS.family.sans, fontWeight: FONTS.weights['500'] }}>
-                Sign Up
-              </h2>
-            </div>
-            <form onSubmit={handleSignup} className="space-y-4">
-              <InputField
-                label="Name"
-                type="text"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                error={!!errors.name}
-                errorMessage={errors.name}
-              />
-              <InputField
-                label="Email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required    
-                error={!!errors.email}
-                errorMessage={errors.email}
-              />
-              <InputField
-                label="Phone Number"
-                type="tel"
-                placeholder="Enter your phone number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                error={!!errors.phone}
-                errorMessage={errors.phone}
-              />
-              <InputField
-                label="Password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                error={!!errors.password}
-                errorMessage={errors.password}
-              />
-
-              <Button variant="primary" type="submit" className="w-full">
-                Sign Up
-              </Button>
-
-              <div className="text-center mt-4">
-                <span style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.normal }}>
-                  By signing up, you agree to our
-                </span>{' '}
-                <a
-                  href="#"
-                  onClick={handlePrivacyPolicy}
-                  style={{ 
-                    color: COLORS.secondaryText,
-                    fontSize: FONTS.sizes.xs, 
-                    fontFamily: FONTS.family.sans, 
-                    fontWeight: FONTS.weights.medium,
-                    textDecoration: 'underline' }}
-                  className="hover:text-opacity-80"
-                >
-                  Terms & Privacy Policy
-                </a>
+              <div className="mb-6">
+                <h2 style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes['2xl'], fontFamily: FONTS.family.sans, fontWeight: FONTS.weights['500'] }}>
+                  Sign Up
+                </h2>
               </div>
+              <form onSubmit={handleSignup} className="space-y-4">
+                <InputField
+                  label="Name"
+                  type="text"
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  error={!!errors.name}
+                  errorMessage={errors.name}
+                />
+                <InputField
+                  label="Email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  error={!!errors.email}
+                  errorMessage={errors.email}
+                />
+                <InputField
+                  label="Phone Number"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  error={!!errors.phone}
+                  errorMessage={errors.phone}
+                />
+                <InputField
+                  label="Password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  error={!!errors.password}
+                  errorMessage={errors.password}
+                />
+                <InputField
+                  label="Confirm Password"
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  error={!!errors.confirmPassword}
+                  errorMessage={errors.confirmPassword}
+                />
 
-              <div className="text-center mt-4">
-                <span style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.normal }}>
-                  Already have an account?
-                </span>{' '}
-                <a
-                  href="#"
-                  onClick={handleSignin}
-                  style={{ color: COLORS.primary, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.medium }}
-                  className="hover:text-opacity-80"
-                >
-                  Sign In
-                </a>
-              </div>
-            </form>
+                <Button variant="primary" type="submit" className="w-full">
+                  Sign Up
+                </Button>
+
+                <div className="text-center mt-4">
+                  <span style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.normal }}>
+                    By signing up, you agree to our
+                  </span>{' '}
+                  <a
+                    href="#"
+                    onClick={handlePrivacyPolicy}
+                    style={{
+                      color: COLORS.secondaryText,
+                      fontSize: FONTS.sizes.xs,
+                      fontFamily: FONTS.family.sans,
+                      fontWeight: FONTS.weights.medium,
+                      textDecoration: 'underline'
+                    }}
+                    className="hover:text-opacity-80"
+                  >
+                    Terms & Privacy Policy
+                  </a>
+                </div>
+
+                <div className="text-center mt-4">
+                  <span style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.normal }}>
+                    Already have an account?
+                  </span>{' '}
+                  <a
+                    href="#"
+                    onClick={handleSignin}
+                    style={{ color: COLORS.primary, fontSize: FONTS.sizes.xs, fontFamily: FONTS.family.sans, fontWeight: FONTS.weights.medium }}
+                    className="hover:text-opacity-80"
+                  >
+                    Sign In
+                  </a>
+                </div>
+              </form>
             </div>
           </div>
         </div>

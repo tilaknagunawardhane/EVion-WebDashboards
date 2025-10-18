@@ -1,12 +1,14 @@
 import React from 'react';
-import { COLORS, FONTS } from '../../../constants';
-import Button from '../../../components/ui/Button';
-import RequestCard from '../components/RequestCard';
-import OverviewCard from '../components/OverviewCard';
-import StationsIcon from '../../../assets/stations.svg'
-import ConnectorsIcon from '../../../assets/connectors.svg'
+import { COLORS, FONTS } from '../../../../constants';
+import Button from '../../../../components/ui/Button';
+import RequestCard from '../RequestCard';
+import OverviewCard from '../OverviewCard';
+import StationsIcon from '../../../../assets/stations.svg'
+import ConnectorsIcon from '../../../../assets/connectors.svg'
+import { useNavigate } from 'react-router-dom';
 
 export default function ChargingStationsRightPanel({ stations, requests }) {
+  const navigate = useNavigate();
   // Summary data
   const total = stations?.length || 2;
   const active = stations?.filter(s => s.status === 'Active').length || 1;
@@ -40,7 +42,7 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
 
   return (
     <div
-      className="rounded-xl border bg-white min-h-[300px] p-3 flex flex-col gap-6 shadow-sm"
+      className="rounded-xl border bg-white p-3 flex flex-col gap-6 h-[calc(100vh-140px)] overflow-y-auto"
       style={{
         borderColor: COLORS.stroke,
         background: COLORS.background,
@@ -83,7 +85,7 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
                   <div className="w-8 h-8 flex items-center justify-center rounded-lg" style={{ backgroundColor: COLORS.bgGreen }}>
                     {renderGreenIcon(ConnectorsIcon)}
                   </div>
-                  <div style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.semibold }}>Connectors</div>
+                  <div style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.semibold }}>Chargers</div>
                 </div>
               </div>
               <div className="grid grid-rows-2 mt-2">
@@ -112,6 +114,7 @@ export default function ChargingStationsRightPanel({ stations, requests }) {
             // Add any other custom styles here
           }}
           className='mt-4 w-full'
+          onClick={() => navigate('/admin/stations/requests')}
         >
           View all requests
         </Button>

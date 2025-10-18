@@ -14,15 +14,15 @@ ChartJS.register(
   Legend
 );
 
-export default function ConnectorStatusChart() {
+export default function FaultStatusChart() {
   const data = {
-    labels: ['Free', 'In-use', 'Faulted', 'Offline/Unavailable'],
+    labels: ['New', 'In-Progress'],
     datasets: [
       {
-        data: [12, 8, 2, 3], // Sample data - replace with your actual counts
+        data: [12, 8], // Sample data - replace with your actual counts
         backgroundColor: [
           COLORS.primary,       // Free
-          COLORS.HighlightText, // In-use
+          '#000000', // In-use
           COLORS.danger,        // Faulted
           COLORS.secondaryText  // Offline
         ],

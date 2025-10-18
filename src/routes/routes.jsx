@@ -14,11 +14,42 @@ import AdminRoute from './AdminRoute'
 import PrivateRoute from './PrivateRoute'
 import ProfileSetup from '../components/auth/ProfileSetup'
 import InitAddStation from '../components/auth/InitAddStation'
+import InitStation from '../components/auth/InitStation'
 import { AuthProvider } from '../contexts/AuthContext'
 
 import AdminDash from '../dashboards/admin/pages/Dash'
+import SupportOfficerDash from '../dashboards/support-officer/pages/Dash'
+import ChargingStationsOverview from '../dashboards/support-officer/pages/ChargingStationsOverview'
 import AdminStaionsPage from '../dashboards/admin/pages/ChargingStations'
+import SupportOfficerRoute from './SupportOfficerRoute'
 import UserAccountPage from '../dashboards/admin/pages/userPages/userAccount'
+import RequestsPage from '../dashboards/admin/pages/stationPages/Requests'
+import ViewRequest from '../dashboards/admin/pages/stationPages/ViewRequest'
+import ViewStation from '../dashboards/admin/pages/stationPages/ViewStation'
+import AdminViewCharger from '../dashboards/admin/pages/stationPages/ViewCharger'
+import AdminTransactions from '../dashboards/admin/pages/transactionsPages/Transactions'
+import AdminNotifications from '../dashboards/admin/pages/Notifications'
+import ChatPage from '../dashboards/admin/pages/Chat'
+import AdminPayouts from '../dashboards/admin/pages/transactionsPages/Payouts'
+
+import FaultReportsPage from '../dashboards/support-officer/pages/FaultReports'
+import FaultReportDetailPage from '../dashboards/support-officer/pages/FaultReportDetail'
+import AfterAcceptedPage from '../dashboards/support-officer/pages/AfterAccepted'
+import CommunityPage from '../dashboards/support-officer/pages/Community'
+import UserChatPage from '../dashboards/support-officer/pages/Chat'
+import StationReportDetailsPage from '../dashboards/support-officer/pages/StationReportDetail'
+import ChargerReportDetailsPage from '../dashboards/support-officer/pages/ChargerReportDetail'
+import BookingReportDetailPage from '../dashboards/support-officer/pages/BookingReportDetail'
+import SupportOfficerNotifications from '../dashboards/support-officer/pages/Notifications'
+import SupportOfficerStationDetailsPage from '../dashboards/support-officer/pages/StationDetailsPage'
+
+import OwnerViewStation from '../dashboards/station-owner/pages/stationPages/StationProfile'
+import OwnerViewCharger from '../dashboards/station-owner/pages/chargerPages/ChargerProfile'
+import FaultAlerts from '../dashboards/station-owner/pages/faultsPages/FaultReports'
+import OwnerChatPage from '../dashboards/station-owner/pages/Chat'
+import OwnerEarnings from '../dashboards/station-owner/pages/earningsPages/Earnings'
+import StationOwnerNotifications from '../dashboards/station-owner/pages/Notifications'
+import StationOwnerReportDetails from '../dashboards/station-owner/pages/faultsPages/ReportDetails'
 
 const router = createBrowserRouter([
   {
@@ -33,6 +64,7 @@ const router = createBrowserRouter([
       { path: 'auth', element: <AuthPage /> },
       { path: 'profilesetup', element: <ProfileSetup />},
       { path: 'initaddstation', element: <InitAddStation />},
+      { path: 'initstation', element: <InitStation /> },
       {
         path: 'admin',
         element: <PrivateRoute><AdminRoute><AdminDashboard /></AdminRoute></PrivateRoute>,
@@ -40,7 +72,16 @@ const router = createBrowserRouter([
           { path: 'users', element: <UsersPage /> },
           { path: 'dashboard', element: <AdminDash /> },
           { path: 'stations', element: <AdminStaionsPage/>},
-          { path: 'users/:id', element: <UserAccountPage/>}
+          { path: 'payments', element: <AdminTransactions />},
+          { path: 'users/:id', element: <UserAccountPage/>},
+          { path: 'stations/requests', element: <RequestsPage/>},
+          // { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
+          { path: 'stations/requests/:id', element: <ViewRequest/>},
+          { path: 'stations/:id', element: <ViewStation/>},
+          { path: 'chat', element: <ChatPage/>},
+          { path: 'notifications', element: <AdminNotifications/>},
+          { path: 'stations/chargerprofile/:id', element: <AdminViewCharger /> },
+          { path: 'payouts', element: <AdminPayouts /> }
 
         ]
       },
@@ -51,13 +92,35 @@ const router = createBrowserRouter([
           { path: 'dashboards', element: <DashboardPage /> },
           { path: 'stations', element: <StationsPage /> },
           { path: 'settings', element: <SettingsPage /> },
+          { path: 'stations/stationprofile/:id', element: <OwnerViewStation />},
+          { path: 'stations/chargerprofile/:id', element: <OwnerViewCharger />},
+          { path: 'alerts', element: <FaultAlerts /> },
+          { path: 'chat', element: <OwnerChatPage /> },
+          { path: 'notifications', element: <StationOwnerNotifications /> },
+          { path: 'reportDetails/:type/:reportId', element: <StationOwnerReportDetails /> },
+          { path: 'earnings', element: <OwnerEarnings /> },
+
         ]
       },
       {
         path: 'support-officer',
-        element: <PrivateRoute><SupportOfficerDashboard /></PrivateRoute>,
+        element: <PrivateRoute><SupportOfficerRoute><SupportOfficerDashboard /></SupportOfficerRoute></PrivateRoute>,
         children: [
-          { path: 'tasks', element: <TasksPage /> }
+          { path: 'dashboard', element: <SupportOfficerDash />},
+          { path: 'chargingStations', element:<ChargingStationsOverview />},
+          { path: 'faultReports', element:<FaultReportsPage /> },
+          { path: 'FaultReportDetail', element:<FaultReportDetailPage /> },
+          { path: 'chat', element:<UserChatPage /> },
+          { path: 'AfterAccepted', element:<AfterAcceptedPage /> },
+          { path: 'community', element: <CommunityPage />},
+          { path: 'tasks', element: <TasksPage /> },
+          { path: 'fault-reports/stations/:id', element: <StationReportDetailsPage /> },
+          { path: 'fault-reports/chargers/:id', element: <ChargerReportDetailsPage /> },
+          { path: 'fault-reports/bookings/:id', element: <BookingReportDetailPage /> },
+          { path: 'station-details/:stationId', element: <SupportOfficerStationDetailsPage /> },
+          { path: 'notifications', element:<SupportOfficerNotifications /> },
+
+
         ]
       }
     ]

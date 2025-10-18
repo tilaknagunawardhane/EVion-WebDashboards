@@ -1,25 +1,40 @@
 import React, { useMemo } from 'react';
-import { COLORS, FONTS } from '../../../constants';
+import { COLORS, FONTS } from '../../constants';
 import { useNavigate } from 'react-router-dom';
+import ChatIcon from '../../assets/chat.svg';
 
 const getStatusStyle = (status) => {
   const statusMap = {
+    'Success': { background: COLORS.bgGreen, color: COLORS.primary }, 
     'Active': { background: COLORS.bgGreen, color: COLORS.primary },
     'Completed': { background: COLORS.bgGreen, color: COLORS.primary },
     'Confirmed': { background: COLORS.bgGreen, color: COLORS.primary },
     'Attended': { background: COLORS.bgGreen, color: COLORS.primary },
     'Paid': { background: COLORS.bgGreen, color: COLORS.primary },
-    'Resolved': { background: COLORS.bgGreen, color: COLORS.primary },
-    'Closed': { background: '#fdc7c7', color: COLORS.danger },
-    'Under Maintenance': { background: '#fadba9', color: COLORS.mainTextColor },
-    'Disabled': { background: '#fdc7c7', color: COLORS.danger },
-    'Deleted': { background: '#fdc7c7', color: COLORS.danger },
-    'No-show': { background: '#fdc7c7', color: COLORS.danger },
-    'Cancelled': { background: '#fdc7c7', color: COLORS.danger },
-    'In Progress': { background: '#fadba9', color: COLORS.mainTextColor },
-    'New': { background: '#d0e0ff', color: COLORS.primary },
-    'Refunded': { background: '#d0f0fd', color: COLORS.primary },
-    'Default': { background: COLORS.bgGreen, color: COLORS.primary }
+    'New': { background: COLORS.bgGreen, color: COLORS.primary },
+    'Open': { background: COLORS.bgGreen, color: COLORS.primary },
+
+    'Closed': { background: COLORS.bgRed, color: COLORS.danger },
+    'Unpaid': { background: COLORS.bgRed, color: COLORS.danger },
+    'Disabled': { background: COLORS.bgRed, color: COLORS.danger },
+    'Blocked': { background: COLORS.bgRed, color: COLORS.danger },
+    'No-show': { background: COLORS.bgRed, color: COLORS.danger },
+    'Cancelled': { background: COLORS.bgRed, color: COLORS.danger },
+    'Refunded': { background: COLORS.bgRed, color: COLORS.danger },
+    'Faulty': { background: COLORS.bgRed, color: COLORS.danger },
+    'Overdue': { background: COLORS.bgRed, color: COLORS.danger },
+
+    'Under Maintenance': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'In Progress': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'Walk-in': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'Pending': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'Pending-Approval': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+
+    'Deleted': { background: COLORS.background, color: COLORS.secondaryText },
+    'Removed': { background: COLORS.background, color: COLORS.secondaryText },
+    'Resolved': { background: COLORS.background, color: COLORS.secondaryText },
+    
+    'Default': { background: COLORS.background, color: COLORS.secondaryText },
   };
   
   return statusMap[status] || statusMap['Default'];
@@ -32,17 +47,31 @@ const getStatusDotColor = (status) => {
     'Confirmed': COLORS.primary,
     'Attended': COLORS.primary,
     'Paid': COLORS.primary,
-    'Resolved': COLORS.primary,
+    'New': COLORS.primary,
+    'Success': COLORS.primary,
+    'Open': COLORS.primary,
+
     'Closed': COLORS.danger,
     'Disabled': COLORS.danger,
     'Deleted': COLORS.danger,
+    'Blocked': COLORS.danger,
     'No-show': COLORS.danger,
+    'Unpaid': COLORS.danger,
     'Cancelled': COLORS.danger,
+    'Refunded': COLORS.danger,
+    'Faulty': COLORS.danger,
+    'Overdue': COLORS.danger,
+
     'Under Maintenance': COLORS.HighlightText,
     'In Progress': COLORS.HighlightText,
-    'New': COLORS.primary,
-    'Refunded': COLORS.primary,
-    'Default': COLORS.primary
+    'Walk-in': COLORS.HighlightText,
+    'Pending': COLORS.HighlightText,
+    'Pending-Approval': COLORS.HighlightText,
+    
+    'Removed': COLORS.secondaryText,
+    'Resolved': COLORS.secondaryText,
+
+    'Default': COLORS.secondaryText
   };
   
   return statusColorMap[status] || statusColorMap['Default'];
@@ -62,7 +91,7 @@ const renderCellContent = (value, column, rowData) => {
   if (column.toLowerCase().includes('status')) {
     return (
       <span 
-        className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
+        className="px-2.5 py-1 text-xs font-normal inline-flex items-center gap-1 rounded-md"
         style={getStatusStyle(value)}
       >
         <span 
@@ -75,27 +104,46 @@ const renderCellContent = (value, column, rowData) => {
   }
   
   // Handle booking/enabled cells
-  if (column.toLowerCase().includes('bookings') || column.toLowerCase().includes('enabled')) {
-    const isEnabled = value === 'Enabled' || value === 'Yes';
-    return (
-      <span 
-        className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
-        style={isEnabled ? 
-          { background: COLORS.bgGreen, color: COLORS.primary } : 
-          { background: '#fdc7c7', color: COLORS.danger }
-        }
-      >
+   if (column === 'Bookings') {
+    if (value === 'Enabled' || value === 'Available') {
+      return (
         <span 
-          className="w-1.5 h-1.5 rounded-full" 
-          style={{ background: isEnabled ? COLORS.primary : COLORS.danger }}
-        ></span>
-        {value}
-      </span>
-    );
+          className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
+          style={{ 
+            background: COLORS.bgGreen, 
+            color: COLORS.primary 
+          }}
+        >
+          <span 
+            className="w-1.5 h-1.5 rounded-full" 
+            style={{ background: COLORS.primary }}
+          ></span>
+          {value}
+        </span>
+      );
+    } else if (value === 'Disabled' || value === 'Not Available') {
+      return (
+        <span 
+          className="px-2.5 py-1 text-xs font-medium inline-flex items-center gap-1 rounded-md"
+          style={{ 
+            background: COLORS.bgRed, 
+            color: COLORS.danger 
+          }}
+        >
+          <span 
+            className="w-1.5 h-1.5 rounded-full" 
+            style={{ background: COLORS.danger }}
+          ></span>
+          {value}
+        </span>
+      );
+    }
   }
+
+  
   
   // Handle action links
-  if (column === 'View Receipt' || column === 'Actions') {
+  if (column === 'View Receipt' || column === 'Download Receipt' || column === 'Actions') {
     return (
       <a 
         href="#" 
@@ -107,6 +155,29 @@ const renderCellContent = (value, column, rowData) => {
           color: COLORS.primary,
           textDecoration: 'underline',
           fontWeight: FONTS.weights.medium
+        }}
+      >
+        {value}
+      </a>
+    );
+  }
+
+  if (column === 'Revenue Breakdown') {
+    return (
+      <a 
+        href="#" 
+        onClick={(e) => {
+          e.stopPropagation();
+          // if (onBreakdownClick) {
+          //   onBreakdownClick(row);
+          // }
+        }}
+        className="underline"
+        style={{ 
+          color: COLORS.primary,
+          textDecoration: 'underline',
+          fontWeight: FONTS.weights.normal,
+          fontSize:FONTS.sizes.xs
         }}
       >
         {value}
@@ -126,7 +197,7 @@ const renderCellContent = (value, column, rowData) => {
   // Handle dates
   if (column.includes('Date') || column.includes('On')) {
     return (
-      <span style={{ color: COLORS.secondaryText }}>
+      <span style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}>
         {value}
       </span>
     );
@@ -164,7 +235,7 @@ const renderQuickActions = (actions, rowData) => {
           <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
         </svg>
       ),
-      color: COLORS.HighlightText,
+      color: COLORS.secondaryText,
       onClick: () => console.log('Disable', rowData)
     },
     'Enable': {
@@ -188,7 +259,67 @@ const renderQuickActions = (actions, rowData) => {
       ),
       color: COLORS.danger,
       onClick: () => console.log('Delete', rowData)
-    }
+    },
+    'View Receipt': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
+    'Contact Support Officer': {
+      icon: (
+        <img 
+          src={ChatIcon} 
+          alt="Chat" 
+          className="w-5 h-5"
+          style={{ filter: 'brightness(0)', transition: 'filter 0.2s ease' }}
+        />
+      ),
+      color: COLORS.mainTextColor,
+      onClick: () => console.log('Contact Support Officer', rowData)
+    },
+    'View Account Details': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
+    'Make Payment': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
+    'Resend': {
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 2h16v20l-2-2-2 2-2-2-2 2-2-2-2 2-2-2-2 2V2z" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="8" y1="10" x2="16" y2="10" />
+          <line x1="8" y1="14" x2="12" y2="14" />
+        </svg>
+      ),
+      color: COLORS.primary,
+      onClick: () => console.log('View Receipt', rowData)
+    },
   };
 
   return (

@@ -11,7 +11,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function LoginForm() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { loginA } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -51,8 +51,8 @@ export default function LoginForm() {
 
     if (!valid) return;
 
-    const userData = { email, role: 'admin' }; // Adjust role based on your logic
-    login(userData);
+    // const userData = { email, role: 'admin' }; // Adjust role based on your logic
+    loginA(email, password, 'admin');
   };
 
 //   const handleForgotPassword = () => {
@@ -101,7 +101,7 @@ export default function LoginForm() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                // required
                 error={!!errors.email}
                 errorMessage={errors.email}
               />
@@ -111,7 +111,7 @@ export default function LoginForm() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                // required
                 error={!!errors.password}
                 errorMessage={errors.password}
               />

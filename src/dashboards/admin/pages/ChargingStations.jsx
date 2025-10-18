@@ -1,11 +1,12 @@
 import React from 'react';
-import ChargingStationsTopBar from '../components/DataTableTopBar';
-import DataTable from '../components/DataTable'; // Changed import
-import ChargingStationsRightPanel from '../components/ChargingStationsRightPanel';
+import ChargingStationsTopBar from '../../../components/ui/DataTableTopBar';
+import DataTable from '../../../components/ui/DataTable'; // Changed import
+import ChargingStationsRightPanel from '../components/stationComponents/ChargingStationsRightPanel';
 import { COLORS, FONTS } from '../../../constants';
 import NotificationsIcon from '../../../assets/notifications.svg';
 import OverviewCard from '../components/OverviewCard';
 import { useNavigate } from 'react-router-dom';
+import AdminPageHeader from '../components/AdminPageHeader'
 
 
 export default function ChargingStations() {
@@ -27,14 +28,14 @@ export default function ChargingStations() {
             id: 2,
             type: 'station',
             status: 'new',
-            title: 'A request to update charging station info',
+            title: 'A request to add a new charging station',
             date: '5 Sat, 08:11 AM'
         },
         {
             id: 3,
             type: 'connector',
             status: 'new',
-            title: 'A request to add a new connector',
+            title: 'A request to add a new charger',
             date: '5 Sat, 08:11 AM'
         },
         {
@@ -76,7 +77,6 @@ export default function ChargingStations() {
         'City',
         'Address Line',
         'Revenue',
-        'Bookings',
         'No of Chargers',
         'Type1',
         'Type2',
@@ -85,8 +85,8 @@ export default function ChargingStations() {
         'CHAdeMO',
         'Tesla',
         'No of Active Reports',
-        'Status',
-        'Quick Actions'
+        'Station Status',
+        // 'Quick Actions'
     ];
 
     // Sample station data - replace with your actual data
@@ -99,7 +99,6 @@ export default function ChargingStations() {
             'City': 'Metropolis',
             'Address Line': '123 Main St',
             'Revenue': '$12,000',
-            'Bookings': 'Enabled',
             'No of Chargers': 8,
             'Type1': 2,
             'Type2': 3,
@@ -108,8 +107,8 @@ export default function ChargingStations() {
             'CHAdeMO': 1,
             'Tesla': 0,
             'No of Active Reports': 4,
-            'Status': 'Active',
-            'Quick Actions': ['View', 'Disable', 'Delete'],
+            'Station Status': 'Open',
+            // 'Quick Actions': ['Delete'],
         },
         {
             'Station Name': 'Westside EV',
@@ -119,7 +118,6 @@ export default function ChargingStations() {
             'City': 'Gotham',
             'Address Line': '456 Elm St',
             'Revenue': '$8,500',
-            'Bookings': 'Disabled',
             'No of Chargers': 5,
             'Type1': 1,
             'Type2': 2,
@@ -128,8 +126,27 @@ export default function ChargingStations() {
             'CHAdeMO': 1,
             'Tesla': 0,
             'No of Active Reports': 7,
-            'Status': 'Disabled',
-            'Quick Actions': ['View', 'Enable', 'Delete'],
+            'Station Status': 'Closed',
+            // 'Quick Actions': ['View', 'Delete'],
+        },
+        {
+            'Station Name': 'Hamilton EV',
+            'Owner Name': 'George Wilson',
+            'Joined On': '2022-11-10',
+            'District': 'West',
+            'City': 'Gotham',
+            'Address Line': '456 Elm St',
+            'Revenue': '$8,500',
+            'No of Chargers': 5,
+            'Type1': 1,
+            'Type2': 2,
+            'CCS1': 0,
+            'CCS2': 1,
+            'CHAdeMO': 1,
+            'Tesla': 0,
+            'No of Active Reports': 7,
+            'Station Status': 'Faulty',
+            // 'Quick Actions': ['View', 'Delete'],
         },
         // Add more station data as needed
     ];
@@ -140,26 +157,7 @@ export default function ChargingStations() {
             padding: '24px',
         }}>
             {/* Header Section */}
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-                    Stations Overview
-                </h1>
-                <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <img
-                            src={NotificationsIcon}
-                            alt="Notifications"
-                            style={{
-                                width: '24px',
-                                height: '24px',
-                                cursor: 'pointer'
-                            }}
-                        />
-                        <span className="absolute top-0 right-0 w-2 h-2 rounded-full"
-                            style={{ backgroundColor: COLORS.primary }}></span>
-                    </div>
-                </div>
-            </div>
+            <AdminPageHeader title="Stations Overview" />
 
             {/* Main Content */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -177,24 +175,25 @@ export default function ChargingStations() {
                             filterOptions={stationFilterOptions}
                             sortOptions={stationSortOptions}
                             searchPlaceholder="Search stations..."
+                            showExportButton={true}
+                            onExport={() => {
+                                // Export functionality would go here
+                                console.log('Exporting stations data...');
+                            }}
                         />
                     </div>
 
-                    <OverviewCard padding='p-6'>
+                    <OverviewCard padding='p-0'>
                         {/* Stations Table */}
-                        <div className="bg-white rounded-sm shadow-sm overflow-hidden"
-                            style={{
-                                border: `1px solid ${COLORS.border}`,
-                                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
-                            }}>
+                        <div className="bg-transparent overflow-hidden">
                             <DataTable
                                 columns={stationColumns}
                                 data={stations.length > 0 ? stations : stationData}
                                 filter={filter}
                                 sort={sort}
                                 search={search}
-                                onRowClick={(station)=>{
-                                    navigate();
+                                onRowClick={(station) => {
+                                    navigate(`/admin/stations/${station.id}`);
                                 }}
                             />
                         </div>

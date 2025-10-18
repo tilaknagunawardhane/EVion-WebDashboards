@@ -2,11 +2,17 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function PrivateRoute({ children }) {
-  const { currentUser } = useAuth()
+  const { currentUser, loading } = useAuth();
+  // console.log("user2:", currentUser);
 
-  if (!currentUser) {
-    return <Navigate to="/auth?mode=login" replace />
+  if (loading) {
+    // You can show a spinner or nothing
+    return null;
   }
 
-  return children
+  if (!currentUser) {
+    return <Navigate to="/auth?mode=login" replace />;
+  }
+
+  return children;
 }

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import DataTableTopBar from '../components/DataTableTopBar';
-import DataTable from '../components/DataTable';
+import DataTableTopBar from '../../../components/ui/DataTableTopBar';
+import DataTable from '../../../components/ui/DataTable';
 import UsersRightPanel from '../components/UsersRightPanel';
 import { COLORS, FONTS } from '../../../constants';
 import NotificationsIcon from '../../../assets/notifications.svg';
 import OverviewCard from '../components/OverviewCard';
 import { useNavigate } from 'react-router-dom';
+import AdminPageHeader from '../components/AdminPageHeader';
 
 export default function UsersPage() {
   const navigate = useNavigate();
@@ -89,12 +90,12 @@ export default function UsersPage() {
       'Total Trips Completed': 15,
       'Overall Rating for trips': 4.5,
       'Total Charging Sessions': 20,
-      'No of Bookings': 'Enabled',
+      'No of Bookings': '08',
       'Overall Rating for Charging sessions': 4.2,
       'No of complaints': 1,
       'No of posts shared': 3,
       'Account Status': 'Active',
-      'Quick Actions': ['View', 'Disable', 'Delete'],
+      'Quick Actions': ['Disable', 'Delete'],
       flagged: false
     }, {
       id: '002',
@@ -107,13 +108,13 @@ export default function UsersPage() {
       'Total Spend': '$225',
       'Total Trips Completed': 8,
       'Overall Rating for trips': 4.8,
-      'Total Charging Sessions': 12,
-      'No of Bookings': 'Enabled',
+      'Total Charging Sessions': 1,
+      'No of Bookings': '23',
       'Overall Rating for Charging sessions': 4.5,
       'No of complaints': 0,
       'No of posts shared': 5,
       'Account Status': 'Active',
-      'Quick Actions': ['View', 'Disable', 'Delete'],
+      'Quick Actions': ['Disable', 'Delete'],
       flagged: true
     },
     {
@@ -128,12 +129,12 @@ export default function UsersPage() {
       'Total Trips Completed': 0,
       'Overall Rating for trips': 0,
       'Total Charging Sessions': 0,
-      'No of Bookings': 'Disabled',
+      'No of Bookings': '0',
       'Overall Rating for Charging sessions': 0,
       'No of complaints': 2,
       'No of posts shared': 0,
       'Account Status': 'Blocked',
-      'Quick Actions': ['View', 'Enable', 'Delete'],
+      'Quick Actions': ['Enable', 'Delete'],
       flagged: false
     }
   ];
@@ -145,26 +146,7 @@ export default function UsersPage() {
       backgroundColor: COLORS.background,
     }}>
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-          EV Users Overview
-        </h1>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <img
-              src={NotificationsIcon}
-              alt="Notifications"
-              style={{
-                width: '24px',
-                height: '24px',
-                cursor: 'pointer'
-              }}
-            />
-            <span className="absolute top-0 right-0 w-2 h-2 rounded-full"
-              style={{ backgroundColor: COLORS.primary }}></span>
-          </div>
-        </div>
-      </div>
+      <AdminPageHeader title="EV Users Overview" />
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -190,13 +172,9 @@ export default function UsersPage() {
             />
           </div>
 
-          <OverviewCard padding='p-6'>
+          <OverviewCard padding='p-0'>
             {/* Users Table */}
-            <div className="bg-white rounded-sm shadow-sm overflow-hidden"
-              style={{
-                border: `1px solid ${COLORS.border}`,
-                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
-              }}>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <DataTable
                 columns={userColumns}
                 data={users.length > 0 ? users : userData}
@@ -210,20 +188,20 @@ export default function UsersPage() {
                 }}
                 customActions={(user) => (
                   <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    <button
+                    {/* <button
                       className="px-2.5 py-1 text-xs font-medium flex items-center gap-1"
                       style={{ color: COLORS.primary }}
                       onClick={() => console.log('View user', user.id)}
 
                     >
                       View
-                    </button>
+                    </button> */}
                     <button
                       className="px-2.5 py-1 text-xs font-medium flex items-center gap-1"
                       style={{ color: COLORS.danger }}
                       onClick={() => console.log('Delete user', user.id)}
                     >
-                      Delete
+                      Delete User Account
                     </button>
                   </div>
                 )}

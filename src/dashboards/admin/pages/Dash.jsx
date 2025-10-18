@@ -9,16 +9,16 @@ import ConnectorStatusChart from '../../admin/components/ConnectorStatusChart'
 import ApprovalCard from '../../admin/components/ApprovalCard'
 import MapImage from '../../../assets/map-placeholder.png' // Import your map image
 import UserGrowthChart from '../components/UserGrowthChart'
-
+import AdminPageHeader from '../components/AdminPageHeader'
 
 export default function AdminDashboardPage() {
     // Dynamic data that will later come from backend
     const dashboardData = {
         stats: {
             stations: { total: 448, pending: 3 },
-            connectors: { total: 2302, faulted: 15 },
-            users: { total: 12501, riskPercentage: 3.87 },
-            revenue: { total: 52311, sessions: 45200, bookingFees: 7111 }
+            chargers: { total: 2302, faulted: 15 },
+            users: { total: 12501, riskPercentage: '-3.87' },
+            revenue: { total: 52311, sessions: 45200, bookingFees: '+7111' }
         },
         trends: {
             chargingSessions: { approved: 52311, bookings: 45200, walkIns: 7111 },
@@ -40,22 +40,9 @@ export default function AdminDashboardPage() {
     return (
         <div style={{ fontFamily: FONTS.family.sans, padding: '24px' }}>
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold" style={{ color: COLORS.mainTextColor }}>
-                    Platform Overview
-                </h1>
-                <div className="notification-icon">
-                    <img
-                        src={NotificationsIcon}
-                        alt="Notifications"
-                        style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: `brightness(0) saturate(100%) invert(48%) sepia(99%) saturate(1230%) hue-rotate(130deg) brightness(95%) contrast(101%)`
-                        }}
-                    />
-                </div>
-            </div>
+
+            <AdminPageHeader title="Platform Overview"/>
+            
 
             {/* Platform Overview Section */}
             <section className="mb-8">
@@ -65,12 +52,13 @@ export default function AdminDashboardPage() {
                         value={dashboardData.stats.stations.total}
                         subValue={`${dashboardData.stats.stations.pending} Pending`}
                         icon="stations"
+
                     />
 
                     <StatCard
-                        title="Connectors"
-                        value={dashboardData.stats.connectors.total}
-                        subValue={`${dashboardData.stats.connectors.faulted} Faulted`}
+                        title="Chargers"
+                        value={dashboardData.stats.chargers.total}
+                        subValue={`${dashboardData.stats.chargers.faulted} Faulted`}
                         icon="connectors"
                     />
 
@@ -79,14 +67,18 @@ export default function AdminDashboardPage() {
                         value={dashboardData.stats.users.total}
                         subValue={`${dashboardData.stats.users.riskPercentage}% risk controls`}
                         icon="users"
+                        status={dashboardData.stats.users.riskPercentage.startsWith('+') ? 'positive' : 'negative'}
+
                     />
 
                     <StatCard
                         title="Revenue"
                         value={`LKR ${dashboardData.stats.revenue.total.toLocaleString()}`}
-                        subValue="6.37%  ↑ vs last month"
+                        subValue={`${dashboardData.stats.revenue.bookingFees}% vs last month`}
                         icon="revenue"
+                        status={dashboardData.stats.revenue.bookingFees.startsWith('+') ? 'positive' : 'negative'}
                     />
+                    
                 </div>
             </section>
 
@@ -148,12 +140,12 @@ export default function AdminDashboardPage() {
                                     Charging Session Trend
                                 </h2>
                                 <StatusCard
-                                    value={dashboardData.stats.connectors.faulted}
-                                    total={dashboardData.stats.connectors.total}
+                                    value={dashboardData.stats.chargers.faulted}
+                                    total={dashboardData.stats.chargers.total}
                                 >
                                     <ConnectorStatusChart
-                                        faulted={dashboardData.stats.connectors.faulted}
-                                        operational={dashboardData.stats.connectors.total - dashboardData.stats.connectors.faulted}
+                                        faulted={dashboardData.stats.chargers.faulted}
+                                        operational={dashboardData.stats.chargers.total - dashboardData.stats.chargers.faulted}
                                     />
                                 </StatusCard>
                             </div>

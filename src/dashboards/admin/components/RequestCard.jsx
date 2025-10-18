@@ -25,13 +25,12 @@ export default function RequestCard({ request }) {
           </span>
           {/* Replace Button with Link */}
           <Link 
-            // to={`/requests/${request.id}`} // Update this path as needed
+            to={`/admin/stations/requests/station/${request.id}`} // Update this path as needed
             className="text-xs font-medium rounded-md transition-all flex items-center gap-1"
             style={{ 
               color: COLORS.secondaryText,
-            //   border: `1px solid ${COLORS.stroke}`,
               padding: '2px 8px',
-              textDecoration: 'underline', // Remove underline
+              textDecoration: 'underline',
               fontFamily: FONTS.family.sans,
               fontWeight: FONTS.weights.medium,
               fontSize: FONTS.sizes.xs,
