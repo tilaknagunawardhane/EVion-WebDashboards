@@ -16,6 +16,7 @@ import ApprovalCard from '../../components/ApprovalCard';
 import ViewStationRightPanel from '../../components/stationComponents/ViewStationRightPanel';
 import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
 import StationSchedule from '../../components/stationComponents/StationSchedule';
+import ReceiptModal from '../../components/stationComponents/ReceiptModal';
 import { FiMoreVertical } from 'react-icons/fi';
 import AddChargingStationForm from '../../components/stationComponents/RAddStationForm';
 import axios from 'axios';
@@ -46,11 +47,11 @@ const defaultCenter = {
 
 // Station Map Component
 const StationMap = ({ location, stationName }) => {
-    const mapCenter = location && location.latitude && location.longitude 
-        ? { 
-            lat: location.latitude || location.lat, 
-            lng: location.longitude || location.lng 
-          }
+    const mapCenter = location && location.latitude && location.longitude
+        ? {
+            lat: location.latitude || location.lat,
+            lng: location.longitude || location.lng
+        }
         : defaultCenter;
 
     return (
@@ -123,7 +124,7 @@ const OwnerViewStation = () => {
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
     const [rating, setRating] = useState(0.0);
-    const [stationSchedule, setStationSchedule] = useState(null); 
+    const [stationSchedule, setStationSchedule] = useState(null);
     const [stationTemporaryClosures, setStationTemporaryClosures] = useState([]);
     const [showAll, setShowAll] = useState(false);
     const [localStationImages, setLocalStationImages] = useState(stationImages);
@@ -132,6 +133,20 @@ const OwnerViewStation = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const stationId = id;
+
+    // Add new state for transactions
+    const [transactions, setTransactions] = useState([]);
+    const [transactionsLoading, setTransactionsLoading] = useState(false);
+    const [transactionsSummary, setTransactionsSummary] = useState(null);
+    const [receiptModalOpen, setReceiptModalOpen] = useState(false);
+    const [selectedReceipt, setSelectedReceipt] = useState(null);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalTransactions: 0,
+        hasNext: false,
+        hasPrev: false
+    });
 
     // Consolidated Station Details State
     const [stationDetails, setStationDetails] = useState({
@@ -163,12 +178,60 @@ const OwnerViewStation = () => {
 
     const [showEditStationForm, setShowEditStationForm] = useState(false);
 
+    // Fetch transactions data
+    const fetchTransactions = async (page = 1, filters = {}) => {
+        if (!stationId) return;
+
+        try {
+            setTransactionsLoading(true);
+            const accessToken = localStorage.getItem('accessToken');
+
+            const params = {
+                page,
+                limit: 10,
+                ...filters
+            };
+
+            const userID = localStorage.getItem('userID');
+
+            const response = await axios.get(
+                `${API_BASE_URL}/api/station-owner/${userID}/${stationId}/transactions`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    params
+                }
+            );
+
+            if (response.data.success) {
+                setTransactions(response.data.transactions);
+                setTransactionsSummary(response.data.summary);
+                setPagination(response.data.pagination);
+            } else {
+                toast.error('Failed to fetch transactions');
+            }
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            toast.error(error.response?.data?.message || 'Error loading transactions');
+        } finally {
+            setTransactionsLoading(false);
+        }
+    };
+
+    // Fetch transactions when transactions tab is active
+    useEffect(() => {
+        if (activeTab === 'transactions' && stationId) {
+            fetchTransactions();
+        }
+    }, [activeTab, stationId]);
+
     // Fetch station data from backend
     useEffect(() => {
         const fetchStationData = async () => {
-            
+
             if (!stationId) return;
-            
+
             try {
                 setLoading(true);
                 const stationOwnerID = localStorage.getItem('userID');
@@ -180,11 +243,11 @@ const OwnerViewStation = () => {
 
                 const headers = { 'Authorization': `Bearer ${accessToken}` };
                 const params = { stationOwnerId: stationOwnerID };
-                
+
                 const [stationResponse, closuresResponse] = await Promise.all([
                     axios.get(`${API_BASE_URL}/api/stations/station/${stationId}`, { headers, params }),
-                    axios.get(`${API_BASE_URL}/api/stations/${stationId}/temporary-closure`, { headers, params }) 
-                ]   
+                    axios.get(`${API_BASE_URL}/api/stations/${stationId}/temporary-closure`, { headers, params })
+                ]
                 );
 
                 console.log('Main Station API Response:', stationResponse.data);
@@ -194,7 +257,7 @@ const OwnerViewStation = () => {
                     const stationData = stationResponse.data.data;
 
                     console.log('Station Data from API:', stationData);
-                    
+
                     // Update station details with API data
                     setStationDetails({
                         id: stationData._id || stationData.id,
@@ -241,13 +304,13 @@ const OwnerViewStation = () => {
 
             } catch (error) {
                 console.error('Error in combined fetch:', error);
-                
+
                 if (error.response) {
                     console.error('Response data:', error.response.data);
                     console.error('Response status:', error.response.status);
                     console.error('Response headers:', error.response.headers);
 
-                     if (error.response.status === 401) {
+                    if (error.response.status === 401) {
                         toast.error('Authentication failed. Please login again.');
                     } else if (error.response.status === 404) {
                         toast.error('Station not found');
@@ -289,10 +352,10 @@ const OwnerViewStation = () => {
     const handleScheduleSubmit = async (newScheduleData) => {
         try {
             const stationOwnerID = localStorage.getItem('userID');
-            
+
             await axios.put(
                 `${API_BASE_URL}/api/stations/update-station-schedule/${stationId}`,
-                { 
+                {
                     stationOwnerID,
                     station_schedule: newScheduleData // Send the entire updated schedule object
                 },
@@ -305,7 +368,7 @@ const OwnerViewStation = () => {
             );
 
             toast.success('Schedule updated successfully!');
-            
+
             // Re-fetch the data to ensure the UI reflects the persisted state
             // await fetchStationData(); 
 
@@ -319,15 +382,15 @@ const OwnerViewStation = () => {
     const handleTemporaryCloseCreate = async (closureData) => {
         try {
             const stationOwnerID = localStorage.getItem('userID');
-            
+
             const payload = {
-                owner_id: stationOwnerID, 
+                owner_id: stationOwnerID,
                 fromDateTime: closureData.fromDateTime,
                 toDateTime: closureData.toDateTime,
                 reason: closureData.reason
             };
 
-            await axios.post(
+            const response = await axios.post(
                 `${API_BASE_URL}/api/stations/${stationId}/create-temporary-closure`,
                 payload,
                 {
@@ -338,13 +401,37 @@ const OwnerViewStation = () => {
                 }
             );
 
-            toast.success('Temporary closure applied.');
-            // Re-fetch all station data, including the new closure list and updated station status
-            // await fetchStationData(); 
+            if (response.data.success) {
+                const { cancellation_summary } = response.data.data;
+
+                let successMessage = 'Temporary closure applied successfully.';
+
+                if (cancellation_summary.total_bookings > 0) {
+                    successMessage += ` ${cancellation_summary.total_bookings} booking(s) cancelled.`;
+
+                    if (cancellation_summary.successful_refunds > 0) {
+                        successMessage += ` ${cancellation_summary.successful_refunds} refund(s) processed.`;
+                    }
+
+                    if (cancellation_summary.failed_refunds > 0) {
+                        successMessage += ` ${cancellation_summary.failed_refunds} refund(s) failed.`;
+                    }
+                }
+
+                toast.success(successMessage);
+
+                // Show detailed refund information in console for debugging
+                console.log('Refund details:', cancellation_summary.refund_details);
+            }
 
         } catch (error) {
             console.error('Error creating temporary closure:', error);
-            toast.error(error.response?.data?.message || 'Failed to apply temporary closure.');
+
+            if (error.response?.data?.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error('Failed to apply temporary closure.');
+            }
         }
     };
 
@@ -357,12 +444,12 @@ const OwnerViewStation = () => {
                 stationOwnerID: stationOwnerID
             };
 
-           const config = {
+            const config = {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
                     'Content-Type': 'application/json' // Good practice to specify
                 }
-            }; 
+            };
 
             // Send DELETE request, passing owner ID and closure ID in the request body (Axios requirement)
             await axios.put(
@@ -422,7 +509,7 @@ const OwnerViewStation = () => {
     ) || false;
 
     const canViewSchedule = !isStationGloballyDisabled && hasOperationalCharger;
-    
+
     // Mobile labels for tabs
     const mobileLabels = {
         profile: 'Profile',
@@ -438,7 +525,7 @@ const OwnerViewStation = () => {
             return canViewSchedule;
         }
         // Always include other tabs
-        return true; 
+        return true;
     });
 
     // Render stars based on rating
@@ -472,7 +559,7 @@ const OwnerViewStation = () => {
         if (window.confirm("Are you sure you want to remove this station? This action cannot be undone.")) {
             try {
                 const stationOwnerID = localStorage.getItem('userID');
-                
+
                 const response = await axios.delete(
                     `${API_BASE_URL}/api/stations/delete-station/${stationId}`,
                     {
@@ -558,83 +645,10 @@ const OwnerViewStation = () => {
         }
     ];
 
-    const transactionsData = [
-        {
-            TransactionID: 'TRN001',
-            'Date & Time': '2025-07-15 10:35 AM',
-            Charger: 'StationA-Charger01',
-            Connector: 'Type 2 AC',
-            SessionID: 'S001',
-            BookingID: 'BKG12345',
-            'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 775.00,
-            'Commission(LKR)': 77.50,
-            'Owner Revenue(LKR)': 697.50,
-            'Payment Status': 'Completed',
-            'Quick Actions': ['View Receipt']
-        },
-        {
-            TransactionID: 'TRN002',
-            'Date & Time': '2025-07-15 11:50 AM',
-            Charger: 'StationA-Charger02',
-            Connector: 'CCS2 DC',
-            SessionID: 'S002',
-            BookingID: '-',
-            'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 1100.00,
-            'Commission(LKR)': 110.00,
-            'Owner Revenue(LKR)': 990.00,
-            'Payment Status': 'Completed',
-            'Quick Actions': ['View Receipt']
-        },
-        {
-            TransactionID: 'TRN003',
-            'Date & Time': '2025-07-16 02:55 PM',
-            Charger: 'StationB-Charger03',
-            Connector: 'CHAdeMO DC',
-            SessionID: 'S003',
-            BookingID: 'BKG12346',
-            'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 1750.00,
-            'Commission(LKR)': 175.00,
-            'Owner Revenue(LKR)': 1575.00,
-            'Payment Status': 'Pending',
-            'Quick Actions': ['View Receipt']
-        },
-        {
-            TransactionID: 'TRN004',
-            'Date & Time': '2025-07-16 03:00 PM',
-            Charger: 'N/A',
-            Connector: 'N/A',
-            SessionID: 'S003',
-            BookingID: 'BKG12346',
-            'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 2000.00,
-            'Commission(LKR)': 200.00,
-            'Owner Revenue(LKR)': 1800.00,
-            'Payment Status': 'Pending',
-            'Quick Actions': ['View Receipt']
-        },
-        {
-            TransactionID: 'TRN005',
-            'Date & Time': '2025-07-17 09:35 AM',
-            Charger: '',
-            Connector: '',
-            SessionID: '',
-            BookingID: 'BKG12348',
-            'Transaction Type': 'Late Cancellation',
-            'Total Earning(LKR)': 1900.00,
-            'Commission(LKR)': 200.00,
-            'Owner Revenue(LKR)': 1700.00,
-            'Payment Status': 'Pending',
-            'Quick Actions': ['View Receipt']
-        }
-    ];
+
 
     // Table columns configuration (no changes here)
     const chargersColumns = ['chargerID', 'Charger Name', 'Joined On', 'Power Type', 'Maximum Power Output(kW)', 'Connectors', 'Unit Price(per kW)', 'Total Sessions', 'Revenue', 'No of Active Reports', 'Charger Status'];
-    const transactionsColumns = ['TransactionID', 'Date & Time', 'SessionID', 'BookingID', 'Transaction Type', 'Total Earning(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions'];
-
 
     // Profile Tab Content
     const ProfileTab = () => {
@@ -703,8 +717,8 @@ const OwnerViewStation = () => {
                         <div className="mb-4">
                             <OverviewCard padding="p-4">
                                 <div className="relative w-full">
-                                    <StationMap 
-                                        location={stationDetails.location} 
+                                    <StationMap
+                                        location={stationDetails.location}
                                         stationName={stationDetails.name}
                                     />
                                     {(!stationDetails.location || !stationDetails.location.latitude) && (
@@ -827,6 +841,245 @@ const OwnerViewStation = () => {
         );
     };
 
+    // Transactions Tab Content
+    const TransactionsTab = () => {
+        const [search, setSearch] = useState('');
+        const [filter, setFilter] = useState('all');
+        const [sort, setSort] = useState('date');
+
+        const transactionsColumns = [
+            'TransactionID',
+            'Date & Time',
+            'Type',
+            'SessionID',
+            'BookingID',
+            'Gross Amount(LKR)',
+            'Commission(LKR)',
+            'Net Amount(LKR)',
+            'Payout Status',
+            'Actions'
+        ];
+
+        const filterOptions = [
+            { label: 'All Types', value: 'all' },
+            { label: 'Booking Fees', value: 'booking_fee' },
+            { label: 'Charging Fees', value: 'charging_fee' }
+        ];
+
+        const sortOptions = [
+            { label: 'Date', value: 'date' },
+            { label: 'Amount', value: 'amount' },
+            { label: 'Type', value: 'type' }
+        ];
+
+        const handleFilterChange = (newFilter) => {
+            setFilter(newFilter);
+            fetchTransactions(1, { type: newFilter === 'all' ? '' : newFilter });
+        };
+
+        const handleSearch = (searchTerm) => {
+            setSearch(searchTerm);
+            // You can implement search if needed
+        };
+
+        const handlePageChange = (newPage) => {
+            fetchTransactions(newPage, { type: filter === 'all' ? '' : filter });
+        };
+
+        const getStatusBadge = (status) => {
+            const statusConfig = {
+                'pending': { color: 'bg-yellow-100 text-yellow-800', text: 'Pending' },
+                'processing': { color: 'bg-blue-100 text-blue-800', text: 'Processing' },
+                'paid': { color: 'bg-green-100 text-green-800', text: 'Paid' },
+                'on_hold': { color: 'bg-red-100 text-red-800', text: 'On Hold' }
+            };
+
+            const config = statusConfig[status] || { color: 'bg-gray-100 text-gray-800', text: status };
+
+            return (
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                    {config.text}
+                </span>
+            );
+        };
+
+        const handleViewReceipt = async (transactionId) => {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                const userID = localStorage.getItem('userID');
+                const response = await axios.get(
+                    `${API_BASE_URL}/api/station-owner/transactions/${transactionId}/details/${userID}/receipt`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`
+                        }
+                    }
+                );
+
+                if (response.data.success) {
+                    // Open receipt in new window or show modal
+                    // console.log('Transaction details:', response.data.transaction);
+                    // You can implement a receipt modal here
+                    toast.info('Receipt details loaded');
+                    setSelectedReceipt(response.data.receipt);
+                    setReceiptModalOpen(true);
+                } else {
+                    toast.error('Failed to load receipt details');
+                }
+            } catch (error) {
+                console.error('Error fetching receipt:', error);
+                toast.error('Failed to load receipt');
+            }
+        };
+
+        const tableData = transactions.map(transaction => ({
+            id: transaction.transactionId,
+            TransactionID: `TRX${transaction.transactionId}`,
+            'Date & Time': new Date(transaction.date).toLocaleString(),
+            Type: transaction.type,
+            SessionID: transaction.sessionId || 'N/A',
+            BookingID: transaction.bookingId || 'N/A',
+            'Gross Amount(LKR)': transaction.grossAmount.toFixed(2),
+            'Commission(LKR)': transaction.commission.toFixed(2),
+            'Net Amount(LKR)': transaction.netAmount.toFixed(2),
+            'Payout Status': getStatusBadge(transaction.payoutStatus),
+            Actions: (
+                <button
+                    onClick={() => handleViewReceipt(transaction.Id)}
+                    className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm transition-colors"
+                >
+                    View Receipt
+                </button>
+            )
+        }));
+
+        return (
+            <div className="space-y-6">
+                {/* Transactions Summary Cards */}
+                {transactionsSummary && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="rounded-xl p-6 border" style={{ borderColor: COLORS.stroke, backgroundColor: 'white' }}>
+                            <h3 className="text-sm font-medium mb-2" style={{ color: COLORS.secondaryText }}>
+                                Total Revenue
+                            </h3>
+                            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.success }}>
+                                LKR {transactionsSummary.totalGross?.toFixed(2) || '0.00'}
+                            </div>
+                            <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                Gross earnings
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl p-6 border" style={{ borderColor: COLORS.stroke, backgroundColor: 'white' }}>
+                            <h3 className="text-sm font-medium mb-2" style={{ color: COLORS.secondaryText }}>
+                                Net Earnings
+                            </h3>
+                            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.primary }}>
+                                LKR {transactionsSummary.totalNet?.toFixed(2) || '0.00'}
+                            </div>
+                            <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                After commission
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl p-6 border" style={{ borderColor: COLORS.stroke, backgroundColor: 'white' }}>
+                            <h3 className="text-sm font-medium mb-2" style={{ color: COLORS.secondaryText }}>
+                                Platform Commission
+                            </h3>
+                            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.danger }}>
+                                LKR {transactionsSummary.totalCommission?.toFixed(2) || '0.00'}
+                            </div>
+                            <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                10% of revenue
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl p-6 border" style={{ borderColor: COLORS.stroke, backgroundColor: 'white' }}>
+                            <h3 className="text-sm font-medium mb-2" style={{ color: COLORS.secondaryText }}>
+                                Total Transactions
+                            </h3>
+                            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.warning }}>
+                                {transactionsSummary.totalTransactions || 0}
+                            </div>
+                            <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                All time
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Transactions Table */}
+                <div className="bg-white rounded-lg shadow-sm border" style={{ borderColor: COLORS.stroke }}>
+                    <DataTableTopBar
+                        search={search}
+                        setSearch={handleSearch}
+                        filter={filter}
+                        setFilter={handleFilterChange}
+                        sort={sort}
+                        setSort={setSort}
+                        filterOptions={filterOptions}
+                        sortOptions={sortOptions}
+                        searchPlaceholder="Search transactions..."
+                    />
+
+                    {transactionsLoading ? (
+                        <div className="flex justify-center items-center h-32">
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                        </div>
+                    ) : transactions.length === 0 ? (
+                        <div className="text-center py-12">
+                            <div className="text-gray-500 text-lg mb-2">No transactions found</div>
+                            <div className="text-sm text-gray-400">
+                                Transactions will appear here once you start receiving bookings and charging sessions.
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <DataTable
+                                columns={transactionsColumns}
+                                data={tableData}
+                                filter={filter}
+                                sort={sort}
+                                search={search}
+                            />
+
+                            {/* Pagination */}
+                            {pagination.totalPages > 1 && (
+                                <div className="flex justify-between items-center p-4 border-t" style={{ borderColor: COLORS.stroke }}>
+                                    <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                        Showing page {pagination.currentPage} of {pagination.totalPages}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => handlePageChange(pagination.currentPage - 1)}
+                                            disabled={!pagination.hasPrev}
+                                            className={`px-3 py-1 rounded-md text-sm ${pagination.hasPrev
+                                                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                                }`}
+                                        >
+                                            Previous
+                                        </button>
+                                        <button
+                                            onClick={() => handlePageChange(pagination.currentPage + 1)}
+                                            disabled={!pagination.hasNext}
+                                            className={`px-3 py-1 rounded-md text-sm ${pagination.hasNext
+                                                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                                }`}
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     // Table Tab Content (no changes needed)
     const TableTab = ({ title, columns, data, onRowClick }) => (
         <div className="grid grid-cols-1 gap-0 bg-transparent rounded-lg p-0">
@@ -862,7 +1115,7 @@ const OwnerViewStation = () => {
             </div>
         );
     }
-      
+
     return (
         <div
             style={{
@@ -902,14 +1155,19 @@ const OwnerViewStation = () => {
                         onRowClick={(charger) => navigate(`/station-owner/stations/chargerprofile/${charger.chargerID}`)}
                     />
                 )}
+
                 {activeTab === 'transactions' && (
-                    <TableTab
-                        title="Transactions"
-                        columns={transactionsColumns}
-                        data={transactionsData}
-                        onRowClick={() => { /* Handle transaction row click if needed */ }}
-                    />
+                    <TransactionsTab />
                 )}
+
+                <ReceiptModal
+                    isOpen={receiptModalOpen}
+                    onClose={() => {
+                        setReceiptModalOpen(false);
+                        setSelectedReceipt(null);
+                    }}
+                    receiptData={selectedReceipt}
+                />
             </div>
         </div>
     );
