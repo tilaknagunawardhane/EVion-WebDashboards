@@ -115,7 +115,10 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
                     status: initialFormData.status || 'unavailable',
                     _id: initialFormData._id
                 });
-                setLocationData(initialFormData.location || null); // Pre-fill location
+                setLocationData(initialFormData.location ? {
+                    lat: initialFormData.location.latitude,
+                    lng: initialFormData.location.longitude,
+                } : null); // Pre-fill location
                 setNumChargers(initialFormData.chargers?.length || 1);
                 setChargers(initialFormData.chargers || [{ name: '', maxPower: '', price: '', connectors: [], powerType: '', status: 'processing' }]);
             } else {
