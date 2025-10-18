@@ -70,6 +70,8 @@ export default function StepOneForm({
             placeholder="Enter address"
             value={formData.addressLine}
             onChange={handleChange('addressLine')}
+            error={errors.addressLine}
+            errorMessage={errors.addressLine}
           />
           <InputField
             label="City"
@@ -82,37 +84,81 @@ export default function StepOneForm({
           />
         </div>
 
-        <div className="w-full relative rounded-lg overflow-hidden border"
-            style={{ borderColor: errors.locationData ? COLORS.danger : COLORS.stroke }}>
+        {/* Updated Location Selection Section */}
+        <div className="w-full">
+          <div className="flex items-center gap-0 mb-1">
+            <label className="block" style={{
+              color: COLORS.mainTextColor,
+              fontSize: FONTS.sizes.xs,
+              fontWeight: FONTS.weights.normal,
+            }}>
+              Station Location
+            </label>
+            <span style={{ color: COLORS.danger }}>*</span>
+          </div>
+          
+          <div className={`relative rounded-lg overflow-hidden border transition-all duration-200 ${
+            errors.location ? 'border-red-500' : 'border-neutral-200 hover:border-primary'
+          }`}>
             <img
-                src={MapPlaceholderImage} // Your map image
-                alt="Map Placeholder"
-                className="w-full h-32 object-cover" // Adjust height as needed
+              src={MapPlaceholderImage}
+              alt="Map Placeholder"
+              className="w-full h-32 object-cover"
             />
             <button
-                type="button"
-                onClick={onSetLocationClick}
-                style={{color:COLORS.mainTextColor}}
-                className="absolute inset-0 flex items-center justify-center font-semibold text-lg bg-black/5 bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
+              type="button"
+              onClick={onSetLocationClick}
+              className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 hover:bg-black/10 transition-all duration-200 w-full"
             >
-                {locationData ? (
-                    `Location Set: ${locationData.lat.toFixed(3)}, ${locationData.lng.toFixed(3)}`
-                ) : (
-                    'Set Location on Map'
-                )}
-                {/* Optional: Add a checkmark icon if locationData is set */}
+              {locationData ? (
+                <div className="text-center">
+                  <div className="font-semibold text-lg mb-1" style={{ color: COLORS.success }}>
+                    ✓ Location Selected
+                  </div>
+                  <div className="text-sm opacity-90" style={{ color: COLORS.mainTextColor }}>
+                    Lat: {locationData.lat.toFixed(6)}, Lng: {locationData.lng.toFixed(6)}
+                  </div>
+                  <div className="text-xs mt-1 opacity-75" style={{ color: COLORS.mainTextColor }}>
+                    Click to change location
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <div className="font-semibold text-lg mb-1" style={{ color: COLORS.mainTextColor }}>
+                    Set Location on Map
+                  </div>
+                  <div className="text-sm opacity-75" style={{ color: COLORS.mainTextColor }}>
+                    Click to select your station location
+                  </div>
+                </div>
+              )}
             </button>
-            {errors.locationData && (
-                <p
-                    className="mt-1 absolute -bottom-6 left-0" // Position error message
-                    style={{
-                        color: COLORS.danger,
-                        fontSize: FONTS.sizes.sm
-                    }}
-                >
-                    {errors.locationData}
-                </p>
-            )}
+          </div>
+          
+          {errors.location && (
+            <p 
+              className="mt-1 text-sm"
+              style={{ color: COLORS.danger }}
+            >
+              {errors.location}
+            </p>
+          )}
+          
+          {locationData && (
+            <div className="mt-2 p-3 rounded-lg bg-green-50 border border-green-200">
+              <div className="flex items-center text-sm">
+                <svg className="w-4 h-4 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span style={{ color: COLORS.success }} className="font-medium">
+                  Location confirmed
+                </span>
+              </div>
+              <div className="text-xs mt-1" style={{ color: COLORS.secondaryText }}>
+                Coordinates: {locationData.lat.toFixed(6)}, {locationData.lng.toFixed(6)}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2">
@@ -163,7 +209,11 @@ export default function StepOneForm({
       </div>
 
       <div className="mt-8 flex justify-end">
-        <Button variant="primary" onClick={nextStep}>
+        <Button 
+          variant="primary" 
+          onClick={nextStep}
+          disabled={!locationData} // Optional: disable next button if no location selected
+        >
           Next
         </Button>
       </div>
