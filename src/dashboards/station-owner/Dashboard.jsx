@@ -46,11 +46,11 @@ export default function StationOwnerDashboard() {
       path: '/station-owner/settings', 
       icon: SettingsIcon
     },
-    { 
-      name: 'Help Center', 
-      path: '/station-owner/help', 
-      icon: HelpIcon
-    }
+    // { 
+    //   name: 'Help Center', 
+    //   path: '/station-owner/help', 
+    //   icon: HelpIcon
+    // }
   ]
 
   const renderIcon = (IconComponent, isActive) => (

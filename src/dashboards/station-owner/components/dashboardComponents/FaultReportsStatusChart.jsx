@@ -1,22 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { COLORS, FONTS } from '../../../../constants';
 
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const STATUS_COLORS = {
-  Open: COLORS.danger,
   Reviewing: COLORS.star,
   Resolved: COLORS.primary,
-  Closed: COLORS.mainTextColor,
+  Rejected: COLORS.mainTextColor,
 };
 
-// Sample data
-const data = [
-  { name: 'Open', value: 1 },
-  { name: 'Reviewing', value: 2 },
-];
-
 const FaultReportsChart = () => {
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchReportsData = async () => {
+
+      const token = localStorage.getItem('accessToken');
+      const ownerId = localStorage.getItem('userID');
+
+      if (!token || !ownerId) {
+          setLoading(false);
+          return;
+      }
+
+      try {
+          const response = await axios.get(
+              `${API_BASE_URL}/api/station-owner-dashboard/fault-reports`, { 
+                headers: { 'Authorization': `Bearer ${token}` },
+                params: { stationOwnerId: ownerId } 
+              });
+          
+          setData(response.data.data || []);
+
+      } catch (error) {
+          console.error("Error fetching fault report status:", error);
+          setData([]);
+
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  useEffect(() => {
+      fetchReportsData();
+  }, []);
+
   const hasReports = data.some(entry => entry.value > 0);
+
+  if (loading) {
+      return (
+          <div className="p-6 bg-white rounded-xl shadow-sm w-full h-[320px] flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+      );
+  }
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-sm w-full h-full">
@@ -53,7 +94,7 @@ const FaultReportsChart = () => {
         </div>
       ) : (
         <div className="h-full flex items-center justify-center text-sm text-gray-500">
-          No fault reports found for Open or In Progress status.
+          No active fault reports found.
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   BarChart,
   Bar,
@@ -12,38 +12,60 @@ import {
 import Button from '../../../../components/ui/Button';
 import { COLORS, FONTS } from '../../../../constants';
 
-// Sample Data Generator
-const generateData = (days) => {
-  const data = [];
-  const today = new Date();
+import axios from 'axios';
 
-  for (let i = days - 1; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-
-    const label = date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-
-    data.push({
-      date: label,
-      bookings: Math.floor(Math.random() * 20),
-      walkins: Math.floor(Math.random() * 10),
-    });
-  }
-
-  return data;
-};
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const StackedSessionsChart = () => {
   const [range, setRange] = useState(14);
-  const [chartData, setChartData] = useState(generateData(14));
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchChartData = useCallback(async (currentRange) => {
+
+      setLoading(true);
+
+      const token = localStorage.getItem('accessToken');
+      const ownerId = localStorage.getItem('userID');
+
+      if (!token || !ownerId) {
+          setLoading(false);
+          return;
+      }
+
+      try {
+          const response = await axios.get(
+              `${API_BASE_URL}/api/station-owner-dashboard/sessions?range=${currentRange}`, 
+              { headers: { 'Authorization': `Bearer ${token}` },
+                params: { stationOwnerId: ownerId }
+      });
+          
+          setChartData(response.data.data || []);
+
+      } catch (error) {
+          console.error(`Error fetching stacked sessions for range ${currentRange}:`, error);
+          setChartData([]);
+
+      } finally {
+          setLoading(false);
+      }
+  }, []); // fetchChartData is stable as it only depends on props/state passed as arguments or non-changing hooks
+
+  useEffect(() => {
+      fetchChartData(range);
+  }, [range, fetchChartData]);
 
   const updateRange = (days) => {
     setRange(days);
-    setChartData(generateData(days));
   };
+
+  if (loading && chartData.length === 0) {
+      return (
+          <div className="p-6 bg-white rounded-xl shadow-sm w-full h-[320px] flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+      );
+  }
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-sm">
