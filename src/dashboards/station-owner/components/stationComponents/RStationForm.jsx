@@ -164,7 +164,7 @@ export default function StepOneForm({
                 className="absolute inset-0 flex items-center justify-center font-semibold text-lg bg-black/5 bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
             >
                 {locationData ? (
-                    `Location Set: ${locationData.lat.toFixed(3)}, ${locationData.lng.toFixed(3)}`
+                    `Location Set: ${locationData.lat.toFixed(3) || 'N/A'}, ${locationData.lng.toFixed(3) || 'N/A'}`
                 ) : (
                     'Set Location on Map'
                 )}
