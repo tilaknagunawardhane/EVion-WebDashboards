@@ -11,7 +11,7 @@ import UserPageHeader from '../components/UserPageHeader';
 const API_BASE_URL = 'http://localhost:5000/api/discussions'; 
 const ALL_DISCUSSIONS_API_URL = `${API_BASE_URL}/get-discussions`; 
 const FLAGGED_API_URL = `${API_BASE_URL}/get-flagged-discussions`;
-const STATS_API_URL = `${API_BASE_BASE_URL}/get-stats`; 
+const STATS_API_URL = `${API_BASE_URL}/get-stats`; 
 
 export default function CommunityPage(){
     const [activeTab, setActiveTab] = useState('communityDiscussion');
@@ -55,8 +55,7 @@ export default function CommunityPage(){
             username: discussion.user,
             dateTime: new Date(discussion.createdAt).toLocaleDateString() + ', ' + new Date(discussion.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             header: discussion.title,
-            // FIX: Ensure this returns an array of URL strings for the web component
-            images: discussion.images.map(src => src), 
+            // FIX: Removed the 'images' property which returned an array of URL strings
             content: discussion.description.substring(0, 150) + '...',
             hashtags: discussion.hashtags || [],
             replies: discussion.comments.map(c => ({ 
@@ -142,19 +141,50 @@ export default function CommunityPage(){
             return;
         }
 
+        if (!postId) {
+             alert("Error: Post ID is missing. Cannot delete.");
+             console.error("Missing Post ID for deletion attempt.");
+             return;
+        }
+        
         try {
-            const response = await fetch(`${API_BASE_URL}/discussions/${postId}`, {
+            // THE FIX: Correcting the URL construction. 
+            // API_BASE_URL is 'http://localhost:5000/api/discussions'
+            // The final URL should be 'http://localhost:5000/api/discussions/[postId]'
+            const deleteUrl = `${API_BASE_URL}/${postId}`;
+            console.log("Attempting DELETE on URL:", deleteUrl); 
+
+            const response = await fetch(deleteUrl, {
                 method: 'DELETE',
+                // Add headers here if authentication (e.g., admin token) is required by the backend
+                // headers: { 'Authorization': 'Bearer YOUR_ADMIN_TOKEN' }
             });
             
             if (!response.ok) {
-                throw new Error(`Failed to delete. Status: ${response.status}`);
+                // Try to get a more specific error message from the server response
+                let errorMessage = `Failed to delete. Status: ${response.status}`;
+                try {
+                    const errorDetails = await response.json();
+                    if (errorDetails.message) {
+                        errorMessage += `: ${errorDetails.message}`;
+                    } else if (errorDetails.error) {
+                        errorMessage += `: ${errorDetails.error}`;
+                    }
+                } catch (e) {
+                    // Ignore if response is not JSON
+                }
+
+                throw new Error(errorMessage);
             }
 
+            // Success: Refetch data and update UI
             fetchPosts();
             fetchStats(); 
+            alert(`Post successfully deleted.`);
+
 
         } catch (err) {
+            // Display the specific error message, including the 400 status
             alert(`Failed to delete post: ${err.message}`);
             console.error('Delete Post Error:', err);
         }
@@ -182,6 +212,7 @@ export default function CommunityPage(){
             actions = (
                 <div className="flex justify-end mt-4">
                     <button 
+                        // IMPORTANT: Ensure post.id is being passed correctly
                         onClick={() => handleDiscardPost(post.id)}
                         className={`px-4 py-2 text-white rounded-lg transition-colors ${activeTab === 'flaggedbyUsers' ? 'bg-red-500 hover:bg-red-600' : 'bg-red-700 hover:bg-red-800'}`}
                     >
