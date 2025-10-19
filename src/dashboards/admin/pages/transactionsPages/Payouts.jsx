@@ -140,10 +140,10 @@ export default function AdminPayouts() {
         const statusText = formatStatus(status);
         return (
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${status === 'completed' ? 'bg-green-100 text-green-800' :
-                    status === 'approved' ? 'bg-blue-100 text-blue-800' :
-                        status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
-                            status === 'failed' ? 'bg-red-100 text-red-800' :
-                                'bg-gray-100 text-gray-800'
+                status === 'approved' ? 'bg-blue-100 text-blue-800' :
+                    status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+                        status === 'failed' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
                 }`}>
                 {statusText}
             </span>
@@ -162,7 +162,7 @@ export default function AdminPayouts() {
         setIsSubmitting(true);
         try {
             const response = await api.post(
-                `/api/admin/payouts/batches/${selectedPayout._id}/pay`,
+                `/api/admin/payouts/batches/${selectedPayout._id}/pay`, // ✅ CORRECT
                 proofData
             );
 
@@ -181,6 +181,7 @@ export default function AdminPayouts() {
         }
     };
 
+    // Custom actions renderer for DataTable
     // Custom actions renderer for DataTable
     const renderActions = (row) => {
         const batch = payoutBatches.find(b => b._id === row.id);
@@ -214,6 +215,13 @@ export default function AdminPayouts() {
                         {isSubmitting ? 'Approving...' : 'Approve Batch'}
                     </button>
                     <button
+                        onClick={(e) => { e.stopPropagation(); handleCancelBatch(batch._id); }}
+                        disabled={isSubmitting}
+                        className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 text-sm transition-colors"
+                    >
+                        {isSubmitting ? 'Cancelling...' : 'Cancel Batch'}
+                    </button>
+                    <button
                         onClick={(e) => { e.stopPropagation(); handleViewBatchDetails(batch._id); }}
                         className="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm transition-colors"
                     >
@@ -233,6 +241,29 @@ export default function AdminPayouts() {
         }
         return <span className="text-gray-500 text-sm">No actions</span>;
     };
+
+    const handleCancelBatch = async (batchId) => {
+    if (!window.confirm('Are you sure you want to cancel this payout batch? This will release all earnings records back to pending status.')) {
+        return;
+    }
+
+    setIsSubmitting(true);
+    try {
+        const userId = localStorage.getItem('userID');
+        const response = await api.post(`/api/admin/payouts/batch/${batchId}/cancel/${userId}`);
+        
+        if (response.data.success) {
+            toast.success('Payout batch cancelled successfully!');
+            fetchPayoutBatches();
+            fetchPayoutStats();
+        }
+    } catch (error) {
+        console.error('Error cancelling batch:', error);
+        toast.error(error.response?.data?.message || 'Failed to cancel batch');
+    } finally {
+        setIsSubmitting(false);
+    }
+};
 
     const handleApproveBatch = async (batchId) => {
         setIsSubmitting(true);
@@ -254,7 +285,7 @@ export default function AdminPayouts() {
 
     const handleViewBatchDetails = async (batchId) => {
         try {
-            const response = await api.get(`/api/admin/payouts/batches/${batchId}`);
+            const response = await api.get(`/api/admin/payouts/batches/${batchId}`); // ✅ CORRECT
             if (response.data.success) {
                 setSelectedBatchDetails(response.data);
                 setIsBatchDetailsModalOpen(true);
@@ -273,7 +304,7 @@ export default function AdminPayouts() {
             const year = currentDate.getFullYear();
 
             const userId = localStorage.getItem('userID');
-            const response = await api.post(`/api/admin/payouts/batch/create/${userId}`, { month, year });
+            const response = await api.post(`/api/admin/payouts/batch/create/${userId}`, { month, year }); // ✅ CORRECT
             if (response.data.success) {
                 toast.success('Payout batch created successfully!');
                 fetchPayoutBatches();
