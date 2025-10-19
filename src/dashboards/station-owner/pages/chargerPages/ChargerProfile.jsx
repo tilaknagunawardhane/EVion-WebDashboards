@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
 import DataTableTopBar from '../../../../components/ui/DataTableTopBar';
 import DataTable from '../../../../components/ui/DataTable';
@@ -12,108 +12,31 @@ import { FiMoreVertical } from 'react-icons/fi';
 import AddChargingStationForm from '../../components/stationComponents/RAddStationForm'; 
 // import { FiMoreVertical } from 'react-icons/fi';
 
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const OwnerViewCharger = () => {
+    const { stationId, chargerId } = useParams(); 
+    const navigate = useNavigate();
+
+    const [chargerData, setChargerData] = useState(null);
+    const [currentSession, setCurrentSession] = useState(null);
+    const [connectorBookings, setConnectorBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const [sessionsTableData, setSessionsTableData] = useState([]);
+    const [bookingsTableData, setBookingsTableData] = useState([]);
+
     const [activeTab, setActiveTab] = useState('overview');
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
-    const navigate = useNavigate();
 
     const [showChargerForm, setShowChargerForm] = useState(false);
     const [formMode, setFormMode] = useState('edit-charger');
     const [initialChargerData, setInitialChargerData] = useState(null);
-
-    
-
-    // Sample station data
-    const station = {
-        name: "EviGO Charging Station",
-        address: "No. 24, Joshep Road, Weilpanna",
-        operator: "A P Perera",
-        email: "perera@gmail.com",
-        operatorJoinedDate: "12 Dec 2024",
-        operatorStatus: "Active",
-        location: "Bloomfield Cricket and Athletic Club",
-        totalEarnings: "LKR 6.45 M",
-        earningsChange: "+6.37%",
-        totalElectricity: "2560 nWh",
-        electricityChange: "-8.3%",
-        sessions: "147",
-        sessionsChange: "+3.87%",
-        reports: "12",
-        status: "Active",
-        noOfConnectors: "7",
-        noOfReports: "17",
-        electricityProvider: "LECO",
-        powerTypes: [ 'AC', 'DC' ],
-        powerSource: "Solar", 
-    };
-
-    // Sample charger data
-    const charger = { 
-        'chargerID': 'EVDC0001', 
-        'Charger Name': 'HyperCharge Dual-Port', 
-        'Joined On': '2023-01-15', 
-        'Power Type': 'DC Fast Charger', 
-        'Maximum Power Output(kW)': '150 kW',
-        'Connectors': ['CCS1', 'CHAdeMO'],
-        'Unit Price(per kW)': '55.00',
-        'Total Sessions': '232',
-        'Revenue': '3,300,500',
-        'No of Active Reports': '0', 
-        'Charger Status': 'Active',
-        'Quick Actions': ['View', 'Disable', 'Delete']  
-    };
-
-    // Sample connector data
-    const connectorsData = [
-        {
-            connectorName:"CCS1",
-            session:null,
-            bookings: [
-            { dateOffset: 0, startTime: "00:00", endTime: "01:30" },
-            { dateOffset: 0, startTime: "04:30", endTime: "05:00" },
-            { dateOffset: 0, startTime: "09:00", endTime: "11:30" },
-            { dateOffset: 0, startTime: "13:00", endTime: "13:30" },
-            { dateOffset: 0, startTime: "14:00", endTime: "14:30" },
-            { dateOffset: 0, startTime: "15:30", endTime: "17:00" },
-
-            { dateOffset: 1, startTime: "03:00", endTime: "04:30" },
-            { dateOffset: 1, startTime: "08:00", endTime: "09:30" },
-            { dateOffset: 1, startTime: "14:00", endTime: "14:30" },
-            { dateOffset: 1, startTime: "19:30", endTime: "20:00" },
-
-            { dateOffset: 2, startTime: "15:00", endTime: "15:30" },
-            ],   
-        },
-        {
-            connectorName: "CHAdeMO",
-            session: {
-                vehicle: "Nissan Leaf",
-                startDate: "2025-07-14",
-                startTime: "11:00",
-                endTime: "11:30",
-                energy: 12.3,
-                cost: 450,
-                progress: 62,
-            },
-            bookings: [
-            { dateOffset: 0, startTime: "00:00", endTime: "01:30" },
-            { dateOffset: 0, startTime: "04:30", endTime: "05:00" },
-            { dateOffset: 0, startTime: "09:00", endTime: "11:30" },
-            { dateOffset: 0, startTime: "13:00", endTime: "13:30" },
-            { dateOffset: 0, startTime: "14:00", endTime: "14:30" },
-            { dateOffset: 0, startTime: "15:30", endTime: "17:00" },
-
-            { dateOffset: 1, startTime: "03:00", endTime: "04:30" },
-            { dateOffset: 1, startTime: "08:00", endTime: "09:30" },
-            { dateOffset: 1, startTime: "14:00", endTime: "14:30" },
-            { dateOffset: 1, startTime: "19:30", endTime: "20:00" },
-
-            { dateOffset: 2, startTime: "15:00", endTime: "15:30" },
-            ],  
-        }
-    ];
 
     const timeSlots = [
     "00:00 - 00:30", "00:30 - 01:00", "01:00 - 01:30", "01:30 - 02:00",
@@ -130,13 +53,125 @@ const OwnerViewCharger = () => {
     "22:00 - 22:30", "22:30 - 23:00", "23:00 - 23:30", "23:30 - 24:00",
     ];
 
+    const fetchChargerProfileData = useCallback(async () => {
+        if (!stationId ) {
+            console.error('Station ID is missing');
+            setLoading(false);
+            return;
+        }
+
+        if ( !chargerId ) {
+            console.error('Charger ID is missing');
+            setLoading(false);
+            return;
+        }
+
+        const token = localStorage.getItem('accessToken');
+        const ownerId = localStorage.getItem('userID');
+
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/api/charger/${stationId}/${chargerId}/profile`,
+                { headers: { 'Authorization': `Bearer ${token}` }, params: { stationOwnerId: ownerId } }
+            );
+
+            const fetchedData = response.data.data;
+            
+            // Map fetched data to state
+            setChargerData(fetchedData.chargerDetails);
+            setCurrentSession(fetchedData.currentSession);
+            setConnectorBookings(fetchedData.bookings);
+
+        } catch (error) {
+            console.error('Error fetching charger profile:', error);
+            toast.error(error.response?.data?.message || 'Failed to load charger profile.');
+            // On failure, navigate back to the station list or charger list
+            navigate(`/station-owner/stations/stationprofile/${stationId}`);
+        } finally {
+            setLoading(false);
+        }
+    }, [stationId, chargerId, navigate]);
+
+    // Trigger fetch on mount/ID change
+    useEffect(() => {
+        fetchChargerProfileData();
+    }, [fetchChargerProfileData]);
+
+    const fetchSessionsTableData = useCallback(async () => {
+        if (!chargerId) return;
+
+        const token = localStorage.getItem('accessToken');
+        const ownerId = localStorage.getItem('userID');
+
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/api/charger/${chargerId}/sessions`,
+                { headers: { 'Authorization': `Bearer ${token}` }, params: { stationOwnerId: ownerId } }
+            );
+            
+            setSessionsTableData(response.data.data || []);
+        } catch (error) {
+            console.error('Error fetching sessions table data:', error);
+            toast.error('Failed to load session table data.');
+            setSessionsTableData([]);
+        }
+    }, [chargerId]);
+
+    // Trigger fetch when tab switches to 'sessions'
+    useEffect(() => {
+        if (activeTab === 'sessions' && chargerId) {
+            fetchSessionsTableData();
+        }
+    }, [activeTab, chargerId, fetchSessionsTableData]);
+
+    const fetchBookingsTableData = useCallback(async () => {
+
+        if (!chargerId) return;
+
+        const token = localStorage.getItem('accessToken');
+        const ownerId = localStorage.getItem('userID');
+
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/api/charger/${chargerId}/bookings`,
+                { headers: { 'Authorization': `Bearer ${token}` }, params: { stationOwnerId: ownerId } }
+            );
+            
+            setBookingsTableData(response.data.data || []);
+        } catch (error) {
+            console.error('Error fetching bookings table data:', error);
+            toast.error('Failed to load bookings table data.');
+            setBookingsTableData([]);
+        }
+    }, [chargerId]);
+
+
+    // Trigger fetch when tab switches to 'bookings'
+    useEffect(() => {
+        if (activeTab === 'bookings' && chargerId) {
+            fetchBookingsTableData();
+        }
+    }, [activeTab, chargerId, fetchSessionsTableData, fetchBookingsTableData]);
+
+    if ( !chargerData) {
+        return <div className="flex justify-center items-center h-screen">No Charger Profile...</div>;
+    }
+
+    if ( loading ) {
+        return <div className="flex justify-center items-center h-screen">Loading Charger Profile...</div>;
+    }
+
+    // Assign fetched data to variables used in JSX
+    const charger = chargerData;
+
+    const connectorsList = charger.connectors || [];
+
     // Tab configuration
     const tabs = [
         { id: 'overview', label: 'Overview' },
         { id: 'sessions', label: 'Sessions' },
         { id: 'bookings', label: 'Bookings'},
         { id: 'transactions', label: 'Transactions Related to Charger'},
-        { id: 'faults', label: 'Faults'},
         // { id: 'stats', label: 'Stats'},
     ];
 
@@ -146,203 +181,7 @@ const OwnerViewCharger = () => {
         sessions: 'Sessions',
         bookings: 'Bookings',
         transactions: 'Transactions Related to Charger',
-        faults: 'Faults',
-        // stats: 'Stats',
     };
-
-    const sessionsData = [
-    {
-        SessionID: 'S001',
-        Date: '2025-07-10',
-        'Connector Used': 'Type 2',
-        Vehicle: 'Tesla Model 3',
-        'Started At': '09:00 AM',
-        'Ended At': '10:30 AM',
-        Duration: '1h 30m',
-        'Total Energy Delivered(kWh)': 15.5,
-        'BookingID/Walk-in': 'BKG12345',
-        'Charging Cost(LKR)': 775.00,
-        'Penalties Received': '',
-        'Total Payment': 775.00,
-        'Payment Status': 'Paid',
-        'Ratings Given': 5,
-        'Issue Reported?': 'No',
-        'Any actions taken to resolve': '',
-        'Quick Actions': ['View Receipt']
-    },
-    {
-        SessionID: 'S002',
-        Date: '2025-07-10',
-        'Connector Used': 'CCS2',
-        Vehicle: 'Nissan Leaf',
-        'Started At': '11:15 AM',
-        'Ended At': '11:45 AM',
-        Duration: '30m',
-        'Total Energy Delivered(kWh)': 22.0,
-        'BookingID/Walk-in': '',
-        'Charging Cost(LKR)': 1100.00,
-        'Penalties Received': '',
-        'Total Payment': 1100.00,
-        'Payment Status': 'Paid',
-        'Ratings Given': 4,
-        'Issue Reported?': 'No',
-        'Any actions taken to resolve': '',
-        'Quick Actions': ['View Receipt']
-    },
-    {
-        SessionID: 'S003',
-        Date: '2025-07-11',
-        'Connector Used': 'CHAdeMO',
-        Vehicle: 'Hyundai Kona EV',
-        'Started At': '02:00 PM',
-        'Ended At': '02:50 PM',
-        Duration: '50m',
-        'Total Energy Delivered(kWh)': 35.0,
-        'BookingID/Walk-in': 'BKG12346',
-        'Charging Cost(LKR)': 1750.00,
-        'Penalties Received': 200.00,
-        'Total Payment': 1950.00,
-        'Payment Status': 'Pending',
-        'Ratings Given': '',
-        'Issue Reported?': 'Yes - Connector Malfunction',
-        'Any actions taken to resolve': 'Disabled Charger',
-        'Quick Actions': ['View Receipt']
-    },
-    {
-        SessionID: 'S004',
-        Date: '2025-07-12',
-        'Connector Used': 'Type 2',
-        Vehicle: 'MG ZS EV',
-        'Started At': '08:30 AM',
-        'Ended At': '12:00 PM',
-        Duration: '3h 30m',
-        'Total Energy Delivered(kWh)': 28.0,
-        'BookingID/Walk-in': 'BKG12347',
-        'Charging Cost(LKR)': 1400.00,
-        'Penalties Received': '',
-        'Total Payment': 1400.00,
-        'Payment Status': 'Paid',
-        'Ratings Given': 5,
-        'Issue Reported?': 'No',
-        'Any actions taken to resolve': '',
-        'Quick Actions': ['View Receipt']
-    },
-    {
-        SessionID: 'S005',
-        Date: '2025-07-12',
-        'Connector Used': 'CCS2 DC',
-        Vehicle: 'Porsche Taycan',
-        'Started At': '04:00 PM',
-        'Ended At': '04:20 PM',
-        Duration: '20m',
-        'Total Energy Delivered(kWh)': 40.0,
-        'BookingID/Walk-in': '',
-        'Charging Cost(LKR)': 2000.00,
-        'Penalties Received': '',
-        'Total Payment': 2000.00,
-        'Payment Status': 'Paid',
-        'Ratings Given': '',
-        'Issue Reported?': 'No',
-        'Any actions taken to resolve': '',
-        'Quick Actions': ['View Receipt']
-    }
-    ];
-
-    const bookingsData = [
-        {
-            BookingID: 'BKG12345',
-            SessionID: 'S001',
-            'Booking Date': '2025-07-09',
-            'Booked Slot': '08:00 AM -08:30 AM',
-            'Charging Started': '08:00 AM',
-            'Charging Ended': '08:30 AM',
-            'Booking Status': 'Completed',
-            'Cancellation Time': '',
-            Reason: '',
-            'Energy (kWh)': 15.0,
-            'Charging Cost (LKR)': 750.00,
-            'Penalties Charged': '',
-            'Payment Status': 'Paid',
-            'Reported Issue?': 'No',
-            'Any actions taken to resolve': ''
-        },
-        {
-            BookingID: 'BKG12346',
-            SessionID: 'S003',
-            'Booking Date': '2025-07-10',
-            Connector: 'CHAdeMO DC',
-            Vehicle: 'Hyundai Kona EV',
-            'Booked Slot': '14:00 PM - 15:00 PM',
-            'Charging Started': '14:06 PM',
-            'Charging Ended': '14:45 PM',
-            'Booking Status': 'Completed',
-            'Cancellation Time': '',
-            Reason: '',
-            'Energy (kWh)': 30.0,
-            'Charging Cost (LKR)': 1500.00,
-            'Penalties Charged': 300.00,
-            'Payment Status': 'Pending',
-            'Reported Issue?': 'Yes - Connector Malfunction',
-            'Any actions taken to resolve': 'Customer contacted'
-        },
-        {
-            BookingID: 'BKG12347',
-            SessionID: 'S004',
-            'Booking Date': '2025-07-11',
-            Connector: 'Type 2 AC',
-            Vehicle: 'MG ZS EV',
-            'Booked Slot': '14:00 PM - 15:00 PM',
-            'Charging Started': '14:06 PM',
-            'Charging Ended': '14:45 PM',
-            'Booking Status': 'Completed',
-            'Cancellation Time': '',
-            Reason: '',
-            'Energy (kWh)': 25.0,
-            'Charging Cost (LKR)': 1250.00,
-            'Penalties Charged': '',
-            'Payment Status': 'Paid',
-            'Reported Issue?': 'No',
-            'Any actions taken to resolve': ''
-        },
-        {
-            BookingID: 'BKG12348',
-            SessionID: '', // No associated session, likely cancelled
-            'Booking Date': '2025-07-12',
-            Connector: 'CCS2 DC',
-            Vehicle: 'BMW iX',
-            'Booked Slot': '08:00 AM -08:30 AM',
-            'Charging Started': '08:00 AM',
-            'Charging Ended': '08:30 AM',
-            'Booking Status': 'Cancelled',
-            'Cancellation Time': '2025-07-12 09:30 AM',
-            Reason: 'Change of plans',
-            'Energy (kWh)': 40.0,
-            'Charging Cost (LKR)': 2000.00,
-            'Penalties Charged': 500.00,
-            'Payment Status': 'Refunded',
-            'Reported Issue?': 'No',
-            'Any actions taken to resolve': ''
-        },
-        {
-            BookingID: 'BKG12349',
-            SessionID: '', // No associated session, future booking
-            'Booking Date': '2025-07-14',
-            Connector: 'Type 2 AC',
-            Vehicle: 'Kia EV6',
-            'Booked Slot': '14:00 PM - 15:00 PM',
-            'Charging Started': '14:06 PM',
-            'Charging Ended': '14:45 PM',
-            'Booking Status': 'Cancelled',
-            'Cancellation Time': '',
-            Reason: '',
-            'Energy (kWh)': 20.0,
-            'Charging Cost (LKR)': '',
-            'Penalties Charged': '',
-            'Payment Status': 'Pending',
-            'Reported Issue?': 'No',
-            'Any actions taken to resolve': ''
-        }
-    ];
 
     const transactionsData = [
         {
@@ -412,63 +251,33 @@ const OwnerViewCharger = () => {
         }
     ];
 
-    const faultsData = [
-        {
-            FaultID: 'FLT001',
-            'Date & Time Reported': '2025-07-15 09:15 AM',
-            'Fault Type': 'Charger',
-            Category: 'Charger not working',
-            Description: 'Charger 01 at Station A is completely unresponsive. No power light.',
-            Connector: 'All',
-            Status: 'Investigating',
-            'Last Update On': '2025-07-15 10:00 AM',
-            'Any actions took to resolve': 'Remote diagnostics initiated.',
-            'Quick Actions': ['Contact Support Officer']
-        },
-        {
-            FaultID: 'FLT003',
-            'Date & Time Reported': '2025-07-16 07:45 AM',
-            'Fault Type': 'Charger',
-            Category: 'Connector broken',
-            Description: 'CCS2 connector on Charger 02 at Station C is physically damaged. Plastic housing cracked.',
-            Connector: 'CCS2 DC',
-            Status: 'Open',
-            'Last Update On': '2025-07-16 08:00 AM',
-            'Any actions took to resolve': 'Connector taken out of service. Replacement part ordered.',
-            'Quick Actions': ['Contact Support Officer']
-        },
-        {
-            FaultID: 'FLT004',
-            'Date & Time Reported': '2025-07-13 11:00 AM',
-            'Fault Type': 'Booking',
-            Category: 'Occupied by other vehicle',
-            Description: 'Customer reported booked slot at Station A was occupied by another vehicle when arrived.',
-            Connector: 'Type 2 AC',
-            Status: 'Closed',
-            'Last Update On': '2025-07-13 01:30 PM',
-            'Any actions took to resolve': 'Contacted customer, verified issue, issued full refund for the booking. Reminder sent to station staff regarding parking rules.',
-            'Quick Actions': ['Contact Support Officer']
-        },
-    ];
-
-    const sessionsColumns = ['SessionID', 'Date', 'Connector Used', 'Vehicle', 'Started At', 'Ended At', 'Duration', 'Total Energy Delivered(kWh)', 'BookingID/Walk-in', 'Charging Cost(LKR)', 'Penalties Received', 'Total Payment', 'Payment Status', 'Ratings Given', 'Issue Reported?', 'Any actions taken to resolve', 'Quick Actions'];
-    const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Booked Slot', 'Charging Started', 'Charging Ended', 'Booking Status', 'Cancellation Time', 'Reason', 'Charging Cost (LKR)', 'Penalties Charged', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
+    const sessionsColumns = ['SessionID', 'Date', 'Connector Used', 'Vehicle', 'Started At', 'Ended At', 'Duration', 'Total Energy Delivered(kWh)', 'BookingID/Walk-in', 'Charging Cost(LKR)', 'Total Payment', 'Payment Status'];
+    const bookingsColumns = ['BookingID', 'SessionID', 'Booking Date', 'Booked Slot', 'Charging Started', 'Charging Ended', 'Booking Status', 'Cancellation Time', 'Reason', 'Charging Cost (LKR)', 'Payment Status', 'Reported Issue?', 'Any actions taken to resolve' ];
     const transactionsColumns = ['TransactionID', 'SessionID', 'BookingID', 'Date & Time', 'Transaction Type', 'Total Earning (LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions']
-    const faultsColumns = ['FaultID', 'Date & Time Reported', 'Fault Type', 'Category', 'Description', 'Connector', 'Status', 'Last Update On', 'Any actions took to resolve', 'Quick Actions']
 
     const handleEditCharger = () => {
         console.log('Edit Charger clicked');
         setFormMode('edit-charger');
         // Map the charger data to the expected format for RAddStationForm's initialChargerData
         setInitialChargerData({
-            id: charger.chargerID, // Pass the ID if your form needs it for update API calls
+            id: charger.id, // Pass the ID if your form needs it for update API calls
             name: charger['Charger Name'],
             maxPower: charger['Maximum Power Output(kW)'].replace(' kW', ''), // Remove ' kW' and parse if needed
             powerType: charger['Power Type'].split(' ')[0], // Extract 'DC' or 'AC'
             connectorTypes: charger['Connectors'], // Use connectorTypes for consistency with RAddStationForm
         });
         setShowChargerForm(true);
-        setShowChargerMenu(false); // Close the dropdown menu
+        // setShowChargerMenu(false); // Close the dropdown menu
+    };
+
+    const handleRemoveCharger = () => {
+            const confirmRemove = window.confirm("Are you sure you want to remove this charger?");
+            if (confirmRemove) {
+                console.log('Remove Charger confirmed');
+                navigate('/station-owner/stations/stationprofile/s1');
+                // Logic to remove the charger
+            }
+            // setShowChargerMenu(false);
     };
 
     // Function to handle form submission from RAddStationForm
@@ -486,7 +295,8 @@ const OwnerViewCharger = () => {
     };
 
     // Overview Tab Content
-    const OverviewTab = () => {
+    const OverviewTab = ({ charger, currentSession, connectorBookings, handleEditCharger, handleRemoveCharger, timeSlots, connectorsList }) => {
+       
         const [showChargerMenu, setShowChargerMenu] = useState(false);
         const chargerMenuRef = useRef();
 
@@ -499,16 +309,6 @@ const OwnerViewCharger = () => {
             document.addEventListener('mousedown', handleClickOutside);
             return () => document.removeEventListener('mousedown', handleClickOutside);
         }, []);
-
-        const handleRemoveCharger = () => {
-            const confirmRemove = window.confirm("Are you sure you want to remove this charger?");
-            if (confirmRemove) {
-                console.log('Remove Charger confirmed');
-                navigate('/station-owner/stations/stationprofile/s1');
-                // Logic to remove the charger
-            }
-            setShowChargerMenu(false);
-        };
 
         return (
             <div className="w-full bg-transparent rounded-xl">
@@ -574,12 +374,12 @@ const OwnerViewCharger = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {connectorsData.map((connector, idx) => (
+                    {connectorsList.map((connector, idx) => (
                         <div key={idx} className="space-y-4 bg-white rounded-xl p-8">
                         <ConnectorView
                             connectorName={connector.connectorName}
-                            session={connector.session}
-                            bookings={connector.bookings}
+                            session={currentSession && currentSession.connectorId === connector.id ? currentSession : null}
+                            bookings={connectorBookings.filter(b => b.connectorId === connector.id)}
                             timeSlots={timeSlots}
                             // onEdit={() => console.log('Edit', connector.connectorName)}
                             // onDisable={() => console.log('Disable', connector.connectorName)}
@@ -629,7 +429,7 @@ const OwnerViewCharger = () => {
             backgroundColor: COLORS.background,
         }}>
 
-            <StationOwnerPageHeader title={`${station.name}-${charger['Charger Name']}`} />
+            <StationOwnerPageHeader title={`Station - ${charger['Charger Name']}`} />
 
 
             {/* Tab Navigation */}
@@ -642,13 +442,21 @@ const OwnerViewCharger = () => {
 
             {/* Tab Content */}
             <div className="mt-6">
-                {activeTab === 'overview' && <OverviewTab />}
+                {activeTab === 'overview' && <OverviewTab
+                    charger={charger}
+                    currentSession={currentSession}
+                    connectorBookings={connectorBookings}
+                    handleEditCharger={handleEditCharger}
+                    handleRemoveCharger={handleRemoveCharger} // Need to define this handler
+                    timeSlots={timeSlots}
+                    connectorsList={connectorsList}
+                />}
 
                 {activeTab === 'sessions' && (
                     <TableTab
                         title="Sessions"
                         columns={sessionsColumns}
-                        data={sessionsData}
+                        data={sessionsTableData}
                         onRowClick={(session) => console.log(session.id)}
                     />
                 )}
@@ -656,7 +464,7 @@ const OwnerViewCharger = () => {
                     <TableTab
                         title="Booking Sessions"
                         columns={bookingsColumns}
-                        data={bookingsData}
+                        data={bookingsTableData}
                         onRowClick={(session) => console.log(session.id)}
                     />
                 )}
@@ -665,13 +473,6 @@ const OwnerViewCharger = () => {
                         title="Transactions"
                         columns={transactionsColumns}
                         data={transactionsData}
-                    />
-                )}
-                {activeTab === 'faults' && (
-                    <TableTab
-                        title="Faults & Complaints"
-                        columns={faultsColumns}
-                        data={faultsData}
                     />
                 )}
             </div>
