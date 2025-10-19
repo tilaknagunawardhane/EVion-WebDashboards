@@ -1,29 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, AreaChart } from 'recharts';
 import { Card, CardHeader, CardContent } from '../settingsComponents/Card';
 import Button from '../../../../components/ui/Button';
 import { COLORS, FONTS } from '../../../../constants';
 
-// Dummy data generator for days
-const generateChartData = (days) => {
-  const now = new Date();
-  return Array.from({ length: days }).map((_, i) => {
-    const date = new Date(now);
-    date.setDate(now.getDate() - (days - i - 1));
-    const day = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+import axios from 'axios';
 
-    return {
-      day,
-      sessions: Math.floor(Math.random() * 15) + 5,
-      electricity: parseFloat((Math.random() * 50 + 20).toFixed(2)), // in MWh
-      income: Math.floor(Math.random() * 10000 + 5000), // LKR
-    };
-  });
-};
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const OverviewChart = () => {
+
   const [selectedDays, setSelectedDays] = useState(14);
-  const data = generateChartData(selectedDays);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchChartData = useCallback(async (days) => {
+
+      setLoading(true);
+
+      const token = localStorage.getItem('accessToken');
+      const ownerId = localStorage.getItem('userID');
+
+      if (!token || !ownerId) {
+          setLoading(false);
+          return;
+      }
+
+      try {
+          const response = await axios.get(
+              `${API_BASE_URL}/api/station-owner-dashboard/overview?range=${days}`, 
+              { headers: { 'Authorization': `Bearer ${token}` },
+                params: { stationOwnerId: ownerId }
+      });
+          
+          setData(response.data.data || []);
+
+      } catch (error) {
+          console.error(`Error fetching overview data for ${days} days:`, error);
+          setData([]);
+
+      } finally {
+          setLoading(false);
+      }
+  }, []);
+
+  useEffect(() => {
+      fetchChartData(selectedDays);
+  }, [selectedDays, fetchChartData]); 
+
+
+  if (loading && data.length === 0) {
+      return (
+          <div className="p-6 bg-white rounded-xl shadow-sm w-full h-[320px] flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+      );
+  }
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-sm">
@@ -59,12 +91,12 @@ const OverviewChart = () => {
             if (active && payload && payload.length) {
                 const point = payload[0].payload;
                 return (
-                <div className="shadow-lg p-3 rounded text-sm" style={{backgroundColor: COLORS.mainTextColor, color: 'white'}}>
-                    <p className="font-semibold">{label}</p>
-                    <p style={{color: COLORS.primary}}>Electricity Consumed: {point.electricity} MWh</p>
-                    <p>Sessions: {point.sessions}</p>
-                    <p>Income: LKR {point.income.toLocaleString()}</p>
-                </div>
+                  <div className="shadow-lg p-3 rounded text-sm" style={{backgroundColor: COLORS.mainTextColor, color: 'white'}}>
+                      <p className="font-semibold">{label}</p>
+                      <p style={{color: COLORS.primary}}>Electricity Consumed: {point.electricity} MWh</p>
+                      <p>Sessions: {point.sessions}</p>
+                      <p>Income: LKR {point.income.toLocaleString()}</p>
+                  </div>
                 );
             }
             return null;

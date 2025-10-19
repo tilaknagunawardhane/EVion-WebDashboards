@@ -1,181 +1,211 @@
-import React, {useState} from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FONTS, COLORS } from "../../../constants";
 import OverviewCard from "../../admin/components/OverviewCard";
-// import PageHeader from "../../admin/components/AdminPageHeader";
 import TabBar from "../../../components/ui/TabBar";
-import { CommunityPost } from "../components/CommunityPost";
+import { CommunityPost } from "../components/CommunityPost"; 
 import CommunityRightPanel from "../components/CommunityRightPanel";
 import UserPageHeader from '../components/UserPageHeader';
 
+const API_BASE_URL = 'http://localhost:5000/api/discussions'; 
+const ALL_DISCUSSIONS_API_URL = `${API_BASE_URL}/get-discussions`; 
+const FLAGGED_API_URL = `${API_BASE_URL}/get-flagged-discussions`;
+const STATS_API_URL = `${API_BASE_URL}/get-stats`; 
+
 export default function CommunityPage(){
     const [activeTab, setActiveTab] = useState('communityDiscussion');
+    
+    const [postsData, setPostsData] = useState({
+        communityDiscussion: [],
+        flaggedbyUsers: []
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    
+    // UI state for post expansion and replies
     const [expandedPosts, setExpandedPosts] = useState({});
     const [showAllReplies, setShowAllReplies] = useState({});
-    const [postsData, setPostsData] = useState({
-        communityDiscussion: [
-            {
-                id: 'post1',
-                hashtags: ['chargingissues', 'plugs', 'slowcharging'],
-                dateTime: 'Monday 6 Jul, 11:53 AM',
-                header: 'BYD Atto 3 vs Nissan Leaf – Which Is Better for Long Trips?',
-                images: [
-                    {
-                        src: 'https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=400&h=200&fit=crop&crop=center',
-                        alt: 'BYD Atto 3 electric vehicle'
-                    }
-                ],
-                content: `Hi everyone, I recently bought an EV and noticed that the real-world range...`,
-                replies: [
-                    {
-                        username: 'John Doe',
-                        timestamp: '3 hrs ago',
-                        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face',
-                        content: `Hey, totally relatable! I drive a BYD Atto 3...`,
-                        readMore: true
-                    }
-                ],
-                showViewAll: true,
-                isFlagged: false,
-                isPending: false
-            }
-        ],
-        pendingForApproval: [
-            {
-                id: 'post3',
-                hashtags: ['newmodel', 'rumors'],
-                dateTime: 'Wednesday 8 Jul, 02:30 PM',
-                header: 'Heard about the upcoming Tesla Model 2 - any details?',
-                images: [
-                    {
-                        src: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400&h=200&fit=crop&crop=center',
-                        alt: 'Tesla vehicle'
-                    }
-                ],
-                content: `A friend who works at Tesla told me they're developing a new budget model...`,
-                replies: [],
-                showViewAll: false,
-                isFlagged: false,
-                isPending: true
-            }
-        ],
-        flaggedbyUsers: [
-            {
-                id: 'post4',
-                hashtags: ['controversial', 'politics'],
-                dateTime: 'Thursday 9 Jul, 10:45 AM',
-                header: 'Why electric vehicles are actually worse for the environment',
-                images: [],
-                content: `I think all this EV hype is just greenwashing...`,
-                replies: [
-                    {
-                        username: 'EcoWarrior',
-                        timestamp: '1 hr ago',
-                        avatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=40&h=40&fit=crop&crop=face',
-                        content: `This is misinformation. Multiple studies show EVs have lower lifetime emissions...`,
-                        readMore: true
-                    }
-                ],
-                showViewAll: true,
-                isFlagged: true,
-                isPending: false
-            }
-        ]
-    });
 
     const CommunityTabs = [
         { id: 'communityDiscussion', label: 'Community Discussion' },
-        { id: 'pendingForApproval', label: 'Pending For Approval' },
         { id: 'flaggedbyUsers', label: 'Flagged by Users' },
     ];
 
-    const currentUser = {
-        id: '001',
-        Name: 'John Doe',
-        'Account Status': 'Active',
+    const currentUser = { id: '001', Name: 'Support Office', 'Account Status': 'Active' };
+    
+    const [stats, setStats] = useState({ 
+        totalPosts: '...', 
+        flagsReceived: '...', 
+        lastPostOn: '...' 
+    });
+
+
+    // --- Data Formatting ---
+
+    const formatPost = (discussion) => {
+        const totalFlags = (discussion.flagged_count?.spam || 0) + 
+                           (discussion.flagged_count?.harassment || 0) + 
+                           (discussion.flagged_count?.other || 0);
+        
+        return {
+            id: discussion._id,
+            username: discussion.user,
+            dateTime: new Date(discussion.createdAt).toLocaleDateString() + ', ' + new Date(discussion.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            header: discussion.title,
+            // 🐛 FIX 1: Display FULL content
+            content: discussion.description, 
+            hashtags: discussion.hashtags || [],
+            // 🐛 FIX 2: Pass image array (requires correct rendering in CommunityPost component)
+            images: discussion.images || [], 
+            replies: discussion.comments.map(c => ({ 
+                username: c.user,
+                timestamp: new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                content: c.text,
+                // FIX 3: Removed 'readMore: true'
+            })),
+            showViewAll: discussion.comments.length > 1,
+            isFlagged: discussion.isFlagged, 
+            flagCount: totalFlags,
+        };
     };
 
-    const stats = {
-        totalPosts: 25,
-        rejectedPosts: 1,
-        flagsReceived: 3,
-        lastPostOn: '6 Jul, 11:53 AM'
-    };
+    // --- API & Data Fetching Logic ---
+    
+    const fetchStats = useCallback(async () => {
+        try {
+            const response = await fetch(STATS_API_URL);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} for stats`);
+            }
+            const data = await response.json();
+            const fetchedStats = data.data;
 
+            let lastPostOnFormatted = 'N/A';
+            if (fetchedStats.lastPostOn) {
+                const date = new Date(fetchedStats.lastPostOn);
+                lastPostOnFormatted = date.toLocaleDateString();
+            }
+
+            setStats({
+                totalPosts: fetchedStats.totalPosts.toString(),
+                flagsReceived: fetchedStats.flagsReceived.toString(),
+                lastPostOn: lastPostOnFormatted,
+            });
+
+        } catch (err) {
+            console.error('Fetch Stats Error:', err);
+        }
+    }, []);
+
+
+    const fetchPosts = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            // Fetch All Discussions
+            const communityResponse = await fetch(ALL_DISCUSSIONS_API_URL);
+            if (!communityResponse.ok) throw new Error(`HTTP error! status: ${communityResponse.status} for community discussions`);
+            const communityData = await communityResponse.json();
+            const communityDiscussions = communityData.data;
+
+            // Fetch Flagged Discussions
+            const flaggedResponse = await fetch(FLAGGED_API_URL);
+            if (!flaggedResponse.ok) throw new Error(`HTTP error! status: ${flaggedResponse.status} for flagged discussions`);
+            const flaggedData = await flaggedResponse.json();
+            const flaggedDiscussions = flaggedData.data;
+
+            const newPostsData = {
+                communityDiscussion: communityDiscussions.map(formatPost),
+                flaggedbyUsers: flaggedDiscussions.map(formatPost)
+            };
+
+            setPostsData(newPostsData);
+
+        } catch (err) {
+            setError(`Failed to fetch posts: ${err.message}`);
+            console.error('Fetch Posts Error:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchPosts();
+        fetchStats(); 
+    }, [fetchPosts, fetchStats]);
+
+
+    // --- Action Handler (DELETE/DISCARD logic) ---
+
+    const handleDiscardPost = useCallback(async (postId) => {
+        // 🚨 CRUCIAL: Check for missing ID to prevent a 400 error originating here
+        if (!postId) {
+            alert("Error: Post ID is missing. Cannot proceed with deletion.");
+            console.error("Deletion Error: Post ID is falsy or missing.");
+            return;
+        }
+        
+        if (!window.confirm("Are you sure you want to permanently delete this post? This action cannot be undone.")) {
+            return;
+        }
+
+        try {
+            const deleteUrl = `${API_BASE_URL}/discussions/${postId}`;
+            
+            const response = await fetch(deleteUrl, {
+                method: 'DELETE',
+            });
+            
+            if (!response.ok) {
+                // Read the server's error message for better debugging
+                const errorText = await response.text(); 
+                throw new Error(`Failed to delete. Status: ${response.status}. Server message: ${errorText}`);
+            }
+            
+            alert("Post deleted successfully.");
+            fetchPosts();
+            fetchStats(); 
+
+        } catch (err) {
+            alert(`Failed to delete post: ${err.message}`);
+            console.error('Delete Post Error:', err);
+        }
+    }, [fetchPosts, fetchStats]);
+
+    // --- Utility Functions (UX) ---
     const toggleExpandPost = (postId) => {
-        setExpandedPosts(prev => ({
-            ...prev,
-            [postId]: !prev[postId]
-        }));
+        setExpandedPosts(prev => ({ ...prev, [postId]: !prev[postId] }));
     };
 
     const toggleShowAllReplies = (postId) => {
-        setShowAllReplies(prev => ({
-            ...prev,
-            [postId]: !prev[postId]
-        }));
-    };
-
-    const handleApprovePost = (postId) => {
-        setPostsData(prev => {
-            // Find the post to approve
-            const postToApprove = prev.pendingForApproval.find(post => post.id === postId);
-            
-            // Remove from pending
-            const updatedPending = prev.pendingForApproval.filter(post => post.id !== postId);
-            
-            // Add to community discussion
-            return {
-                ...prev,
-                pendingForApproval: updatedPending,
-                communityDiscussion: [
-                    ...prev.communityDiscussion,
-                    { ...postToApprove, isPending: false }
-                ]
-            };
-        });
-    };
-
-    const handleDiscardPost = (postId) => {
-        setPostsData(prev => ({
-            ...prev,
-            flaggedbyUsers: prev.flaggedbyUsers.filter(post => post.id !== postId)
-        }));
+        setShowAllReplies(prev => ({ ...prev, [postId]: !prev[postId] }));
     };
 
     const getActivePosts = () => {
-        return postsData[activeTab].map(post => {
+        let currentPosts = postsData[activeTab];
+
+        return currentPosts.map(post => {
             let actions = null;
             
-            if (activeTab === 'pendingForApproval') {
-                actions = (
-                    <div className="flex justify-end mt-4">
-                        <button 
-                            onClick={() => handleApprovePost(post.id)}
-                            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                        >
-                            Approve Post
-                        </button>
-                    </div>
-                );
-            } else if (activeTab === 'flaggedbyUsers') {
-                actions = (
-                    <div className="flex justify-end mt-4">
-                        <button 
-                            onClick={() => handleDiscardPost(post.id)}
-                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                        >
-                            Discard Post
-                        </button>
-                    </div>
-                );
-            }
+            const deleteButtonLabel = activeTab === 'flaggedbyUsers' 
+                ? `Discard Post (${post.flagCount} Flags)`
+                : 'Delete Post'; 
+
+            actions = (
+                <div className="flex justify-end mt-4">
+                    <button 
+                        onClick={() => handleDiscardPost(post.id)}
+                        className={`px-4 py-2 text-white rounded-lg transition-colors ${activeTab === 'flaggedbyUsers' ? 'bg-red-500 hover:bg-red-600' : 'bg-red-700 hover:bg-red-800'}`}
+                    >
+                        {deleteButtonLabel}
+                    </button>
+                </div>
+            );
             
-            return {
-                ...post,
-                actions
-            };
+            return { ...post, actions };
         });
     };
+
+    // --- Component Render ---
 
     return (
         <div style={{
@@ -200,20 +230,33 @@ export default function CommunityPage(){
                 {/* Left Side */}
                 <div className="md:col-span-3">
                     <OverviewCard>
-                        <div className="space-y-8">
-                            {getActivePosts().map(post => (
-                                <div key={post.id}>
-                                    <CommunityPost 
-                                        {...post}
-                                        isExpanded={expandedPosts[post.id]}
-                                        onExpand={() => toggleExpandPost(post.id)}
-                                        showAllReplies={showAllReplies[post.id]}
-                                        onViewAllReplies={() => toggleShowAllReplies(post.id)}
-                                    />
-                                    {post.actions}
-                                </div>
-                            ))}
-                        </div>
+                        {loading && <p className="text-center py-8">Loading posts...</p>}
+                        {error && <p className="text-red-500 text-center py-8">Error: {error}</p>}
+                        
+                        {!loading && !error && (
+                            <div className="space-y-8">
+                                {getActivePosts().length === 0 ? (
+                                    <p className="text-center text-gray-500 py-8">No posts found for this tab.</p>
+                                ) : (
+                                    getActivePosts().map(post => (
+                                        <div key={post.id}>
+                                            {/* Display the username before the CommunityPost component */}
+                                            <p className="text-sm text-gray-600 mb-1">
+                                                <span className="font-semibold">Posted by:</span> {post.username}
+                                            </p>
+                                            <CommunityPost 
+                                                {...post}
+                                                isExpanded={expandedPosts[post.id]}
+                                                onExpand={() => toggleExpandPost(post.id)}
+                                                showAllReplies={showAllReplies[post.id]}
+                                                onViewAllReplies={() => toggleShowAllReplies(post.id)}
+                                            />
+                                            {post.actions}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
                     </OverviewCard>
                 </div>
 
@@ -222,7 +265,8 @@ export default function CommunityPage(){
                     <div className="sticky top-6 space-y-6">
                         <CommunityRightPanel
                             user={currentUser}
-                            stats={stats}
+                            // Pass the dynamically fetched stats
+                            stats={stats} 
                         />
                     </div>
                 </div>

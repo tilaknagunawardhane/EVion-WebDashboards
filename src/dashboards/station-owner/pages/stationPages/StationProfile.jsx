@@ -126,6 +126,7 @@ const OwnerViewStation = () => {
     const [rating, setRating] = useState(0.0);
     const [stationSchedule, setStationSchedule] = useState(null);
     const [stationTemporaryClosures, setStationTemporaryClosures] = useState([]);
+    const [chargersTableData, setChargersTableData] = useState([]); // For chargers table
     const [showAll, setShowAll] = useState(false);
     const [localStationImages, setLocalStationImages] = useState(stationImages);
     const [loading, setLoading] = useState(true);
@@ -177,6 +178,39 @@ const OwnerViewStation = () => {
     });
 
     const [showEditStationForm, setShowEditStationForm] = useState(false);
+
+    // Fetch chargers table data
+    const fetchChargersTableData = useCallback(async () => {
+
+        if (!stationId) return;
+        
+        try {
+            // You might want a separate loading state for this tab if it's slow
+            const stationOwnerID = localStorage.getItem('userID');
+            const token = localStorage.getItem('accessToken');
+
+            const response = await axios.get(
+                `${API_BASE_URL}/api/charger/${stationId}/charger-table`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    params: { stationOwnerId: stationOwnerID }
+                }
+            );
+            
+            setChargersTableData(response.data.data || []);
+
+        } catch (error) {
+            console.error('Error fetching charger table data:', error);
+            toast.error('Failed to load charger details table.');
+            setChargersTableData([]); // Set to empty on failure
+        }
+    }, [stationId]);
+
+    useEffect(() => {
+        if (activeTab === 'chargers' && stationId) {
+            fetchChargersTableData();
+        }
+    }, [activeTab, stationId, fetchChargersTableData]);
 
     // Fetch transactions data
     const fetchTransactions = async (page = 1, filters = {}) => {
@@ -601,51 +635,6 @@ const OwnerViewStation = () => {
             reader.readAsDataURL(file);
         }
     };
-
-    // Sample data for tables (no changes here, as they are separate data sets)
-    const chargersData = [
-        {
-            'chargerID': 'EVDC0001',
-            'Charger Name': 'HyperCharge Dual-Port',
-            'Joined On': '2023-01-15',
-            'Power Type': 'DC Fast Charger',
-            'Maximum Power Output(kW)': '150 kW',
-            'Connectors': ['CCS1', 'CHAdeMO'],
-            'Unit Price(per kW)': '55.00',
-            'Total Sessions': '232',
-            'Revenue': '3,300,500',
-            'No of Active Reports': '0',
-            'Charger Status': 'Active',
-        },
-        {
-            'chargerID': 'EVDC0002',
-            'Charger Name': 'FastCharge DC',
-            'Joined On': '2022-11-10',
-            'Power Type': 'DC Fast Charger',
-            'Maximum Power Output(kW)': '60 kW',
-            'Connectors': ['CCS2'],
-            'Unit Price(per kW)': '55.00',
-            'Total Sessions': '560',
-            'Revenue': '5,000,000',
-            'No of Active Reports': '0',
-            'Charger Status': 'Disabled',
-        },
-        {
-            'chargerID': 'EVAC0003',
-            'Charger Name': 'AC Charger 1',
-            'Joined On': '',
-            'Power Type': 'AC Charger',
-            'Maximum Power Output(kW)': '12 kW',
-            'Connectors': ['Type1'],
-            'Unit Price(per kW)': '42.00',
-            'Total Sessions': '',
-            'Revenue': '',
-            'No of Active Reports': '',
-            'Charger Status': 'Pending-Approval',
-        }
-    ];
-
-
 
     // Table columns configuration (no changes here)
     const chargersColumns = ['chargerID', 'Charger Name', 'Joined On', 'Power Type', 'Maximum Power Output(kW)', 'Connectors', 'Unit Price(per kW)', 'Total Sessions', 'Revenue', 'No of Active Reports', 'Charger Status'];
@@ -1151,8 +1140,8 @@ const OwnerViewStation = () => {
                     <TableTab
                         title="Chargers"
                         columns={chargersColumns}
-                        data={chargersData}
-                        onRowClick={(charger) => navigate(`/station-owner/stations/chargerprofile/${charger.chargerID}`)}
+                        data={chargersTableData}
+                        onRowClick={(charger) => navigate(`/station-owner/stations/chargerprofile/${stationId}/${charger.chargerID}`)}
                     />
                 )}
 
