@@ -93,7 +93,7 @@ const router = createBrowserRouter([
           { path: 'stations', element: <StationsPage /> },
           { path: 'settings', element: <SettingsPage /> },
           { path: 'stations/stationprofile/:id', element: <OwnerViewStation />},
-          { path: 'stations/chargerprofile/:id', element: <OwnerViewCharger />},
+          { path: 'stations/chargerprofile/:stationId/:chargerId', element: <OwnerViewCharger />},
           { path: 'alerts', element: <FaultAlerts /> },
           { path: 'chat', element: <OwnerChatPage /> },
           { path: 'notifications', element: <StationOwnerNotifications /> },

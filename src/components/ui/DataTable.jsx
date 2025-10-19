@@ -13,6 +13,8 @@ const getStatusStyle = (status) => {
     'Paid': { background: COLORS.bgGreen, color: COLORS.primary },
     'New': { background: COLORS.bgGreen, color: COLORS.primary },
     'Open': { background: COLORS.bgGreen, color: COLORS.primary },
+    'open': { background: COLORS.bgGreen, color: COLORS.primary },
+    'processing': { background: COLORS.bgYellow, color: COLORS.star },
 
     'Closed': { background: COLORS.bgRed, color: COLORS.danger },
     'Unpaid': { background: COLORS.bgRed, color: COLORS.danger },
@@ -29,10 +31,18 @@ const getStatusStyle = (status) => {
     'Walk-in': { background: COLORS.bgYellow, color: COLORS.HighlightText },
     'Pending': { background: COLORS.bgYellow, color: COLORS.HighlightText },
     'Pending-Approval': { background: COLORS.bgYellow, color: COLORS.HighlightText },
+    'to_be_installed': { background: COLORS.bgYellow, color: COLORS.star },
+    'to be installed': { background: COLORS.bgYellow, color: COLORS.star },
 
     'Deleted': { background: COLORS.background, color: COLORS.secondaryText },
     'Removed': { background: COLORS.background, color: COLORS.secondaryText },
     'Resolved': { background: COLORS.background, color: COLORS.secondaryText },
+    'unavailable': { background: COLORS.background, color: COLORS.secondaryText },
+
+    'rejected': { background: COLORS.bgRed, color: COLORS.danger },
+    'disabled_by_SO': { background: COLORS.bgRed, color: COLORS.danger },
+    
+    'deleted': { background: COLORS.background, color: COLORS.secondaryText },
     
     'Default': { background: COLORS.background, color: COLORS.secondaryText },
   };
@@ -50,6 +60,8 @@ const getStatusDotColor = (status) => {
     'New': COLORS.primary,
     'Success': COLORS.primary,
     'Open': COLORS.primary,
+    'open': COLORS.primary,
+    'processing': COLORS.star,
 
     'Closed': COLORS.danger,
     'Disabled': COLORS.danger,
@@ -61,15 +73,21 @@ const getStatusDotColor = (status) => {
     'Refunded': COLORS.danger,
     'Faulty': COLORS.danger,
     'Overdue': COLORS.danger,
+    'unavailable': COLORS.secondaryText,
+    'deleted': COLORS.secondaryText,
 
     'Under Maintenance': COLORS.HighlightText,
     'In Progress': COLORS.HighlightText,
     'Walk-in': COLORS.HighlightText,
     'Pending': COLORS.HighlightText,
     'Pending-Approval': COLORS.HighlightText,
+    'to_be_installed': COLORS.star,
+    'to be installed': COLORS.star,
     
     'Removed': COLORS.secondaryText,
     'Resolved': COLORS.secondaryText,
+    'rejected': COLORS.danger,
+    'disabled_by_SO': COLORS.danger,
 
     'Default': COLORS.secondaryText
   };
