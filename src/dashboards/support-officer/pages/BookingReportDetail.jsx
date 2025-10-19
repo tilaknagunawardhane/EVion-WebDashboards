@@ -50,7 +50,7 @@ export default function BookingReportDetail() {
                 setReport(data.data);
                 setAction(data.data.action || '');
                 // Auto-load booking cost as refund amount
-                setRefundAmount(data.data.booking_id?.cost || '0.00');
+                setRefundAmount(data.data.booking_id?.booking_fee || '0.00');
             }
         } catch (error) {
             toast.error('Failed to load report details');
@@ -293,7 +293,7 @@ export default function BookingReportDetail() {
                                 <p><strong>Date:</strong> {report.booking_id?.booking_date ? new Date(report.booking_id.booking_date).toLocaleDateString() : 'N/A'}</p>
                                 <p><strong>Time:</strong> {report.booking_id?.start_time ? new Date(report.booking_id.start_time).toLocaleTimeString() : 'N/A'}</p>
                                 <p><strong>Status:</strong> {report.booking_id?.status}</p>
-                                <p><strong>Cost:</strong> Rs {report.booking_id?.cost || '0.00'}</p>
+                                <p><strong>Cost:</strong> Rs {report.booking_id?.booking_fee || '0.00'}</p>
                             </div>
                         </div>
 

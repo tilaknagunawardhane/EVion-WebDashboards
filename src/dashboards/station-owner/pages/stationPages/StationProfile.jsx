@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'; // Added useEffect
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { COLORS, FONTS } from '../../../../constants';
 import { useNavigate, useParams } from 'react-router-dom';
 import TabBar from '../../../../components/ui/TabBar';
@@ -16,12 +16,15 @@ import ApprovalCard from '../../components/ApprovalCard';
 import ViewStationRightPanel from '../../components/stationComponents/ViewStationRightPanel';
 import StationOwnerPageHeader from '../../components/StationOwnerPageHeader';
 import StationSchedule from '../../components/stationComponents/StationSchedule';
+import ReceiptModal from '../../components/stationComponents/ReceiptModal';
 import { FiMoreVertical } from 'react-icons/fi';
 import AddChargingStationForm from '../../components/stationComponents/RAddStationForm';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { LoadScript, GoogleMap, Marker } from '@react-google-maps/api'; // Add these imports
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // Add this
 
 const stationImages = [
     'https://images.unsplash.com/photo-1703860271509-b50f5679f2a0?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -31,28 +34,48 @@ const stationImages = [
     'https://images.unsplash.com/photo-1737312272830-f445719b7ed9?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 ];
 
-const sampleSchedule = {
-    monday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '08:00', to: '18:00' }] },
-    tuesday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '09:00', to: '17:00' }] },
-    wednesday: { selected: true, open24Hours: true, closed: false, timeBlocks: [] },
-    thursday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '07:00', to: '12:00' }, { from: '14:00', to: '20:00' }] },
-    friday: { selected: true, open24Hours: false, closed: false, timeBlocks: [{ from: '10:00', to: '22:00' }] },
-    saturday: { selected: true, open24Hours: false, closed: true, timeBlocks: [] }, // Closed
-    sunday: { selected: false, open24Hours: false, closed: false, timeBlocks: [] }, // Not set
+// Map configuration
+const mapContainerStyle = {
+    width: '100%',
+    height: '300px'
 };
 
-const sampleTemporaryClosure = [
-    {
-        from: new Date('2025-07-20T10:00:00'),
-        to: new Date('2025-07-20T14:00:00'),
-        reason: 'Scheduled infrastructure upgrade.'
-    },
-    {
-        from: new Date('2025-07-25T09:00:00'),
-        to: new Date('2025-07-25T17:00:00'),
-        reason: 'Annual safety inspection.'
-    },
-];
+const defaultCenter = {
+    lat: 6.9271, // Colombo, Sri Lanka
+    lng: 79.8612
+};
+
+// Station Map Component
+const StationMap = ({ location, stationName }) => {
+    const mapCenter = location && location.latitude && location.longitude
+        ? {
+            lat: location.latitude || location.lat,
+            lng: location.longitude || location.lng
+        }
+        : defaultCenter;
+
+    return (
+        <div className="map-container rounded-xl overflow-hidden">
+            <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={mapCenter}
+                zoom={15}
+                options={{
+                    streetViewControl: false,
+                    mapTypeControl: false,
+                    fullscreenControl: true,
+                }}
+            >
+                {location && (location.latitude || location.lat) && (location.longitude || location.lng) && (
+                    <Marker
+                        position={mapCenter}
+                        title={stationName || "Charging Station"}
+                    />
+                )}
+            </GoogleMap>
+        </div>
+    );
+};
 
 // Dropdown component for Station Actions (no changes needed)
 const StationActionsDropdown = ({ onRemoveStation }) => {
@@ -101,19 +124,32 @@ const OwnerViewStation = () => {
     const [filter, setFilter] = useState(null);
     const [sort, setSort] = useState(null);
     const [rating, setRating] = useState(0.0);
-    const [stationSchedule, setStationSchedule] = useState(sampleSchedule);
-    const [stationTemporaryClosures, setStationTemporaryClosures] = useState(sampleTemporaryClosure);
+    const [stationSchedule, setStationSchedule] = useState(null);
+    const [stationTemporaryClosures, setStationTemporaryClosures] = useState([]);
+    const [chargersTableData, setChargersTableData] = useState([]); // For chargers table
     const [showAll, setShowAll] = useState(false);
     const [localStationImages, setLocalStationImages] = useState(stationImages);
     const [loading, setLoading] = useState(true);
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
-     const { id } = useParams(); // Get station ID from URL params
-     const stationId = id; // Use the id directly
+    const { id } = useParams();
+    const stationId = id;
 
-     console.log('Station ID from URL:', id);
+    // Add new state for transactions
+    const [transactions, setTransactions] = useState([]);
+    const [transactionsLoading, setTransactionsLoading] = useState(false);
+    const [transactionsSummary, setTransactionsSummary] = useState(null);
+    const [receiptModalOpen, setReceiptModalOpen] = useState(false);
+    const [selectedReceipt, setSelectedReceipt] = useState(null);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalTransactions: 0,
+        hasNext: false,
+        hasPrev: false
+    });
 
-    // Consolidated Station Details State - THIS IS THE MAIN CHANGE
+    // Consolidated Station Details State
     const [stationDetails, setStationDetails] = useState({
         id: '',
         name: '',
@@ -137,14 +173,99 @@ const OwnerViewStation = () => {
         noOfConnectors: "0",
         noOfReports: "0",
         averageRating: 0,
-        totalRatings: 0
+        totalRatings: 0,
+        chargers: []
     });
 
     const [showEditStationForm, setShowEditStationForm] = useState(false);
 
+    // Fetch chargers table data
+    const fetchChargersTableData = useCallback(async () => {
+
+        if (!stationId) return;
+        
+        try {
+            // You might want a separate loading state for this tab if it's slow
+            const stationOwnerID = localStorage.getItem('userID');
+            const token = localStorage.getItem('accessToken');
+
+            const response = await axios.get(
+                `${API_BASE_URL}/api/charger/${stationId}/charger-table`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    params: { stationOwnerId: stationOwnerID }
+                }
+            );
+            
+            setChargersTableData(response.data.data || []);
+
+        } catch (error) {
+            console.error('Error fetching charger table data:', error);
+            toast.error('Failed to load charger details table.');
+            setChargersTableData([]); // Set to empty on failure
+        }
+    }, [stationId]);
+
+    useEffect(() => {
+        if (activeTab === 'chargers' && stationId) {
+            fetchChargersTableData();
+        }
+    }, [activeTab, stationId, fetchChargersTableData]);
+
+    // Fetch transactions data
+    const fetchTransactions = async (page = 1, filters = {}) => {
+        if (!stationId) return;
+
+        try {
+            setTransactionsLoading(true);
+            const accessToken = localStorage.getItem('accessToken');
+
+            const params = {
+                page,
+                limit: 10,
+                ...filters
+            };
+
+            const userID = localStorage.getItem('userID');
+
+            const response = await axios.get(
+                `${API_BASE_URL}/api/station-owner/${userID}/${stationId}/transactions`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    params
+                }
+            );
+
+            if (response.data.success) {
+                setTransactions(response.data.transactions);
+                setTransactionsSummary(response.data.summary);
+                setPagination(response.data.pagination);
+            } else {
+                toast.error('Failed to fetch transactions');
+            }
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            toast.error(error.response?.data?.message || 'Error loading transactions');
+        } finally {
+            setTransactionsLoading(false);
+        }
+    };
+
+    // Fetch transactions when transactions tab is active
+    useEffect(() => {
+        if (activeTab === 'transactions' && stationId) {
+            fetchTransactions();
+        }
+    }, [activeTab, stationId]);
+
     // Fetch station data from backend
     useEffect(() => {
         const fetchStationData = async () => {
+
+            if (!stationId) return;
+
             try {
                 setLoading(true);
                 const stationOwnerID = localStorage.getItem('userID');
@@ -153,32 +274,28 @@ const OwnerViewStation = () => {
                 console.log('Making API request to:', `${API_BASE_URL}/api/stations/station/${stationId}`);
                 console.log('Station Owner ID:', stationOwnerID);
                 console.log('Access Token exists:', !!accessToken)
-                
-                const response = await axios.get(
-                    `${API_BASE_URL}/api/stations/station/${stationId}`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                        },
-                        params: {
-                            stationOwnerId: stationOwnerID
-                        }
-                    }
-                    
+
+                const headers = { 'Authorization': `Bearer ${accessToken}` };
+                const params = { stationOwnerId: stationOwnerID };
+
+                const [stationResponse, closuresResponse] = await Promise.all([
+                    axios.get(`${API_BASE_URL}/api/stations/station/${stationId}`, { headers, params }),
+                    axios.get(`${API_BASE_URL}/api/stations/${stationId}/temporary-closure`, { headers, params })
+                ]
                 );
 
-                console.log('API Response:', response.data);
+                console.log('Main Station API Response:', stationResponse.data);
+                console.log('Closures API Response:', closuresResponse.data);
 
-                if (response.data.success) {
-                    const stationData = response.data.data;
+                if (stationResponse.data.success) {
+                    const stationData = stationResponse.data.data;
 
                     console.log('Station Data from API:', stationData);
-                    
+
                     // Update station details with API data
                     setStationDetails({
                         id: stationData._id || stationData.id,
                         name: stationData.station_name || '',
-                        // address: stationData.address || '',
                         address: `${stationData.address || ''}${', '}${stationData.city}${', '}${stationData.district}`,
                         addressLine: stationData.address || '',
                         city: stationData.city || '',
@@ -199,23 +316,35 @@ const OwnerViewStation = () => {
                         noOfConnectors: stationData.chargers?.length || "0",
                         noOfReports: stationData.noOfReports || "0",
                         averageRating: stationData.averageRating || 0,
-                        totalRatings: stationData.totalRatings || 0
+                        totalRatings: stationData.totalRatings || 0,
+                        chargers: stationData.chargers || [],
                     });
+
+                    // Set Schedule Data from API
+                    setStationSchedule(stationData.station_schedule || null);
 
                     // Set rating from API data
                     setRating(stationData.averageRating || 0.0);
                 } else {
                     toast.error('Failed to fetch station data');
                 }
+
+
+                if (closuresResponse.data.success) {
+                    setStationTemporaryClosures(closuresResponse.data.data || []);
+                } else {
+                    toast.error('Failed to fetch temporary closures');
+                }
+
             } catch (error) {
-                console.error('Error fetching station data:', error);
-                
+                console.error('Error in combined fetch:', error);
+
                 if (error.response) {
                     console.error('Response data:', error.response.data);
                     console.error('Response status:', error.response.status);
                     console.error('Response headers:', error.response.headers);
 
-                     if (error.response.status === 401) {
+                    if (error.response.status === 401) {
                         toast.error('Authentication failed. Please login again.');
                     } else if (error.response.status === 404) {
                         toast.error('Station not found');
@@ -239,11 +368,137 @@ const OwnerViewStation = () => {
         }
     }, [stationId]);
 
+    // Separate useEffect to call the function on mount/ID change
+    // useEffect(() => {
+    //     if (stationId) {
+    //         fetchStationData();
+    //     }
+    // }, [stationId, fetchStationData]);
+
     const initialDisplayCount = 3;
     const imagesToDisplay = showAll ? localStationImages : localStationImages.slice(0, initialDisplayCount);
 
     const handleUpdateStationDetails = () => {
         setShowEditStationForm(true);
+    };
+
+    // Handler to update the schedule via API
+    const handleScheduleSubmit = async (newScheduleData) => {
+        try {
+            const stationOwnerID = localStorage.getItem('userID');
+
+            await axios.put(
+                `${API_BASE_URL}/api/stations/update-station-schedule/${stationId}`,
+                {
+                    stationOwnerID,
+                    station_schedule: newScheduleData // Send the entire updated schedule object
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            toast.success('Schedule updated successfully!');
+
+            // Re-fetch the data to ensure the UI reflects the persisted state
+            // await fetchStationData(); 
+
+        } catch (error) {
+            console.error('Error updating schedule:', error);
+            toast.error(error.response?.data?.message || 'Failed to save schedule.');
+        }
+    };
+
+    // API Handler for Temporary Closure Creation
+    const handleTemporaryCloseCreate = async (closureData) => {
+        try {
+            const stationOwnerID = localStorage.getItem('userID');
+
+            const payload = {
+                owner_id: stationOwnerID,
+                fromDateTime: closureData.fromDateTime,
+                toDateTime: closureData.toDateTime,
+                reason: closureData.reason
+            };
+
+            const response = await axios.post(
+                `${API_BASE_URL}/api/stations/${stationId}/create-temporary-closure`,
+                payload,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            if (response.data.success) {
+                const { cancellation_summary } = response.data.data;
+
+                let successMessage = 'Temporary closure applied successfully.';
+
+                if (cancellation_summary.total_bookings > 0) {
+                    successMessage += ` ${cancellation_summary.total_bookings} booking(s) cancelled.`;
+
+                    if (cancellation_summary.successful_refunds > 0) {
+                        successMessage += ` ${cancellation_summary.successful_refunds} refund(s) processed.`;
+                    }
+
+                    if (cancellation_summary.failed_refunds > 0) {
+                        successMessage += ` ${cancellation_summary.failed_refunds} refund(s) failed.`;
+                    }
+                }
+
+                toast.success(successMessage);
+
+                // Show detailed refund information in console for debugging
+                console.log('Refund details:', cancellation_summary.refund_details);
+            }
+
+        } catch (error) {
+            console.error('Error creating temporary closure:', error);
+
+            if (error.response?.data?.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error('Failed to apply temporary closure.');
+            }
+        }
+    };
+
+    // Temporary Closure Removal
+    const handleTemporaryCloseRemove = async (closureId) => {
+        try {
+            const stationOwnerID = localStorage.getItem('userID');
+
+            const requestBody = {
+                stationOwnerID: stationOwnerID
+            };
+
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                    'Content-Type': 'application/json' // Good practice to specify
+                }
+            };
+
+            // Send DELETE request, passing owner ID and closure ID in the request body (Axios requirement)
+            await axios.put(
+                `${API_BASE_URL}/api/stations/${stationId}/remove-temporary-closure/${closureId}`,
+                requestBody, // Correctly passes { stationOwnerID: '...' } as the body
+                config
+            );
+
+            toast.success('Temporary closure successfully cancelled.');
+            // await fetchStationData();
+
+        } catch (error) {
+            console.error('Error cancelling temporary closure:', error);
+            toast.error(error.response?.data?.message || 'Failed to cancel temporary closure.');
+        }
     };
 
     const handleFormSubmit = (data) => {
@@ -274,6 +529,21 @@ const OwnerViewStation = () => {
         // { id: 'stats', label: 'Stats' }
     ];
 
+    const GLOBAL_RESTRICTED_STATUSES = [
+        'disabled_by_so', // Station Owner disabled
+        'deleted'         // Station is marked for deletion
+    ];
+
+    const isStationGloballyDisabled = GLOBAL_RESTRICTED_STATUSES.includes(stationDetails.status.toLowerCase());
+
+
+    const hasOperationalCharger = stationDetails.chargers?.some(charger =>
+        // The opposite of the restricted list: is it 'open' OR is it 'unavailable'?
+        charger.charger_status === 'open' || charger.charger_status === 'unavailable'
+    ) || false;
+
+    const canViewSchedule = !isStationGloballyDisabled && hasOperationalCharger;
+
     // Mobile labels for tabs
     const mobileLabels = {
         profile: 'Profile',
@@ -282,6 +552,15 @@ const OwnerViewStation = () => {
         transactions: 'Transactions Related to Station',
         // stats: 'Stats'
     };
+
+    const visibleTabs = tabs.filter(tab => {
+        if (tab.id === 'schedule') {
+            // Only include the 'schedule' tab if the condition is met
+            return canViewSchedule;
+        }
+        // Always include other tabs
+        return true;
+    });
 
     // Render stars based on rating
     const renderStars = () => {
@@ -314,7 +593,7 @@ const OwnerViewStation = () => {
         if (window.confirm("Are you sure you want to remove this station? This action cannot be undone.")) {
             try {
                 const stationOwnerID = localStorage.getItem('userID');
-                
+
                 const response = await axios.delete(
                     `${API_BASE_URL}/api/stations/delete-station/${stationId}`,
                     {
@@ -357,126 +636,8 @@ const OwnerViewStation = () => {
         }
     };
 
-    // Sample data for tables (no changes here, as they are separate data sets)
-    const chargersData = [
-        {
-            'chargerID': 'EVDC0001',
-            'Charger Name': 'HyperCharge Dual-Port',
-            'Joined On': '2023-01-15',
-            'Power Type': 'DC Fast Charger',
-            'Maximum Power Output(kW)': '150 kW',
-            'Connectors': ['CCS1', 'CHAdeMO'],
-            'Unit Price(per kW)': '55.00',
-            'Total Sessions': '232',
-            'Revenue': '3,300,500',
-            'No of Active Reports': '0',
-            'Charger Status': 'Active',
-        },
-        {
-            'chargerID': 'EVDC0002',
-            'Charger Name': 'FastCharge DC',
-            'Joined On': '2022-11-10',
-            'Power Type': 'DC Fast Charger',
-            'Maximum Power Output(kW)': '60 kW',
-            'Connectors': ['CCS2'],
-            'Unit Price(per kW)': '55.00',
-            'Total Sessions': '560',
-            'Revenue': '5,000,000',
-            'No of Active Reports': '0',
-            'Charger Status': 'Disabled',
-        },
-        {
-            'chargerID': 'EVAC0003',
-            'Charger Name': 'AC Charger 1',
-            'Joined On': '',
-            'Power Type': 'AC Charger',
-            'Maximum Power Output(kW)': '12 kW',
-            'Connectors': ['Type1'],
-            'Unit Price(per kW)': '42.00',
-            'Total Sessions': '',
-            'Revenue': '',
-            'No of Active Reports': '',
-            'Charger Status': 'Pending-Approval',
-        }
-    ];
-
-    const transactionsData = [
-        {
-            TransactionID: 'TRN001',
-            'Date & Time': '2025-07-15 10:35 AM',
-            Charger: 'StationA-Charger01',
-            Connector: 'Type 2 AC',
-            SessionID: 'S001',
-            BookingID: 'BKG12345',
-            'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 775.00,
-            'Commission(LKR)': 77.50,
-            'Owner Revenue(LKR)': 697.50,
-            'Payment Status': 'Completed',
-            'Quick Actions': ['View Receipt']
-        },
-        {
-            TransactionID: 'TRN002',
-            'Date & Time': '2025-07-15 11:50 AM',
-            Charger: 'StationA-Charger02',
-            Connector: 'CCS2 DC',
-            SessionID: 'S002',
-            BookingID: '-',
-            'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 1100.00,
-            'Commission(LKR)': 110.00,
-            'Owner Revenue(LKR)': 990.00,
-            'Payment Status': 'Completed',
-            'Quick Actions': ['View Receipt']
-        },
-        {
-            TransactionID: 'TRN003',
-            'Date & Time': '2025-07-16 02:55 PM',
-            Charger: 'StationB-Charger03',
-            Connector: 'CHAdeMO DC',
-            SessionID: 'S003',
-            BookingID: 'BKG12346',
-            'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 1750.00,
-            'Commission(LKR)': 175.00,
-            'Owner Revenue(LKR)': 1575.00,
-            'Payment Status': 'Pending',
-            'Quick Actions': ['View Receipt']
-        },
-        {
-            TransactionID: 'TRN004',
-            'Date & Time': '2025-07-16 03:00 PM',
-            Charger: 'N/A',
-            Connector: 'N/A',
-            SessionID: 'S003',
-            BookingID: 'BKG12346',
-            'Transaction Type': 'Charging Payment',
-            'Total Earning(LKR)': 2000.00,
-            'Commission(LKR)': 200.00,
-            'Owner Revenue(LKR)': 1800.00,
-            'Payment Status': 'Pending',
-            'Quick Actions': ['View Receipt']
-        },
-        {
-            TransactionID: 'TRN005',
-            'Date & Time': '2025-07-17 09:35 AM',
-            Charger: '',
-            Connector: '',
-            SessionID: '',
-            BookingID: 'BKG12348',
-            'Transaction Type': 'Late Cancellation',
-            'Total Earning(LKR)': 1900.00,
-            'Commission(LKR)': 200.00,
-            'Owner Revenue(LKR)': 1700.00,
-            'Payment Status': 'Pending',
-            'Quick Actions': ['View Receipt']
-        }
-    ];
-
     // Table columns configuration (no changes here)
     const chargersColumns = ['chargerID', 'Charger Name', 'Joined On', 'Power Type', 'Maximum Power Output(kW)', 'Connectors', 'Unit Price(per kW)', 'Total Sessions', 'Revenue', 'No of Active Reports', 'Charger Status'];
-    const transactionsColumns = ['TransactionID', 'Date & Time', 'SessionID', 'BookingID', 'Transaction Type', 'Total Earning(LKR)', 'Commission(LKR)', 'Owner Revenue(LKR)', 'Payment Status', 'Quick Actions'];
-
 
     // Profile Tab Content
     const ProfileTab = () => {
@@ -516,143 +677,393 @@ const OwnerViewStation = () => {
         }
 
         return (
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Left side - Profile info */}
-                <div className="lg:col-span-3 space-y-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-                        style={{ borderColor: COLORS.stroke }}>
-                        <div>
-                            <h1 className="text-xl font-medium" style={{ color: COLORS.mainTextColor }}>
-                                {stationDetails.name} {/* Use stationDetails */}
-                            </h1>
-                            <p className="text-sm mt-1" style={{ color: COLORS.secondaryText }}>
-                                {stationDetails.address} {/* Use stationDetails */}
-                            </p>
-                            {renderStars()}
-                        </div>
-                        <div className="sm:self-start flex items-center gap-2">
-                            <span className="px-3 py-1 rounded-full text-sm inline-block uppercase" style={{
-                                backgroundColor: statusStyle.bg,
-                                color: statusStyle.text
-                            }}>
-                                {currentStatus}
-                            </span>
-                            <StationActionsDropdown onRemoveStation={handleRemoveStation} />
-                        </div>
-                    </div>
-
-                    <div className="mb-4">
-                        <OverviewCard padding="p-4">
-                            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                                <img
-                                    src={MapImage}
-                                    alt="Charging Stations Map"
-                                    className="absolute inset-0 w-full h-full object-cover rounded-xl"
-                                />
-                            </div>
-                        </OverviewCard>
-                    </div>
-
-                    <div className="flex-col gap-4 mt-4 bg-white p-8 rounded-xl">
-                        <div className="flex flex-wrap justify-between gap-4 text-sm">
+            <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Left side - Profile info */}
+                    <div className="lg:col-span-3 space-y-6">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                            style={{ borderColor: COLORS.stroke }}>
                             <div>
-                                <strong
-                                    style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                                >
-                                    Electricity Provider:
-                                </strong>{' '}
-                                {stationDetails.electricityProvider}
+                                <h1 className="text-xl font-medium" style={{ color: COLORS.mainTextColor }}>
+                                    {stationDetails.name}
+                                </h1>
+                                <p className="text-sm mt-1" style={{ color: COLORS.secondaryText }}>
+                                    {stationDetails.address}
+                                </p>
+                                {renderStars()}
                             </div>
-                            <div>
-                                <strong
-                                    style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                                >
-                                    Power Source:
-                                </strong>{' '}
-                                {stationDetails.powerSource}
+                            <div className="sm:self-start flex items-center gap-2">
+                                <span className="px-3 py-1 rounded-full text-sm inline-block uppercase" style={{
+                                    backgroundColor: statusStyle.bg,
+                                    color: statusStyle.text
+                                }}>
+                                    {currentStatus}
+                                </span>
+                                <StationActionsDropdown onRemoveStation={handleRemoveStation} />
                             </div>
                         </div>
-                    </div>
 
-                    <div className="flex justify-center">
-                        <p
-                            className="underline cursor-pointer"
-                            style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                            onClick={handleUpdateStationDetails}
-                        >
-                            Update Station Details
-                        </p>
-                    </div>
-
-                    <div className="flex-col gap-4 mt-8 bg-transparent p-0 rounded-xl">
-                        <h3 className="mb-4" style={{ fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.normal, color: COLORS.mainTextColor }}>Station Gallery</h3>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                            {imagesToDisplay.map((src, idx) => (
-                                <div key={idx} className="relative">
-                                    <img
-                                        src={src}
-                                        alt={`station ${idx}`}
-                                        className="w-full h-32 object-cover rounded-lg shadow"
+                        <div className="mb-4">
+                            <OverviewCard padding="p-4">
+                                <div className="relative w-full">
+                                    <StationMap
+                                        location={stationDetails.location}
+                                        stationName={stationDetails.name}
                                     />
-                                    <button
-                                        onClick={() => handleRemoveImage(idx)}
-                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
-                                        aria-label="Remove image"
+                                    {(!stationDetails.location || !stationDetails.location.latitude) && (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-80">
+                                            <p className="text-gray-500 text-sm">Location not set</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </OverviewCard>
+                            {stationDetails.location && (stationDetails.location.latitude || stationDetails.location.lat) && (
+                                <div className="mt-2 text-center text-sm" style={{ color: COLORS.secondaryText }}>
+                                    Coordinates: {stationDetails.location.latitude?.toFixed(6) || stationDetails.location.lat?.toFixed(6)}, {stationDetails.location.longitude?.toFixed(6) || stationDetails.location.lng?.toFixed(6)}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex-col gap-4 mt-4 bg-white p-8 rounded-xl">
+                            <div className="flex flex-wrap justify-between gap-4 text-sm">
+                                <div>
+                                    <strong
+                                        style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
                                     >
-                                        X
+                                        Electricity Provider:
+                                    </strong>{' '}
+                                    {stationDetails.electricityProvider}
+                                </div>
+                                <div>
+                                    <strong
+                                        style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
+                                    >
+                                        Power Source:
+                                    </strong>{' '}
+                                    {stationDetails.powerSource}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center">
+                            <p
+                                className="underline cursor-pointer"
+                                style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
+                                onClick={handleUpdateStationDetails}
+                            >
+                                Update Station Details
+                            </p>
+                        </div>
+
+                        <div className="flex-col gap-4 mt-8 bg-transparent p-0 rounded-xl">
+                            <h3 className="mb-4" style={{ fontSize: FONTS.sizes.base, fontWeight: FONTS.weights.normal, color: COLORS.mainTextColor }}>Station Gallery</h3>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {imagesToDisplay.map((src, idx) => (
+                                    <div key={idx} className="relative">
+                                        <img
+                                            src={src}
+                                            alt={`station ${idx}`}
+                                            className="w-full h-32 object-cover rounded-lg shadow"
+                                        />
+                                        <button
+                                            onClick={() => handleRemoveImage(idx)}
+                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
+                                            aria-label="Remove image"
+                                        >
+                                            X
+                                        </button>
+                                    </div>
+                                ))}
+                                <div
+                                    className="w-full h-32 flex items-center justify-center rounded-lg border-2 border-dashed"
+                                    style={{ borderColor: COLORS.stroke }}
+                                >
+                                    <button
+                                        onClick={() => fileInputRef.current.click()}
+                                        className="text-center"
+                                        style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
+                                    >
+                                        Add New Image
+                                    </button>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleAddImage}
+                                        className="hidden"
+                                        accept="image/*"
+                                    />
+                                </div>
+                            </div>
+
+                            {localStationImages.length > initialDisplayCount && (
+                                <div className="flex justify-center mt-4 text-right">
+                                    <button
+                                        onClick={() => setShowAll(!showAll)}
+                                        className="underline"
+                                        style={{ color: COLORS.secondaryText, fontWeight: FONTS.weights.normal, fontSize: FONTS.sizes.sm }}
+                                    >
+                                        {showAll ? 'Show Less' : 'View All'}
                                     </button>
                                 </div>
-                            ))}
-                            <div
-                                className="w-full h-32 flex items-center justify-center rounded-lg border-2 border-dashed"
-                                style={{ borderColor: COLORS.stroke }}
-                            >
-                                <button
-                                    onClick={() => fileInputRef.current.click()}
-                                    className="text-center"
-                                    style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.sm }}
-                                >
-                                    Add New Image
-                                </button>
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    onChange={handleAddImage}
-                                    className="hidden"
-                                    accept="image/*"
-                                />
-                            </div>
+                            )}
                         </div>
 
-                        {localStationImages.length > initialDisplayCount && (
-                            <div className="flex justify-center mt-4 text-right">
-                                <button
-                                    onClick={() => setShowAll(!showAll)}
-                                    className="underline"
-                                    style={{ color: COLORS.secondaryText, fontWeight: FONTS.weights.normal, fontSize: FONTS.sizes.sm }}
-                                >
-                                    {showAll ? 'Show Less' : 'View All'}
-                                </button>
-                            </div>
+                        {showEditStationForm && (
+                            <AddChargingStationForm
+                                onClose={handleCloseForm}
+                                onSubmit={handleFormSubmit}
+                                mode="edit-station"
+                                initialFormData={stationDetails}
+                            />
                         )}
                     </div>
 
-                    {showEditStationForm && (
-                        <AddChargingStationForm
-                            onClose={handleCloseForm}
-                            onSubmit={handleFormSubmit}
-                            mode="edit-station" // This form is designed for 'add-station', but we pass initial data
-                            initialFormData={stationDetails} // Pass the consolidated stationDetails
+                    {/* Right side panel - Only for profile tab */}
+                    <div className="lg:col-span-1 space-y-4">
+                        <ViewStationRightPanel
+                            station={stationDetails}
                         />
-                    )}
+                    </div>
                 </div>
+            </LoadScript>
+        );
+    };
 
-                {/* Right side panel - Only for profile tab */}
-                <div className="lg:col-span-1 space-y-4">
-                    <ViewStationRightPanel
-                        station={stationDetails} // Use stationDetails
+    // Transactions Tab Content
+    const TransactionsTab = () => {
+        const [search, setSearch] = useState('');
+        const [filter, setFilter] = useState('all');
+        const [sort, setSort] = useState('date');
+
+        const transactionsColumns = [
+            'TransactionID',
+            'Date & Time',
+            'Type',
+            'SessionID',
+            'BookingID',
+            'Gross Amount(LKR)',
+            'Commission(LKR)',
+            'Net Amount(LKR)',
+            'Payout Status',
+            'Actions'
+        ];
+
+        const filterOptions = [
+            { label: 'All Types', value: 'all' },
+            { label: 'Booking Fees', value: 'booking_fee' },
+            { label: 'Charging Fees', value: 'charging_fee' }
+        ];
+
+        const sortOptions = [
+            { label: 'Date', value: 'date' },
+            { label: 'Amount', value: 'amount' },
+            { label: 'Type', value: 'type' }
+        ];
+
+        const handleFilterChange = (newFilter) => {
+            setFilter(newFilter);
+            fetchTransactions(1, { type: newFilter === 'all' ? '' : newFilter });
+        };
+
+        const handleSearch = (searchTerm) => {
+            setSearch(searchTerm);
+            // You can implement search if needed
+        };
+
+        const handlePageChange = (newPage) => {
+            fetchTransactions(newPage, { type: filter === 'all' ? '' : filter });
+        };
+
+        const getStatusBadge = (status) => {
+            const statusConfig = {
+                'pending': { color: 'bg-yellow-100 text-yellow-800', text: 'Pending' },
+                'processing': { color: 'bg-blue-100 text-blue-800', text: 'Processing' },
+                'paid': { color: 'bg-green-100 text-green-800', text: 'Paid' },
+                'on_hold': { color: 'bg-red-100 text-red-800', text: 'On Hold' }
+            };
+
+            const config = statusConfig[status] || { color: 'bg-gray-100 text-gray-800', text: status };
+
+            return (
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                    {config.text}
+                </span>
+            );
+        };
+
+        const handleViewReceipt = async (transactionId) => {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                const userID = localStorage.getItem('userID');
+                const response = await axios.get(
+                    `${API_BASE_URL}/api/station-owner/transactions/${transactionId}/details/${userID}/receipt`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`
+                        }
+                    }
+                );
+
+                if (response.data.success) {
+                    // Open receipt in new window or show modal
+                    // console.log('Transaction details:', response.data.transaction);
+                    // You can implement a receipt modal here
+                    toast.info('Receipt details loaded');
+                    setSelectedReceipt(response.data.receipt);
+                    setReceiptModalOpen(true);
+                } else {
+                    toast.error('Failed to load receipt details');
+                }
+            } catch (error) {
+                console.error('Error fetching receipt:', error);
+                toast.error('Failed to load receipt');
+            }
+        };
+
+        const tableData = transactions.map(transaction => ({
+            id: transaction.transactionId,
+            TransactionID: `TRX${transaction.transactionId}`,
+            'Date & Time': new Date(transaction.date).toLocaleString(),
+            Type: transaction.type,
+            SessionID: transaction.sessionId || 'N/A',
+            BookingID: transaction.bookingId || 'N/A',
+            'Gross Amount(LKR)': transaction.grossAmount.toFixed(2),
+            'Commission(LKR)': transaction.commission.toFixed(2),
+            'Net Amount(LKR)': transaction.netAmount.toFixed(2),
+            'Payout Status': getStatusBadge(transaction.payoutStatus),
+            Actions: (
+                <button
+                    onClick={() => handleViewReceipt(transaction.Id)}
+                    className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm transition-colors"
+                >
+                    View Receipt
+                </button>
+            )
+        }));
+
+        return (
+            <div className="space-y-6">
+                {/* Transactions Summary Cards */}
+                {transactionsSummary && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="rounded-xl p-6 border" style={{ borderColor: COLORS.stroke, backgroundColor: 'white' }}>
+                            <h3 className="text-sm font-medium mb-2" style={{ color: COLORS.secondaryText }}>
+                                Total Revenue
+                            </h3>
+                            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.success }}>
+                                LKR {transactionsSummary.totalGross?.toFixed(2) || '0.00'}
+                            </div>
+                            <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                Gross earnings
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl p-6 border" style={{ borderColor: COLORS.stroke, backgroundColor: 'white' }}>
+                            <h3 className="text-sm font-medium mb-2" style={{ color: COLORS.secondaryText }}>
+                                Net Earnings
+                            </h3>
+                            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.primary }}>
+                                LKR {transactionsSummary.totalNet?.toFixed(2) || '0.00'}
+                            </div>
+                            <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                After commission
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl p-6 border" style={{ borderColor: COLORS.stroke, backgroundColor: 'white' }}>
+                            <h3 className="text-sm font-medium mb-2" style={{ color: COLORS.secondaryText }}>
+                                Platform Commission
+                            </h3>
+                            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.danger }}>
+                                LKR {transactionsSummary.totalCommission?.toFixed(2) || '0.00'}
+                            </div>
+                            <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                10% of revenue
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl p-6 border" style={{ borderColor: COLORS.stroke, backgroundColor: 'white' }}>
+                            <h3 className="text-sm font-medium mb-2" style={{ color: COLORS.secondaryText }}>
+                                Total Transactions
+                            </h3>
+                            <div className="text-2xl font-bold mb-1" style={{ color: COLORS.warning }}>
+                                {transactionsSummary.totalTransactions || 0}
+                            </div>
+                            <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                All time
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Transactions Table */}
+                <div className="bg-white rounded-lg shadow-sm border" style={{ borderColor: COLORS.stroke }}>
+                    <DataTableTopBar
+                        search={search}
+                        setSearch={handleSearch}
+                        filter={filter}
+                        setFilter={handleFilterChange}
+                        sort={sort}
+                        setSort={setSort}
+                        filterOptions={filterOptions}
+                        sortOptions={sortOptions}
+                        searchPlaceholder="Search transactions..."
                     />
+
+                    {transactionsLoading ? (
+                        <div className="flex justify-center items-center h-32">
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                        </div>
+                    ) : transactions.length === 0 ? (
+                        <div className="text-center py-12">
+                            <div className="text-gray-500 text-lg mb-2">No transactions found</div>
+                            <div className="text-sm text-gray-400">
+                                Transactions will appear here once you start receiving bookings and charging sessions.
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <DataTable
+                                columns={transactionsColumns}
+                                data={tableData}
+                                filter={filter}
+                                sort={sort}
+                                search={search}
+                            />
+
+                            {/* Pagination */}
+                            {pagination.totalPages > 1 && (
+                                <div className="flex justify-between items-center p-4 border-t" style={{ borderColor: COLORS.stroke }}>
+                                    <div className="text-sm" style={{ color: COLORS.secondaryText }}>
+                                        Showing page {pagination.currentPage} of {pagination.totalPages}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => handlePageChange(pagination.currentPage - 1)}
+                                            disabled={!pagination.hasPrev}
+                                            className={`px-3 py-1 rounded-md text-sm ${pagination.hasPrev
+                                                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                                }`}
+                                        >
+                                            Previous
+                                        </button>
+                                        <button
+                                            onClick={() => handlePageChange(pagination.currentPage + 1)}
+                                            disabled={!pagination.hasNext}
+                                            className={`px-3 py-1 rounded-md text-sm ${pagination.hasNext
+                                                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                                }`}
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
         );
@@ -693,7 +1104,7 @@ const OwnerViewStation = () => {
             </div>
         );
     }
-      
+
     return (
         <div
             style={{
@@ -702,13 +1113,13 @@ const OwnerViewStation = () => {
                 backgroundColor: COLORS.background,
             }}>
 
-            <StationOwnerPageHeader title={`${stationDetails.name}`} /> {/* Use stationDetails */}
+            <StationOwnerPageHeader title={`${stationDetails.name}`} />
 
             {/* Tab Navigation */}
             <TabBar
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
-                tabs={tabs}
+                tabs={visibleTabs}
                 mobileLabels={mobileLabels}
             />
 
@@ -716,27 +1127,36 @@ const OwnerViewStation = () => {
             <div className="mt-6">
                 {activeTab === 'profile' && <ProfileTab />}
 
-                {activeTab === 'schedule' && <StationSchedule
+                {activeTab === 'schedule' && canViewSchedule && <StationSchedule
                     initialSchedule={stationSchedule}
                     initialTemporaryClosure={stationTemporaryClosures}
+                    onScheduleSave={handleScheduleSubmit}
+                    onTemporaryCloseCreate={handleTemporaryCloseCreate}
+                    onTemporaryCloseRemove={handleTemporaryCloseRemove}
+                    stationId={stationId}
                 />}
 
                 {activeTab === 'chargers' && (
                     <TableTab
                         title="Chargers"
                         columns={chargersColumns}
-                        data={chargersData}
-                        onRowClick={(charger) => navigate(`/station-owner/stations/chargerprofile/${charger.chargerID}`)}
+                        data={chargersTableData}
+                        onRowClick={(charger) => navigate(`/station-owner/stations/chargerprofile/${stationId}/${charger.chargerID}`)}
                     />
                 )}
+
                 {activeTab === 'transactions' && (
-                    <TableTab
-                        title="Transactions"
-                        columns={transactionsColumns}
-                        data={transactionsData}
-                        onRowClick={() => { /* Handle transaction row click if needed */ }}
-                    />
+                    <TransactionsTab />
                 )}
+
+                <ReceiptModal
+                    isOpen={receiptModalOpen}
+                    onClose={() => {
+                        setReceiptModalOpen(false);
+                        setSelectedReceipt(null);
+                    }}
+                    receiptData={selectedReceipt}
+                />
             </div>
         </div>
     );

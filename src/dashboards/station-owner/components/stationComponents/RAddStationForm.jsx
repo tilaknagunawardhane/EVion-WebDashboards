@@ -8,8 +8,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { COLORS, FONTS } from '../../../../constants';
 import StepOneForm from '../stationComponents/RStationForm';
 import StepTwoForm from '../stationComponents/RChargerForm';
+import { MapModal } from '../stationComponents/MapComponents'; // Add this import
+import { LoadScript } from '@react-google-maps/api'; // Add this import
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // Add this
 
 const elecProviders = [
     'CEB', 'LECO', 'Private'
@@ -28,16 +31,26 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
   const [districts, setDistricts] = useState([]);
   const [connectors, setConnectors] = useState({ AC: [], DC: [] });
   const [loading, setLoading] = useState(true);
-//   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const { id: paramStationId } = useParams();
   const [locationData, setLocationData] = useState(null);
+  const [showMapModal, setShowMapModal] = useState(false); // Add this state
 
+  // Updated location handler
   const handleSetLocationOnMap = () => {
-    alert('Opening map to set location...');
-    const dummyLat = 6.90 + Math.random() * 0.1;
-    const dummyLng = 79.90 + Math.random() * 0.1;
-    setLocationData({ lat: dummyLat, lng: dummyLng });
+    setShowMapModal(true);
+  };
+
+  const handleLocationSelect = (location, address = '') => {
+    setLocationData(location);
+    
+    // Auto-fill address if available
+    if (address) {
+      setFormData(prev => ({
+        ...prev,
+        addressLine: address
+      }));
+    }
   };
 
   const stationId = propStationId || paramStationId;
@@ -51,7 +64,7 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
     _id: '',
     electricityProvider: '',
     powerSource: '',
-    status: 'unavailable', // Default status for new stations
+    status: 'unavailable',
   });
 
   useEffect(() => {
@@ -73,9 +86,8 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
 
             if (mode === 'edit-charger' && initialChargerData) {
                 console.log('Initial Charger Data for Editing:', initialChargerData);
-                // Editing an existing charger
                 setCurrentStep(2);
-                setNumChargers(1); // Force 1 charger for editing
+                setNumChargers(1);
                 setChargers([
                     {
                         name: initialChargerData.charger_name || '',
@@ -83,28 +95,22 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
                         price: initialChargerData.price || '',
                         status: initialChargerData.charger_status || 'processing',
                         connectors: initialChargerData.connector_types.map(ct => ct.connector?._id) || [],
-                        // connectors: initialChargerData.connector_types?.map(ct => ({
-                        //     connector: ct.connector?._id,
-                        //     status: ct.status || 'available' // Include status
-                        // })) || [],
                         powerType: initialChargerData.power_type || '',
                         _id: initialChargerData._id
                     }
                 ]);
-                setFormData({}); // Clear station form data as it's not relevant here
-                setLocationData(null); // Clear location data as it's not relevant here
+                setFormData({});
+                setLocationData(null);
             } else if (mode === 'add-new-charger') {
-                // Adding a new charger to an existing station
                 setCurrentStep(2);
-                setNumChargers(1); // Start with one empty charger form
+                setNumChargers(1);
                 setChargers([
                     { name: '', maxPower: '', price: '', connectors: [], powerType: '', status: 'processing' }
                 ]);
-                setFormData({}); // Clear station form data
-                setLocationData(null); // Clear location data
-            } else if (mode === 'edit-station' && initialFormData) { // Changed 'add-station' to 'edit-station' for clarity
-                // Editing an existing station (StationProfile's "Update Station Details")
-                setCurrentStep(1); // Always start at Step 1 for station details edit
+                setFormData({});
+                setLocationData(null);
+            } else if (mode === 'edit-station' && initialFormData) {
+                setCurrentStep(1);
                 setFormData({
                     stationName: initialFormData.name || '',
                     addressLine: initialFormData.addressLine || '',
@@ -115,11 +121,14 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
                     status: initialFormData.status || 'unavailable',
                     _id: initialFormData._id
                 });
-                setLocationData(initialFormData.location || null); // Pre-fill location
+                // Set location data if it exists
+                setLocationData(initialFormData.location ? {
+                    lat: initialFormData.location.latitude || initialFormData.location.lat,
+                    lng: initialFormData.location.longitude || initialFormData.location.lng,
+                } : null);
                 setNumChargers(initialFormData.chargers?.length || 1);
                 setChargers(initialFormData.chargers || [{ name: '', maxPower: '', price: '', connectors: [], powerType: '', status: 'processing' }]);
             } else {
-                // Default: 'add-station' mode for a brand new station
                 setCurrentStep(1);
                 setNumChargers(1);
                 setChargers([
@@ -139,14 +148,12 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
         } catch (error) {
             toast.error(error.response?.data?.message || 'Error loading data');
             console.error('Error fetching data:', error);
-            // onClose();
         } finally {
             setLoading(false);
         }
     };
 
     fetchInitialData();
-
   }, [mode, initialFormData, initialChargerData, onClose]);
   
   const handleChange = (field) => (e) => {
@@ -196,195 +203,203 @@ export default function AddChargingStationForm({ onClose, onSubmit, mode, initia
   };
 
   const submit = async () => {
+    try {
+      const stationOwnerID = localStorage.getItem('userID');
+      let response;
 
-        // setIsSubmitting(true);
-
-        try {
-
-            const stationOwnerID = localStorage.getItem('userID');
-            let response;
-
-            if (mode === 'edit-station') { // Use 'edit-station' explicitly
-                const stationData = {
-                    station_name: formData.stationName.trim(),
-                    address: formData.addressLine.trim(),
-                    // district: formData.district,
-                    // city: formData.city.trim(),
-                    electricity_provider: formData.electricityProvider || undefined,
-                    power_source: formData.powerSource || undefined,
-                };
-                response = await axios.put(
-                    `${API_BASE_URL}/api/stations/update-station/${stationId}`,
-                    { stationOwnerID, ...stationData },
-                    {
-                        headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-                        'Content-Type': 'application/json'
-                        }
-                    }
-                );
-                toast.success('Station updated successfully!');
-
-            } else if (mode === 'add-station') { // Original add new station flow
-                const stationData = {
-                    station_name: formData.stationName.trim(),
-                    address: formData.addressLine.trim(),
-                    district: formData.district,
-                    city: formData.city.trim(),
-                    station_status: 'unavailable', // New stations start as unavailable
-                    electricity_provider: formData.electricityProvider || undefined,
-                    power_source: formData.powerSource || undefined,
-                    chargers: chargers.map(charger => ({
-                        charger_name: charger.name.trim(),
-                        power_type: charger.powerType,
-                        max_power_output: parseFloat(charger.maxPower),
-                        price: parseFloat(charger.price) || 0,
-                        charger_status: 'processing',
-                        connector_types: charger.connectors.map(connectorId => ({
-                            connector: connectorId,
-                            status: 'available'
-                        }))
-                    }))
-                };
-
-                response = await axios.post(
-                    `${API_BASE_URL}/api/stations/create-station`,
-                    { stationOwnerID, ...stationData },
-                    {
-                        headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-                        'Content-Type': 'application/json'
-                        }
-                    }
-                    );
-                toast.success('Station request submitted successfully!');
-
-            } else if (mode === 'add-new-charger') {
-                const chargerData = {
-                    charger_name: chargers[0].name.trim(),
-                    power_type: chargers[0].powerType,
-                    max_power_output: parseFloat(chargers[0].maxPower),
-                    price: parseFloat(chargers[0].price) || 0,
-                    connector_types: chargers[0].connectors.map(connectorId => ({
-                        connector: connectorId,
-                        status: 'available'
-                    })),
-                    charger_status: 'processing'
-                };
-
-                response = await axios.post(
-                    `${API_BASE_URL}/api/stations/${stationId}/add-charger`,
-                    { stationOwnerID, ...chargerData },
-                    {
-                        headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-                        'Content-Type': 'application/json'
-                        }
-                    }
-                    );
-                toast.success('Charger added successfully!');
-
-            } else if (mode === 'edit-charger' && initialChargerData) {
-                const chargerData = {
-                    charger_name: chargers[0].name.trim(),
-                    power_type: chargers[0].powerType,
-                    max_power_output: parseFloat(chargers[0].maxPower),
-                    price: parseFloat(chargers[0].price) || 0,
-                    connector_types: chargers[0].connectors.map(connectorId => ({
-                        connector: connectorId,
-                    })),
-                    // connector_types: chargers[0].connectors.map(connector => ({
-                    //     connector: connector._id || connector,  // if you store full object or just id
-                    //     status: connector.status || 'unavailable'
-                    // })),
-                    charger_status: chargers[0].status
-                };
-                response = await axios.put(
-                    `${API_BASE_URL}/api/stations/station/${stationId}/update-charger/${chargers[0]._id}?stationOwnerId=${stationOwnerID}`,
-                    chargerData,
-                    {
-                        headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-                        'Content-Type': 'application/json'
-                        }
-                    }
-                );
-                toast.success('Charger updated successfully!');
+      if (mode === 'edit-station') {
+        const stationData = {
+          station_name: formData.stationName.trim(),
+          address: formData.addressLine.trim(),
+          electricity_provider: formData.electricityProvider || undefined,
+          power_source: formData.powerSource || undefined,
+          // Add location data for edit mode
+          location: locationData ? {
+            longitude: locationData.lng,
+            latitude: locationData.lat
+          } : undefined,
+        };
+        response = await axios.put(
+          `${API_BASE_URL}/api/stations/update-station/${stationId}`,
+          { stationOwnerID, ...stationData },
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+              'Content-Type': 'application/json'
             }
-
-            onSubmit?.(response.data.data);
-            // navigate('/initstation'); // This navigation should be decided by the parent component, not here
-            onClose();
-        } catch (error) {
-            console.error('Error submitting:', error);
-            const errorMessage = error.response?.data?.message ||
-                (error.response?.status === 401 ? 'Please login again' :
-                `Failed to submit. Please try again.`);
-            toast.error(errorMessage);
-
-            if (error.response?.status === 401) {
-                navigate('/login');
-            }
-        }
-    };
-
-    const getAvailableConnectors = (powerType) => {
-        return powerType ? connectors[powerType] || [] : [];
-    };
-
-    if (loading) {
-        return (
-        <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/10 flex items-center justify-center">
-            <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-md max-h-[90vh] flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        </div>
+          }
         );
+        toast.success('Station updated successfully!');
+
+      } else if (mode === 'add-station') {
+        const stationData = {
+          station_name: formData.stationName.trim(),
+          address: formData.addressLine.trim(),
+          district: formData.district,
+          city: formData.city.trim(),
+          station_status: 'unavailable',
+          electricity_provider: formData.electricityProvider || undefined,
+          power_source: formData.powerSource || undefined,
+          // Add location data
+          location: locationData ? {
+            longitude: locationData.lng,
+            latitude: locationData.lat
+          } : undefined,
+          chargers: chargers.map(charger => ({
+            charger_name: charger.name.trim(),
+            power_type: charger.powerType,
+            max_power_output: parseFloat(charger.maxPower),
+            price: parseFloat(charger.price) || 0,
+            charger_status: 'processing',
+            connector_types: charger.connectors.map(connectorId => ({
+              connector: connectorId,
+              status: 'unavailable'
+            }))
+          }))
+        };
+
+        response = await axios.post(
+          `${API_BASE_URL}/api/stations/create-station`,
+          { stationOwnerID, ...stationData },
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        toast.success('Station request submitted successfully!');
+
+      } else if (mode === 'add-new-charger') {
+        const chargerData = {
+          charger_name: chargers[0].name.trim(),
+          power_type: chargers[0].powerType,
+          max_power_output: parseFloat(chargers[0].maxPower),
+          price: parseFloat(chargers[0].price) || 0,
+          connector_types: chargers[0].connectors.map(connectorId => ({
+            connector: connectorId,
+            status: 'unavailable'
+          })),
+          charger_status: 'processing'
+        };
+
+        response = await axios.post(
+          `${API_BASE_URL}/api/stations/station/${stationId}/add-charger`,
+          { stationOwnerID, ...chargerData },
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        toast.success('Charger added successfully!');
+
+      } else if (mode === 'edit-charger' && initialChargerData) {
+        const chargerData = {
+          charger_name: chargers[0].name.trim(),
+          power_type: chargers[0].powerType,
+          max_power_output: parseFloat(chargers[0].maxPower),
+          price: parseFloat(chargers[0].price) || 0,
+          connector_types: chargers[0].connectors.map(connectorId => ({
+            connector: connectorId,
+          })),
+          charger_status: chargers[0].status
+        };
+        response = await axios.put(
+          `${API_BASE_URL}/api/stations/station/${stationId}/update-charger/${chargers[0]._id}?stationOwnerId=${stationOwnerID}`,
+          chargerData,
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        toast.success('Charger updated successfully!');
+      }
+
+      onSubmit?.(response.data.data);
+      onClose();
+    } catch (error) {
+      console.error('Error submitting:', error);
+      const errorMessage = error.response?.data?.message ||
+        (error.response?.status === 401 ? 'Please login again' :
+          `Failed to submit. Please try again.`);
+      toast.error(errorMessage);
+
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     }
+  };
 
+  const getAvailableConnectors = (powerType) => {
+    return powerType ? connectors[powerType] || [] : [];
+  };
+
+  if (loading) {
     return (
-        <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/10 flex items-center justify-center">
-            <div className="bg-white rounded-xl p-12 w-full max-w-2xl shadow-md h-[600px] overflow-hidden max-h-[90vh]">
-                <div className="h-full overflow-y-auto">
-                    <button onClick={onClose} className="absolute top-3 right-4 text-3xl font-extralight" style={{ color: COLORS.secondaryText }}>×</button>
-
-                    {/* Conditional rendering for forms based on mode and current step */}
-                    {(currentStep === 1 && mode === 'add-station') || mode === 'edit-station' ? (
-                        <StepOneForm
-                            {...{
-                                formData,
-                                handleChange,
-                                nextStep: () => setCurrentStep(2),
-                                districts,
-                                elecProviders,
-                                sources,
-                                locationData,      // Pass location data
-                                onSetLocationClick: handleSetLocationOnMap, // Pass map setter function
-                                mode, // Pass the mode to StepOneForm
-                                submit // Pass submit directly for 'edit-station'
-                            }} />
-                    ) : (
-                        <StepTwoForm {...{
-                            numChargers: (mode === 'add-new-charger' || mode === 'edit-charger') ? 1 : numChargers,
-                            updateNumChargers,
-                            chargers,
-                            handleChargerChange,
-                            handleConnectorChange,
-                            getAvailableConnectors,
-                            goBack: () => {
-                                if (mode === 'add-new-charger' || mode === 'edit-charger') {
-                                    onClose();
-                                } else {
-                                    setCurrentStep(1);
-                                }
-                            },
-                            onSubmit: submit,
-                            formMode: mode,
-                            isEditingOrAddingSingleCharger: (mode === 'add-new-charger' || mode === 'edit-charger')
-                        }} />
-                    )}
-                </div>
-            </div>
+      <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/10 flex items-center justify-center">
+        <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-md max-h-[90vh] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
+      </div>
     );
+  }
+
+  return (
+    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={['places']}>
+      <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/10 flex items-center justify-center">
+        <div className="bg-white rounded-xl p-12 w-full max-w-2xl shadow-md h-[600px] overflow-hidden max-h-[90vh]">
+          <div className="h-full overflow-y-auto">
+            <button onClick={onClose} className="absolute top-3 right-4 text-3xl font-extralight" style={{ color: COLORS.secondaryText }}>×</button>
+
+            {(currentStep === 1 && mode === 'add-station') || mode === 'edit-station' ? (
+              <StepOneForm
+                {...{
+                  formData,
+                  handleChange,
+                  nextStep: () => setCurrentStep(2),
+                  districts,
+                  elecProviders,
+                  sources,
+                  locationData,
+                  onSetLocationClick: handleSetLocationOnMap,
+                  mode,
+                  onSubmit: submit
+                }} />
+            ) : (
+              <StepTwoForm {...{
+                numChargers: (mode === 'add-new-charger' || mode === 'edit-charger') ? 1 : numChargers,
+                updateNumChargers,
+                chargers,
+                handleChargerChange,
+                handleConnectorChange,
+                getAvailableConnectors,
+                goBack: () => {
+                  if (mode === 'add-new-charger' || mode === 'edit-charger') {
+                    onClose();
+                  } else {
+                    setCurrentStep(1);
+                  }
+                },
+                onSubmit: submit,
+                formMode: mode,
+                isEditingOrAddingSingleCharger: (mode === 'add-new-charger' || mode === 'edit-charger')
+              }} />
+            )}
+          </div>
+        </div>
+
+        {/* Add Map Modal */}
+        <MapModal
+          isOpen={showMapModal}
+          onClose={() => setShowMapModal(false)}
+          onLocationSelect={handleLocationSelect}
+          initialLocation={locationData}
+        />
+      </div>
+    </LoadScript>
+  );
 }

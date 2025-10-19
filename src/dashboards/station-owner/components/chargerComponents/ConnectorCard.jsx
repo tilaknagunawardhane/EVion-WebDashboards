@@ -25,7 +25,7 @@ const ChargingSessionCard = ({ connectorName, session, bookings, timeSlots  }) =
       start == null || end == null
     ) return false;
 
-    return slotStart >= start && slotEnd <= end;
+    return slotStart < start && slotEnd < end;
   }
 
   function toMinutes(timeStr) {
@@ -46,88 +46,6 @@ const ChargingSessionCard = ({ connectorName, session, bookings, timeSlots  }) =
           {connectorName}
         </h3>
       </div>
-      
-      {session ? (
-        <div className="gap-4 p-4 rounded-xl" style={{ backgroundColor: COLORS.background}}>
-          <div className="flex items-center justify-between">
-            <div style={{ fontSize: FONTS.sizes.sm, color: COLORS.mainTextColor, fontWeight: FONTS.weights.medium }}>
-                {session.vehicle}
-            </div>
-            <div style={{ fontSize: FONTS.sizes.xs, color: COLORS.mainTextColor, fontWeight: FONTS.weights.medium }}>
-                <strong
-                style={{ fontWeight: FONTS.weights.normal, color: COLORS.secondaryText, fontSize: FONTS.sizes.xs }}
-                >
-                Charging Started At:
-                </strong>{' '}
-                {session.startTime}
-            </div>
-
-          </div>
-
-          <div className="flex justify-between p-4 mt-2">
-            
-            {/* Duration */}
-            <div className="flex-col justify-items-center space-y-2">
-              <img
-                src={ClockIcon}
-                alt=""
-                className="w-12 h-12"
-                style={{
-                    color: COLORS.primary
-                }}
-              />
-              <div className="space-y-0">
-                <div style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>Duration</div>
-                <div style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.sm, fontWeight: FONTS.weights.medium }}>{duration}</div>
-              </div>
-            </div>
-
-            {/* Energy */}
-            <div className="flex-col justify-items-center space-y-2">
-              <img
-                src={EnergyIcon}
-                alt=""
-                className="w-12 h-12"
-                style={{
-                    color: COLORS.primary
-                }}
-              />
-              <div className="space-y-0">
-                <div style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>Energy</div>
-                <div style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.xl, fontWeight: FONTS.weights.semibold }}>
-                  {session.energy}
-                  <span style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
-                    kWh
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Cost */}
-            <div className="flex-col justify-items-center space-y-2">
-              <img
-                src={CostIcon}
-                alt=""
-                className="w-12 h-12"
-                style={{
-                    color: COLORS.primary
-                }}
-              />
-              <div className="space-y-0">
-                <div style={{ color: COLORS.secondaryText, fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>Cost</div>
-                <div style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.xl, fontWeight: FONTS.weights.semibold }}>
-                  <span style={{ color: COLORS.mainTextColor, fontSize: FONTS.sizes.xs, fontWeight: FONTS.weights.normal }}>
-                    Rs.
-                  </span>
-                  {session.cost}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="flex p-8 rounded-xl text-xs text-gray-400 italic mb-6 h-[197px]" style={{ backgroundColor: COLORS.background }}>No current session</div>
-      )}
 
       <div className="flex items-center mt-6 w-full justify-between">
         <h3 className="text-base font-medium justify-between" style={{ color: COLORS.mainTextColor }}>

@@ -31,7 +31,7 @@ export default function AdminDashboard() {
     },
     { 
       name: 'Payments', 
-      path: '/admin/payments', 
+      path: '/admin/payouts', 
       icon: EarningsIcon
     },
   ]

@@ -78,7 +78,16 @@ export default function ChargerForm({
         }
     };
 
-    const isDisabled = formMode === 'edit-charger';
+    const DISABLED_STATUSES = [
+      'to_be_installed', 
+      'rejected', 
+      'open', 
+      'unavailable', 
+      'disabled_by_SO', 
+      'deleted'
+    ];
+
+    // const isDisabled = formMode === 'edit-charger';
 
   return (
     <div>
@@ -108,9 +117,18 @@ export default function ChargerForm({
           </div>
         )}
 
-        {chargers.map((charger, index) => (
-            ((formMode === 'edit-charger' || formMode === 'add-new-charger') && index > 0) ? null :
-              (
+        {chargers.map((charger, index) => {
+
+            const isFieldDisabled = 
+              (formMode === 'edit-charger' || formMode === 'add-new-charger') && 
+              DISABLED_STATUSES.includes(charger.status);
+
+            if ((formMode === 'edit-charger' || formMode === 'add-new-charger') && index > 0) {
+              return null;
+            }
+
+            
+            return (
                 <div key={index} className="mb-6 p-4 rounded-lg" style={{ backgroundColor: COLORS.background }}>
                   <h4 className="text-md font-medium mb-3" style={{ color: COLORS.mainTextColor }}>
                     {formMode === 'edit-charger' ? 'Edit Charger' : `Charger ${index + 1}`}
@@ -147,7 +165,7 @@ export default function ChargerForm({
                             backgroundColor: COLORS.background,
                         }}
                         required
-                        disabled={isDisabled}
+                        disabled={isFieldDisabled}
                       >
                         <option value="">Select</option>
                         {powerTypes.map((type) => (
@@ -221,7 +239,7 @@ export default function ChargerForm({
                                 }}
                                 className="ml-0"
                                 style={{ accentColor: COLORS.primary }}
-                                disabled={isDisabled}
+                                disabled={isFieldDisabled}
                               />
                               <span>{connector.type_name}</span>
                             </label>
@@ -241,8 +259,8 @@ export default function ChargerForm({
                     </div>
                   </div>
                 </div>
-              )
-        ))}
+              );
+})}
       </div>
 
       <div className="mt-8 flex justify-between">
