@@ -169,8 +169,8 @@ export default function AdminDashboardPage() {
 
                     <StatCard
                         title="Revenue"
-                        value={`LKR ${dashboardData.stats.revenue.total.toLocaleString()}`}
-                        subValue={`${formatPercentage(dashboardData.stats.revenue.bookingFees)}% vs last month`}
+                        value={`LKR ${(-dashboardData.stats.revenue.total).toLocaleString()}`}
+                        //subValue={`${formatPercentage(dashboardData.stats.revenue.bookingFees)}% vs last month`}
                         icon="revenue"
                         status={parseFloat(dashboardData.stats.revenue.bookingFees) >= 0 ? 'positive' : 'negative'}
                     />
@@ -208,9 +208,68 @@ export default function AdminDashboardPage() {
                             Revenue Trends
                         </h2>
                         <OverviewCard>
-                            <div className="h-90">
-                                <RevenueTrendChart data={dashboardData.revenueTrends} />
+                            <div className="h-70">
+                                <RevenueTrendChart data={dashboardData.dailyRevenueTrends} />
                             </div>
+                        
+                        {/* Revenue Summary Cards */}
+                       {dashboardData.revenueBreakdown && (() => {
+    // Flip the signs for display
+                            const total = -dashboardData.revenueBreakdown.total;
+                            const charging = -dashboardData.revenueBreakdown.charging;
+                            const booking = -dashboardData.revenueBreakdown.booking;
+                            
+                            // Calculate percentages
+                            const chargingPercentage = total !== 0 ? ((charging / total) * 100).toFixed(1) : '0.0';
+                            const bookingPercentage = total !== 0 ? ((booking / total) * 100).toFixed(1) : '0.0';
+                            
+                            return (
+                                <div className="grid grid-cols-3 gap-4 mt-3">
+                                    <div style={{
+                                        padding: '16px',
+                                        backgroundColor: COLORS.primary,
+                                        borderRadius: '8px',
+                                        color: 'white'
+                                    }}>
+                                        <p style={{ fontSize: '12px', opacity: 0.9 }}>Total Revenue</p>
+                                        <p style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '8px' }}>
+                                            LKR {total.toLocaleString()}
+                                        </p>
+                                        <p style={{ fontSize: '10px', opacity: 0.8, marginTop: '4px' }}>
+                                            100%
+                                        </p>
+                                    </div>
+                                    <div style={{
+                                        padding: '16px',
+                                        backgroundColor: COLORS.star,
+                                        borderRadius: '8px',
+                                        color: 'white'
+                                    }}>
+                                        <p style={{ fontSize: '12px', opacity: 0.9 }}>Charging Sessions</p>
+                                        <p style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '8px' }}>
+                                            LKR {charging.toLocaleString()}
+                                        </p>
+                                        <p style={{ fontSize: '10px', opacity: 0.8, marginTop: '4px' }}>
+                                            {chargingPercentage}% of total
+                                        </p>
+                                    </div>
+                                    <div style={{
+                                        padding: '16px',
+                                        backgroundColor: COLORS.danger,
+                                        borderRadius: '8px',
+                                        color: 'white'
+                                    }}>
+                                        <p style={{ fontSize: '12px', opacity: 0.9 }}>Booking Fees</p>
+                                        <p style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '8px' }}>
+                                            LKR {booking.toLocaleString()}
+                                        </p>
+                                        <p style={{ fontSize: '10px', opacity: 0.8, marginTop: '4px' }}>
+                                            {bookingPercentage}% of total
+                                        </p>
+                                    </div>
+                                </div>
+                            );
+                        })()}
                         </OverviewCard>
                     </div>
                 </div>
@@ -254,7 +313,7 @@ export default function AdminDashboardPage() {
                             </div>
 
                             {/* Approval Cards Section */}
-                            {/* <div className="lg:col-span-1">
+                            <div className="lg:col-span-1">
                                 <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
                                     Approvals
                                 </h2>
@@ -276,7 +335,7 @@ export default function AdminDashboardPage() {
                                     bgColor={COLORS.primary}
                                     textColor={COLORS.background}
                                 />
-                            </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>
