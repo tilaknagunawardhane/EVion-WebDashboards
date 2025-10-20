@@ -1,4 +1,4 @@
-import { Bar } from 'react-chartjs-2'
+import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,11 +7,8 @@ import {
   Title,
   Tooltip,
   Legend,
-  Colors,
-} from 'chart.js'
-
+} from 'chart.js';
 import { COLORS } from '../../../constants/colors';
-
 
 // Register Chart.js components
 ChartJS.register(
@@ -21,31 +18,54 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend
-)
+);
 
-const complaintsData = [
-  { station: 'Station A', complaints: 12 },
-  { station: 'Station B', complaints: 8 },
-  { station: 'Station C', complaints: 15 },
-  { station: 'Station D', complaints: 6 },
-  { station: 'Station E', complaints: 9 },
-  { station: 'Station F', complaints: 18 },
-]
+export default function ChargingStationComplaintsChart({ data }) {
+  // Use the data from backend or fallback to empty array
+  const complaintsData = data || [];
 
-export default function ChargingStationComplaintsChart() {
-  const data = {
-    labels: complaintsData.map(item => item.station),
+  console.log('ChargingStationComplaintsChart received data:', complaintsData);
+
+  // If no data, show a message
+  if (complaintsData.length === 0) {
+    return (
+      <div
+        style={{
+          height: '300px',
+          padding: '16px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <p style={{ color: COLORS.secondaryText, fontSize: '14px' }}>
+          No report data available
+        </p>
+      </div>
+    );
+  }
+
+  // Prepare chart data - use displayName which combines station and charger
+  const chartData = {
+    labels: complaintsData.map(item => {
+      const name = item.displayName || item.stationName || 'Unknown';
+      // Truncate long names for better display
+      return name.length > 25 ? name.substring(0, 25) + '...' : name;
+    }),
     datasets: [
       {
-        label: 'Number of Complaints',
-        data: complaintsData.map(item => item.complaints),
+        label: 'Number of Reports',
+        data: complaintsData.map(item => item.reportCount),
         backgroundColor: COLORS.primary,
         borderWidth: 1,
         borderRadius: 4,
         borderSkipped: false,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -64,7 +84,7 @@ export default function ChargingStationComplaintsChart() {
         },
       },
       tooltip: {
-        backgroundColor: 'white', 
+        backgroundColor: 'white',
         titleColor: COLORS.mainTextColor,
         bodyColor: COLORS.secondaryText,
         borderColor: COLORS.border,
@@ -72,7 +92,26 @@ export default function ChargingStationComplaintsChart() {
         padding: 12,
         usePointStyle: true,
         callbacks: {
-          label: (context) => `${context.dataset.label}: ${context.raw}`,
+          title: (context) => {
+            const index = context[0].dataIndex;
+            const item = complaintsData[index];
+            return item.displayName || item.stationName || 'Unknown';
+          },
+          label: (context) => {
+            return `Reports: ${context.raw}`;
+          },
+          afterLabel: (context) => {
+            const index = context.dataIndex;
+            const item = complaintsData[index];
+            const details = [];
+            if (item.stationName) {
+              details.push(`Station: ${item.stationName}`);
+            }
+            if (item.chargerName) {
+              details.push(`Charger: ${item.chargerName}`);
+            }
+            return details;
+          }
         },
       },
       title: {
@@ -87,8 +126,10 @@ export default function ChargingStationComplaintsChart() {
         ticks: {
           color: COLORS.secondaryText,
           font: {
-            size: 12
+            size: 10
           },
+          maxRotation: 45,
+          minRotation: 45
         },
         border: {
           display: false,
@@ -105,40 +146,37 @@ export default function ChargingStationComplaintsChart() {
           font: {
             size: 12
           },
-          // callback: (value) => value,
+          stepSize: 1,
+          precision: 0
         },
         border: {
           display: false,
         },
         title: {
           display: true,
-          text: 'Number of Complaints',
+          text: 'Number of Reports',
           color: COLORS.mainTextColor,
           font: {
-            size: 14,
-            weight: 'bold'
-          }
+            size: 13,
+            weight: '600'
+          },
+          padding: 8
         }
       },
     },
-    elements: {
-      bar: {
-        // borderWidth: 2,
-      },
-    },
-  }
+  };
 
   return (
     <div
       style={{
-        height: '300px', 
-        padding: '16px', 
-        backgroundColor: 'white', 
-        borderRadius: '8px', 
+        height: '300px',
+        padding: '16px',
+        backgroundColor: 'white',
+        borderRadius: '8px',
         boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
       }}
     >
-      <Bar data={data} options={options} />
+      <Bar data={chartData} options={options} />
     </div>
-  )
+  );
 }
