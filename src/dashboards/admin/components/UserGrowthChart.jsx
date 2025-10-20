@@ -55,51 +55,60 @@ export default function UserGrowthChart({ data }) {
   };
 
   const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          usePointStyle: true
-        }
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'bottom',
+      labels: {
+        usePointStyle: true,
+        padding: 20  // Add horizontal padding between legend items
       },
-      tooltip: {
-        callbacks: {
-          label: (context) => `${context.dataset.label}: ${context.raw.toLocaleString()}`
-        }
-      },
-      title: {
+      padding: {
+        top: 30  // Add space between chart and legend
+      }
+    },
+    tooltip: {
+      callbacks: {
+        label: (context) => `${context.dataset.label}: ${context.raw.toLocaleString()}`
+      }
+    },
+    title: {
+      display: false
+    }
+  },
+  scales: {
+    x: {
+      grid: {
         display: false
       }
     },
-    scales: {
-      x: {
-        grid: {
-          display: false
-        }
+    y: {
+      beginAtZero: true,
+      ticks: {
+        callback: (value) => value.toLocaleString()
       },
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: (value) => value.toLocaleString()
-        },
-        grid: {
-          color: COLORS.border,
-          drawBorder: false
-        }
-      }
-    },
-    elements: {
-      line: {
-        borderWidth: 2
-      },
-      point: {
-        radius: 4,
-        hoverRadius: 6
+      grid: {
+        color: COLORS.border,
+        drawBorder: false
       }
     }
-  };
+  },
+  elements: {
+    line: {
+      borderWidth: 2
+    },
+    point: {
+      radius: 4,
+      hoverRadius: 6
+    }
+  },
+  layout: {
+    padding: {
+      bottom: 10  // Additional padding at the bottom if needed
+    }
+  }
+};
 
   return (
     <div style={{ height: '300px' }}>
