@@ -28,10 +28,11 @@ export default function SupportOfficerDashboardPage() {
             setLoading(true);
             setError(null);
             
-            // Replace with your actual API endpoint
             const response = await axios.get(`${API_BASE_URL}/api/support-officer-dashboard/stats`);
             
             if (response.data.success) {
+                console.log('Dashboard data received:', response.data.data);
+                console.log('Reports by charger:', response.data.data.trends?.reportsByCharger);
                 setDashboardData(response.data.data);
             } else {
                 setError('Failed to fetch dashboard data');
@@ -156,10 +157,8 @@ export default function SupportOfficerDashboardPage() {
 
                     <StatCard
                         title="Connectors"
-                        value={dashboardData.stats.chargers.open + 
-                               dashboardData.stats.chargers.unavailable + 
-                               dashboardData.stats.chargers.disabled}
-                        subValue={`${dashboardData.stats.chargers.faulted} Faulted`}
+                        value={dashboardData.stats.chargers.totalConnectors}
+                        subValue={`${dashboardData.stats.chargers.unavailableConnectors} Unavailable`}
                         icon="connectors"
                         subValueColor={COLORS.lightRed}
                     />
@@ -202,28 +201,25 @@ export default function SupportOfficerDashboardPage() {
                             Fault Status
                         </h2>
                         <StatusCard
-                            value={dashboardData.stats.chargers.faulted}
-                            total={dashboardData.stats.chargers.open + 
-                                   dashboardData.stats.chargers.unavailable + 
-                                   dashboardData.stats.chargers.disabled}
+                            value={dashboardData.stats.reports.resolved}
+                            total={dashboardData.stats.reports.underReview}
                             percentage={getFaultPercentage()}
                         >
                             <FaultStatusChart 
-                                open={dashboardData.stats.chargers.open}
-                                unavailable={dashboardData.stats.chargers.unavailable}
-                                disabled={dashboardData.stats.chargers.disabled}
+                                underReview={dashboardData.stats.reports.underReview}
+                                resolved={dashboardData.stats.reports.resolved}
                             />
                         </StatusCard>
                     </div>
 
-                    {/* Charging Station Complaints */}
+                    {/* Charging Station Complaints - UPDATED */}
                     <div className="lg:col-span-1">
                         <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
                             Complaints
                         </h2>
                         <OverviewCard>
                             <ChargingStationComplaintsChart 
-                                data={dashboardData.trends.reportsByCategory}
+                                data={dashboardData.trends?.reportsByCharger || []}
                             />
                         </OverviewCard>
                     </div>
