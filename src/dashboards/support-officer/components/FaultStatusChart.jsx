@@ -80,7 +80,7 @@ export default function FaultStatusChart({ underReview, resolved }) {
       <Doughnut data={data} options={options} />
       <div style={{
         position: 'absolute',
-        top: '35%',
+        top: '30%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
         textAlign: 'center',
@@ -100,7 +100,7 @@ export default function FaultStatusChart({ underReview, resolved }) {
           fontFamily: FONTS.family.sans,
           marginTop: '0.1px'
         }}>
-          Total Reports
+          Total
         </div>
       </div>
     </div>
