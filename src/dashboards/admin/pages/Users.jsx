@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import DataTableTopBar from '../../../components/ui/DataTableTopBar';
 import DataTable from '../../../components/ui/DataTable';
 import UsersRightPanel from '../components/UsersRightPanel';
@@ -7,13 +7,19 @@ import NotificationsIcon from '../../../assets/notifications.svg';
 import OverviewCard from '../components/OverviewCard';
 import { useNavigate } from 'react-router-dom';
 import AdminPageHeader from '../components/AdminPageHeader';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function UsersPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState('Date of Registration');
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); 
+  const [loading, setLoading] = useState(true);
+  
   const [requests, setRequests] = useState([
     {
       id: 1,
@@ -37,6 +43,44 @@ export default function UsersPage() {
       date: '4 Fri, 03:45 PM'
     }
   ]);
+
+  const fetchUsersData = useCallback(async () => {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      const adminId = localStorage.getItem('userID');
+
+      if (!token || !adminId) {
+          setLoading(false);
+          return;
+      }
+
+      try {
+          const response = await axios.get(
+              `${API_BASE_URL}/api/admin/users/all`,
+              { headers: { 'Authorization': `Bearer ${token}` }, params: { adminId: adminId } }
+          );
+
+          setUsers(response.data.data || []);
+      } catch (error) {
+          console.error('Error fetching user list:', error);
+          toast.error('Failed to load user list.');
+          setUsers([]);
+      } finally {
+          setLoading(false);
+      }
+  }, []);
+
+  useEffect(() => {
+      fetchUsersData();
+  }, [fetchUsersData]);
+
+  if (loading) {
+      return (
+          <div className="flex justify-center items-center h-screen">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+      );
+  }
 
   const userFilterOptions = [
     { label: 'Status', value: 'status' },
@@ -65,15 +109,8 @@ export default function UsersPage() {
     'No of Vehicles Registered',
     'Total Energy Charged',
     'Total Spend',
-    'Total Trips Completed',
-    'Overall Rating for trips',
     'Total Charging Sessions',
     'No of Bookings',
-    'Overall Rating for Charging sessions',
-    'No of complaints',
-    'No of posts shared',
-    'Account Status',
-    'Quick Actions'
   ];
 
   // More comprehensive sample user data
@@ -149,9 +186,9 @@ export default function UsersPage() {
       <AdminPageHeader title="EV Users Overview" />
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Left Side - 3/4 width */}
-        <div className="lg:col-span-3">
+        <div>
           {/* Search and Filter Bar */}
           <div className="mb-6">
             <DataTableTopBar
@@ -177,7 +214,7 @@ export default function UsersPage() {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <DataTable
                 columns={userColumns}
-                data={users.length > 0 ? users : userData}
+                data={users}
                 filter={filter}
                 sort={sort}
                 search={search}
@@ -211,14 +248,11 @@ export default function UsersPage() {
         </div>
 
         {/* Right Side - 1/4 width */}
-        <div className="lg:col-span-1">
+        {/* <div className="lg:col-span-1">
           <div className="sticky top-6 space-y-6">
-            <UsersRightPanel
-              users={users.length > 0 ? users : userData}
-              requests={requests}
-            />
+            <UsersRightPanel/>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
