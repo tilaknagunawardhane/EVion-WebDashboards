@@ -13,7 +13,7 @@ export default function ActiveUserCard({
 }) {
   return (
     <div 
-      className="p-4 rounded-lg mb-4 cursor-pointer hover:shadow-md transition-shadow"
+      className="p-3 rounded-lg mb-3 cursor-pointer hover:shadow-md transition-shadow"  // Changed p-4 to p-3, mb-4 to mb-3
       style={{ 
         backgroundColor: bgColor,
         border: `1px solid ${borderColor}`,
@@ -23,16 +23,17 @@ export default function ActiveUserCard({
       <div className="flex justify-between items-center">
         <div>
           <p 
-            className="text-2xl font-bold mb-1" 
+            className="text-lg font-bold mb-0.5"  // Changed text-2xl to text-lg, mb-1 to mb-0.5
             style={{ color: textColor }}
           >
             {name}
           </p>
           <p 
-            className="text-sm" 
+            className="text-xs"  // Changed text-sm to text-xs
             style={{ 
               color: textColor,
-              fontFamily: FONTS.family.sans 
+              fontFamily: FONTS.family.sans,
+              lineHeight: '1.4'  // Added for tighter line spacing
             }}
           >
             Posts: {posts} <br />
@@ -43,7 +44,7 @@ export default function ActiveUserCard({
           <img 
             src={ArrowRightIcon} 
             alt="" 
-            style={{ width: '18px', height: '18px' }} 
+            style={{ width: '16px', height: '16px' }}  // Changed from 18px to 16px
           />
         </div>
       </div>
