@@ -28,10 +28,12 @@ export default function SupportOfficerDashboardPage() {
             setLoading(true);
             setError(null);
             
-            // Replace with your actual API endpoint
             const response = await axios.get(`${API_BASE_URL}/api/support-officer-dashboard/stats`);
             
             if (response.data.success) {
+                console.log('Dashboard data received:', response.data.data);
+                console.log('Reports by charger:', response.data.data.trends?.reportsByCharger);
+                console.log('Top active users:', response.data.data.topUsers);
                 setDashboardData(response.data.data);
             } else {
                 setError('Failed to fetch dashboard data');
@@ -50,19 +52,6 @@ export default function SupportOfficerDashboardPage() {
         const { chargers } = dashboardData.stats;
         const total = chargers.open + chargers.unavailable + chargers.disabled;
         return total > 0 ? ((chargers.faulted / total) * 100).toFixed(1) : 0;
-    };
-
-    // Get top active users from discussion data
-    const getTopActiveUsers = () => {
-        if (!dashboardData?.discussionTrends) return [];
-        
-        // This is a placeholder - you may need to add a separate endpoint
-        // to get actual user activity data
-        return [
-            { name: 'John Doe', posts: 5, rejected: 1, rank: 3 },
-            { name: 'Jane Smith', posts: 8, rejected: 1, rank: 2 },
-            { name: 'Mike Johnson', posts: 9, rejected: 2, rank: 1 }
-        ];
     };
 
     if (loading) {
@@ -130,7 +119,8 @@ export default function SupportOfficerDashboardPage() {
 
     if (!dashboardData) return null;
 
-    const topUsers = getTopActiveUsers();
+    // Get top active users from the API response
+    const topUsers = dashboardData.topUsers || [];
 
     return (
         <div style={{ 
@@ -156,10 +146,8 @@ export default function SupportOfficerDashboardPage() {
 
                     <StatCard
                         title="Connectors"
-                        value={dashboardData.stats.chargers.open + 
-                               dashboardData.stats.chargers.unavailable + 
-                               dashboardData.stats.chargers.disabled}
-                        subValue={`${dashboardData.stats.chargers.faulted} Faulted`}
+                        value={dashboardData.stats.chargers.totalConnectors}
+                        subValue={`${dashboardData.stats.chargers.unavailableConnectors} Unavailable`}
                         icon="connectors"
                         subValueColor={COLORS.lightRed}
                     />
@@ -202,16 +190,13 @@ export default function SupportOfficerDashboardPage() {
                             Fault Status
                         </h2>
                         <StatusCard
-                            value={dashboardData.stats.chargers.faulted}
-                            total={dashboardData.stats.chargers.open + 
-                                   dashboardData.stats.chargers.unavailable + 
-                                   dashboardData.stats.chargers.disabled}
+                            value={dashboardData.stats.reports.resolved}
+                            total={dashboardData.stats.reports.underReview}
                             percentage={getFaultPercentage()}
                         >
                             <FaultStatusChart 
-                                open={dashboardData.stats.chargers.open}
-                                unavailable={dashboardData.stats.chargers.unavailable}
-                                disabled={dashboardData.stats.chargers.disabled}
+                                underReview={dashboardData.stats.reports.underReview}
+                                resolved={dashboardData.stats.reports.resolved}
                             />
                         </StatusCard>
                     </div>
@@ -223,7 +208,7 @@ export default function SupportOfficerDashboardPage() {
                         </h2>
                         <OverviewCard>
                             <ChargingStationComplaintsChart 
-                                data={dashboardData.trends.reportsByCategory}
+                                data={dashboardData.trends?.reportsByCharger || []}
                             />
                         </OverviewCard>
                     </div>
@@ -250,23 +235,35 @@ export default function SupportOfficerDashboardPage() {
                         <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
                             Most Active Users
                         </h2>
-                        {topUsers.map((user, index) => (
-                            <ActiveUserCard
-                                key={index}
-                                name={user.name}
-                                posts={user.posts.toString()}
-                                rejected={user.rejected.toString()}
-                                bgColor={
-                                    user.rank === 1 ? COLORS.primary :
-                                    user.rank === 2 ? COLORS.bgGreen :
-                                    COLORS.border
-                                }
-                                textColor={
-                                    user.rank === 1 ? COLORS.background :
-                                    COLORS.mainTextColor
-                                }
-                            />
-                        ))}
+                        {topUsers.length > 0 ? (
+                            topUsers.map((user, index) => (
+                                <ActiveUserCard
+                                    key={index}
+                                    name={user.name}
+                                    posts={user.posts.toString()}
+                                    rejected={user.rejected.toString()}
+                                    bgColor={
+                                        user.rank === 1 ? COLORS.primary :
+                                        user.rank === 2 ? COLORS.bgGreen :
+                                        COLORS.border
+                                    }
+                                    textColor={
+                                        user.rank === 1 ? COLORS.background :
+                                        COLORS.mainTextColor
+                                    }
+                                />
+                            ))
+                        ) : (
+                            <OverviewCard>
+                                <div style={{ 
+                                    padding: '20px', 
+                                    textAlign: 'center',
+                                    color: COLORS.secondaryText 
+                                }}>
+                                    No active users yet
+                                </div>
+                            </OverviewCard>
+                        )}
                     </div>
 
                     {/* Response Time & Stats */}

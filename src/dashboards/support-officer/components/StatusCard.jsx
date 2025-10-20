@@ -16,11 +16,11 @@ export default function StatusCard({ title, value, total, children }) {
       {value !== undefined && total !== undefined && (
         <div className="flex justify-between items-center mb-4">
           <div>
-            <p className="text-sm" style={{ color: COLORS.secondaryText }}>New</p>
+            <p className="text-sm" style={{ color: COLORS.secondaryText }}>Resolved</p>
             <p className="text-xl font-bold" style={{ color: COLORS.error }}>{value}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm" style={{ color: COLORS.secondaryText }}>In Progress</p>
+            <p className="text-sm" style={{ color: COLORS.secondaryText }}>Under Review</p>
             <p className="text-xl font-bold" style={{ color: COLORS.mainTextColor }}>{total}</p>
           </div>
         </div>
