@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ChargingStationsTopBar from '../../../components/ui/DataTableTopBar';
 import DataTable from '../../../components/ui/DataTable'; // Changed import
 import ChargingStationsRightPanel from '../components/stationComponents/ChargingStationsRightPanel';
@@ -8,51 +8,63 @@ import OverviewCard from '../components/OverviewCard';
 import { useNavigate } from 'react-router-dom';
 import AdminPageHeader from '../components/AdminPageHeader'
 
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 
 export default function ChargingStations() {
     const navigate = useNavigate();
 
     const [search, setSearch] = React.useState('');
     const [filter, setFilter] = React.useState({});
-    const [sort, setSort] = React.useState('Date Joined');
-    const [stations, setStations] = React.useState([]);
-    const [requests, setRequests] = React.useState([
-        {
-            id: 1,
-            type: 'station',
-            status: 'new',
-            title: 'A request to add a new charging station',
-            date: '5 Sat, 08:11 AM'
-        },
-        {
-            id: 2,
-            type: 'station',
-            status: 'new',
-            title: 'A request to add a new charging station',
-            date: '5 Sat, 08:11 AM'
-        },
-        {
-            id: 3,
-            type: 'connector',
-            status: 'new',
-            title: 'A request to add a new charger',
-            date: '5 Sat, 08:11 AM'
-        },
-        {
-            id: 4,
-            type: 'station',
-            status: 'review',
-            title: 'Station upgrade request',
-            date: '4 Fri, 03:45 PM'
-        },
-        {
-            id: 5,
-            type: 'connector',
-            status: 'review',
-            title: 'Connector replacement',
-            date: '3 Thu, 11:20 AM'
+    const [sort, setSort] = React.useState('Joined On');
+    const [stations, setStations] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchStationsData = useCallback(async () => {
+
+        setLoading(true);
+
+        const token = localStorage.getItem('accessToken');
+        const adminId = localStorage.getItem('userID');
+        
+        if (!token) {
+            setLoading(false);
+            return;
         }
-    ]);
+
+        if (!adminId) {
+            setLoading(false);
+            toast.error('Admin ID not found. Please log in again.');
+            return;
+        }
+
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/api/admin/stations`,
+                { headers: { 'Authorization': `Bearer ${token}` }, params: { adminId: adminId } }
+            );
+
+            setStations(response.data.data || []);
+
+        } catch (error) {
+            console.error('Error fetching stations for admin:', error);
+            toast.error('Failed to load charging stations list.');
+            setStations([]);
+
+        } finally {
+            setLoading(false);
+
+        }
+    }, []);
+
+    // Trigger fetch on mount
+    useEffect(() => {
+        fetchStationsData();
+    }, [fetchStationsData]);
+
 
     const stationFilterOptions = [
         { label: 'District', value: 'district' },
@@ -89,67 +101,13 @@ export default function ChargingStations() {
         // 'Quick Actions'
     ];
 
-    // Sample station data - replace with your actual data
-    const stationData = [
-        {
-            'Station Name': 'EV Central',
-            'Owner Name': 'John Doe',
-            'Joined On': '2023-01-15',
-            'District': 'Central',
-            'City': 'Metropolis',
-            'Address Line': '123 Main St',
-            'Revenue': '$12,000',
-            'No of Chargers': 8,
-            'Type1': 2,
-            'Type2': 3,
-            'CCS1': 1,
-            'CCS2': 1,
-            'CHAdeMO': 1,
-            'Tesla': 0,
-            'No of Active Reports': 4,
-            'Station Status': 'Open',
-            // 'Quick Actions': ['Delete'],
-        },
-        {
-            'Station Name': 'Westside EV',
-            'Owner Name': 'Jane Smith',
-            'Joined On': '2022-11-10',
-            'District': 'West',
-            'City': 'Gotham',
-            'Address Line': '456 Elm St',
-            'Revenue': '$8,500',
-            'No of Chargers': 5,
-            'Type1': 1,
-            'Type2': 2,
-            'CCS1': 0,
-            'CCS2': 1,
-            'CHAdeMO': 1,
-            'Tesla': 0,
-            'No of Active Reports': 7,
-            'Station Status': 'Closed',
-            // 'Quick Actions': ['View', 'Delete'],
-        },
-        {
-            'Station Name': 'Hamilton EV',
-            'Owner Name': 'George Wilson',
-            'Joined On': '2022-11-10',
-            'District': 'West',
-            'City': 'Gotham',
-            'Address Line': '456 Elm St',
-            'Revenue': '$8,500',
-            'No of Chargers': 5,
-            'Type1': 1,
-            'Type2': 2,
-            'CCS1': 0,
-            'CCS2': 1,
-            'CHAdeMO': 1,
-            'Tesla': 0,
-            'No of Active Reports': 7,
-            'Station Status': 'Faulty',
-            // 'Quick Actions': ['View', 'Delete'],
-        },
-        // Add more station data as needed
-    ];
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
 
     return (
         <div style={{
@@ -188,7 +146,7 @@ export default function ChargingStations() {
                         <div className="bg-transparent overflow-hidden">
                             <DataTable
                                 columns={stationColumns}
-                                data={stations.length > 0 ? stations : stationData}
+                                data={stations}
                                 filter={filter}
                                 sort={sort}
                                 search={search}
@@ -203,7 +161,7 @@ export default function ChargingStations() {
                 {/* Right Side - 1/4 width */}
                 <div className="lg:col-span-1">
                     <div className="sticky top-6 space-y-6">
-                        <ChargingStationsRightPanel stations={stations} requests={requests} />
+                        <ChargingStationsRightPanel/>
                     </div>
                 </div>
             </div>
