@@ -231,40 +231,41 @@ export default function SupportOfficerDashboardPage() {
                     </div>
 
                     {/* Most Active Users */}
-                    <div className="lg:col-span-1">
-                        <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                            Most Active Users
-                        </h2>
-                        {topUsers.length > 0 ? (
-                            topUsers.map((user, index) => (
-                                <ActiveUserCard
-                                    key={index}
-                                    name={user.name}
-                                    posts={user.posts.toString()}
-                                    rejected={user.rejected.toString()}
-                                    bgColor={
-                                        user.rank === 1 ? COLORS.primary :
-                                        user.rank === 2 ? COLORS.bgGreen :
-                                        COLORS.border
-                                    }
-                                    textColor={
-                                        user.rank === 1 ? COLORS.background :
-                                        COLORS.mainTextColor
-                                    }
-                                />
-                            ))
-                        ) : (
-                            <OverviewCard>
-                                <div style={{ 
-                                    padding: '20px', 
-                                    textAlign: 'center',
-                                    color: COLORS.secondaryText 
-                                }}>
-                                    No active users yet
-                                </div>
-                            </OverviewCard>
-                        )}
-                    </div>
+                    {/* Most Active Users */}
+<div className="lg:col-span-1">
+    <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
+        Most Active Users
+    </h2>
+    {topUsers.length > 0 ? (
+        topUsers.slice(0, 4).map((user, index) => (  // Added .slice(0, 4)
+            <ActiveUserCard
+                key={index}
+                name={user.name}
+                posts={user.posts.toString()}
+                rejected={user.rejected.toString()}
+                bgColor={
+                    user.rank === 1 ? COLORS.primary :
+                    user.rank === 2 ? COLORS.bgGreen :
+                    COLORS.border
+                }
+                textColor={
+                    user.rank === 1 ? COLORS.background :
+                    COLORS.mainTextColor
+                }
+            />
+        ))
+    ) : (
+        <OverviewCard>
+            <div style={{ 
+                padding: '20px', 
+                textAlign: 'center',
+                color: COLORS.secondaryText 
+            }}>
+                No active users yet
+            </div>
+        </OverviewCard>
+    )}
+</div>
 
                     {/* Response Time & Stats */}
                     <div className="lg:col-span-1">
