@@ -5,7 +5,7 @@ const BatchDetailsModal = ({ isOpen, onClose, batchData }) => {
     if (!isOpen || !batchData) return null;
 
     const { batch, earnings } = batchData;
-    
+
     const formatStatus = (status) => {
         const statusMap = {
             'draft': 'Draft',
@@ -28,13 +28,12 @@ const BatchDetailsModal = ({ isOpen, onClose, batchData }) => {
     const getStatusBadge = (status) => {
         const statusText = formatStatus(status);
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                status === 'completed' ? 'bg-green-100 text-green-800' :
-                status === 'approved' ? 'bg-blue-100 text-blue-800' :
-                status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
-                status === 'failed' ? 'bg-red-100 text-red-800' :
-                'bg-gray-100 text-gray-800'
-            }`}>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${status === 'completed' ? 'bg-green-100 text-green-800' :
+                    status === 'approved' ? 'bg-blue-100 text-blue-800' :
+                        status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+                            status === 'failed' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                }`}>
                 {statusText}
             </span>
         );
@@ -42,11 +41,10 @@ const BatchDetailsModal = ({ isOpen, onClose, batchData }) => {
 
     const getPayoutStatusBadge = (status) => {
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                status === 'paid' ? 'bg-green-100 text-green-800' :
-                status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-            }`}>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${status === 'paid' ? 'bg-green-100 text-green-800' :
+                    status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                }`}>
                 {status.charAt(0).toUpperCase() + status.slice(1)}
             </span>
         );
@@ -166,9 +164,9 @@ const BatchDetailsModal = ({ isOpen, onClose, batchData }) => {
                                                 )}
                                                 {payout.payment_proof_url && (
                                                     <div className="text-xs mt-1">
-                                                        <a 
-                                                            href={payout.payment_proof_url} 
-                                                            target="_blank" 
+                                                        <a
+                                                            href={payout.payment_proof_url}
+                                                            target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="text-blue-600 hover:text-blue-800"
                                                         >
@@ -298,13 +296,28 @@ const BatchDetailsModal = ({ isOpen, onClose, batchData }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-end p-6 border-t border-gray-200">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-                    >
-                        Close
-                    </button>
+                <div className="flex justify-between p-6 border-t border-gray-200">
+                    {batch.status === 'draft' && (
+                        <button
+                            onClick={() => {
+                                if (window.confirm('Are you sure you want to cancel this payout batch?')) {
+                                    // You can add cancel functionality here or call a prop function
+                                    console.log('Cancel batch:', batch._id);
+                                }
+                            }}
+                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                        >
+                            Cancel Batch
+                        </button>
+                    )}
+                    <div className="flex gap-3 ml-auto">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

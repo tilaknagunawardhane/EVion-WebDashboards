@@ -77,7 +77,7 @@ const router = createBrowserRouter([
           { path: 'stations/requests', element: <RequestsPage/>},
           // { path: 'stations/requests/:type/:id', element: <ViewRequest/>},
           { path: 'stations/requests/:id', element: <ViewRequest/>},
-          { path: 'stations/:id', element: <ViewStation/>},
+          { path: 'stations/:stationId', element: <ViewStation/>},
           { path: 'chat', element: <ChatPage/>},
           { path: 'notifications', element: <AdminNotifications/>},
           { path: 'stations/chargerprofile/:id', element: <AdminViewCharger /> },

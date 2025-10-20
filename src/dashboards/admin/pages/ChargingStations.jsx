@@ -1,104 +1,149 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import ChargingStationsTopBar from '../../../components/ui/DataTableTopBar';
-import DataTable from '../../../components/ui/DataTable'; // Changed import
+import DataTableTopBar from '../../../components/ui/DataTableTopBar';
+import DataTable from '../../../components/ui/DataTable';
 import ChargingStationsRightPanel from '../components/stationComponents/ChargingStationsRightPanel';
 import { COLORS, FONTS } from '../../../constants';
-import NotificationsIcon from '../../../assets/notifications.svg';
 import OverviewCard from '../components/OverviewCard';
 import { useNavigate } from 'react-router-dom';
-import AdminPageHeader from '../components/AdminPageHeader'
-
+import AdminPageHeader from '../components/AdminPageHeader';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-
 export default function ChargingStations() {
     const navigate = useNavigate();
-
-    const [search, setSearch] = React.useState('');
-    const [filter, setFilter] = React.useState({});
-    const [sort, setSort] = React.useState('Joined On');
+    const [search, setSearch] = useState('');
+    const [filter, setFilter] = useState({});
+    const [sort, setSort] = useState('Joined On');
     const [stations, setStations] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 10
+    });
+
+    const stationFilterOptions = [
+        { label: 'All Status', value: 'all' },
+        { label: 'Open', value: 'open' },
+        { label: 'Unavailable', value: 'unavailable' },
+        { label: 'Disabled', value: 'disabled_by_SO' },
+        { label: 'Deleted', value: 'deleted' },
+        { label: 'CEB', value: 'CEB' },
+        { label: 'LECO', value: 'LECO' },
+        { label: 'Private', value: 'Private' }
+    ];
+
+    const stationSortOptions = [
+        { label: 'Station Name', value: 'station_name' },
+        { label: 'City', value: 'city' },
+        { label: 'Status', value: 'station_status' },
+        { label: 'Created Date', value: 'createdAt' }
+    ];
 
     const fetchStationsData = useCallback(async () => {
-
         setLoading(true);
-
         const token = localStorage.getItem('accessToken');
-        const adminId = localStorage.getItem('userID');
         
         if (!token) {
             setLoading(false);
             return;
         }
 
-        if (!adminId) {
-            setLoading(false);
-            toast.error('Admin ID not found. Please log in again.');
-            return;
-        }
-
         try {
+            // Build query parameters
+            const params = new URLSearchParams({
+                page: pagination.currentPage.toString(),
+                limit: pagination.itemsPerPage.toString()
+            });
+
+            // Add filters
+            if (filter.value && filter.value !== 'all') {
+                if (['open', 'unavailable', 'disabled_by_SO', 'deleted'].includes(filter.value)) {
+                    params.append('status', filter.value);
+                } else if (['CEB', 'LECO', 'Private'].includes(filter.value)) {
+                    params.append('electricity_provider', filter.value);
+                }
+            }
+
+            // Add search
+            if (search) {
+                params.append('search', search);
+            }
+
+            // Add sort
+            if (sort && sort !== 'Joined On') {
+                params.append('sort', sort);
+            }
+
             const response = await axios.get(
-                `${API_BASE_URL}/api/admin/stations`,
-                { headers: { 'Authorization': `Bearer ${token}` }, params: { adminId: adminId } }
+                `${API_BASE_URL}/api/admin/stations?${params}`,
+                { headers: { 'Authorization': `Bearer ${token}` } }
             );
 
-            setStations(response.data.data || []);
-
+            if (response.data.success) {
+                setStations(response.data.data || []);
+                setPagination(prev => ({
+                    ...prev,
+                    totalPages: response.data.pagination?.totalPages || 1,
+                    totalItems: response.data.pagination?.totalItems || 0
+                }));
+            }
         } catch (error) {
             console.error('Error fetching stations for admin:', error);
             toast.error('Failed to load charging stations list.');
             setStations([]);
-
         } finally {
             setLoading(false);
-
         }
-    }, []);
+    }, [search, filter, sort, pagination.currentPage]);
 
-    // Trigger fetch on mount
     useEffect(() => {
         fetchStationsData();
     }, [fetchStationsData]);
 
+    const handlePageChange = (newPage) => {
+        setPagination(prev => ({ ...prev, currentPage: newPage }));
+    };
 
-    const stationFilterOptions = [
-        { label: 'District', value: 'district' },
-        { label: 'City', value: 'city' },
-        { label: 'Status', value: 'status' },
-        { label: 'Connector Types', value: 'connectorTypes' },
-    ];
+    const getStatusBadge = (status) => {
+        const statusText = status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' ');
+        return (
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                status === 'open' ? 'bg-green-100 text-green-800' :
+                status === 'unavailable' ? 'bg-yellow-100 text-yellow-800' :
+                status === 'disabled_by_SO' ? 'bg-red-100 text-red-800' :
+                'bg-gray-100 text-gray-800'
+            }`}>
+                {statusText}
+            </span>
+        );
+    };
 
-    const stationSortOptions = [
-        { label: 'Date Joined', value: 'dateJoined' },
-        { label: 'Station Name', value: 'stationName' },
-        { label: 'Revenue', value: 'revenue' },
-        { label: 'Number of Chargers', value: 'noOfChargers' },
-    ];
+    // Format data for table with only necessary columns
+    const tableData = stations.map(station => ({
+        id: station._id,
+        'Station Name': station.station_name,
+        'Owner Name': station.station_owner_id?.name || 'Unknown',
+        'District': station.district_name || station.district?.name || 'Unknown',
+        'City': station.city,
+        'Address': station.address || 'No address',
+        'Electricity Provider': station.electricity_provider || 'N/A',
+        'Available Chargers': `${station.available_chargers || 0}/${station.total_chargers || 0}`,
+        'Status': station.station_status,
+        'Joined On': new Date(station.createdAt).toLocaleDateString()
+    }));
 
-    // Define columns for stations table
-    const stationColumns = [
+    const tableColumns = [
         'Station Name',
         'Owner Name',
-        'Joined On',
-        'District',
+        'District', 
         'City',
-        'Address Line',
-        'Revenue',
-        'No of Chargers',
-        'Type1',
-        'Type2',
-        'CCS1',
-        'CCS2',
-        'CHAdeMO',
-        'Tesla',
-        'No of Active Reports',
-        'Station Status',
-        // 'Quick Actions'
+        'Available Chargers',
+        'Status',
+        'Joined On'
     ];
 
     if (loading) {
@@ -113,17 +158,14 @@ export default function ChargingStations() {
         <div style={{
             fontFamily: FONTS.family.sans,
             padding: '24px',
+            backgroundColor: COLORS.background,
         }}>
-            {/* Header Section */}
-            <AdminPageHeader title="Stations Overview" />
+            <AdminPageHeader title="Charging Stations Overview" />
 
-            {/* Main Content */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Left Side - 3/4 width */}
                 <div className="lg:col-span-3">
-                    {/* Search and Filter Bar */}
                     <div className="mb-6">
-                        <ChargingStationsTopBar
+                        <DataTableTopBar
                             search={search}
                             setSearch={setSearch}
                             filter={filter}
@@ -132,36 +174,66 @@ export default function ChargingStations() {
                             setSort={setSort}
                             filterOptions={stationFilterOptions}
                             sortOptions={stationSortOptions}
-                            searchPlaceholder="Search stations..."
+                            searchPlaceholder="Search stations by name, city, or address..."
                             showExportButton={true}
                             onExport={() => {
-                                // Export functionality would go here
                                 console.log('Exporting stations data...');
+                                // Implement export functionality
                             }}
                         />
                     </div>
 
                     <OverviewCard padding='p-0'>
-                        {/* Stations Table */}
-                        <div className="bg-transparent overflow-hidden">
+                        <div className="bg-white rounded-sm shadow-sm overflow-hidden"
+                            style={{
+                                border: `1px solid ${COLORS.border}`,
+                                boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.05)'
+                            }}>
                             <DataTable
-                                columns={stationColumns}
-                                data={stations}
+                                columns={tableColumns}
+                                data={tableData}
                                 filter={filter}
                                 sort={sort}
                                 search={search}
                                 onRowClick={(station) => {
-                                    navigate(`/admin/stations/${station.id}`);
-                                }}
+        console.log('Row clicked - station object:', station);
+        console.log('Station ID:', station.id);
+        console.log('Full station data:', station);
+        navigate(`/admin/stations/${station.id}`);
+    }}
                             />
+                            
+                            {/* Pagination Controls */}
+                            {pagination.totalPages > 1 && (
+                                <div className="flex justify-between items-center mt-4 px-4 py-3 bg-white border-t border-gray-200">
+                                    <div className="text-sm text-gray-700">
+                                        Showing {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} to {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)} of {pagination.totalItems} results
+                                    </div>
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={() => handlePageChange(pagination.currentPage - 1)}
+                                            disabled={pagination.currentPage === 1}
+                                            className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Previous
+                                        </button>
+                                        <button
+                                            onClick={() => handlePageChange(pagination.currentPage + 1)}
+                                            disabled={pagination.currentPage === pagination.totalPages}
+                                            className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </OverviewCard>
                 </div>
 
-                {/* Right Side - 1/4 width */}
                 <div className="lg:col-span-1">
                     <div className="sticky top-6 space-y-6">
-                        <ChargingStationsRightPanel/>
+                        <ChargingStationsRightPanel />
                     </div>
                 </div>
             </div>
