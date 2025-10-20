@@ -187,7 +187,7 @@ export default function AdminDashboardPage() {
                         </h2>
                         <OverviewCard>
                             <div className="flex flex-col">
-                                <div className="flex space-x-4 mb-4">
+                                <div className="flex space-x-4 mb-9">
                                     <span style={{ color: COLORS.secondaryText }}>
                                         New Users: {newUsers.toLocaleString()}
                                     </span>
@@ -195,7 +195,7 @@ export default function AdminDashboardPage() {
                                         Active Users: {activeUsers.toLocaleString()}
                                     </span>
                                 </div>
-                                <div className="h-80">
+                                <div className="h-86">
                                     <UserGrowthChart data={dashboardData.userGrowth} />
                                 </div>
                             </div>
@@ -313,7 +313,7 @@ export default function AdminDashboardPage() {
                             </div>
 
                             {/* Approval Cards Section */}
-                            <div className="lg:col-span-1">
+                            {/* <div className="lg:col-span-1">
                                 <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
                                     Approvals
                                 </h2>
@@ -335,7 +335,7 @@ export default function AdminDashboardPage() {
                                     bgColor={COLORS.primary}
                                     textColor={COLORS.background}
                                 />
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
