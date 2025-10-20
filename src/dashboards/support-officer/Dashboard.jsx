@@ -1,15 +1,17 @@
 import { NavLink, Outlet } from 'react-router-dom'
-// import { useAuth } from '../../contexts/AuthContext'
+import { useAuth } from '../../contexts/AuthContext' // Uncommented this line
 import DashboardIcon from '../../assets/dashboard_black_icon.svg'
 import StationIcon from '../../assets/stations.svg'
 import AlertIcon from '../../assets/alert_black_icon.svg'
 import CommentIcon from '../../assets/comment_icon.svg'
 import SettingsIcon from '../../assets/settings_icon.svg'
+import LogoutIcon from '../../assets/logout_icon.svg' // You'll need to add this icon
 import logo from '../../assets/Logo 2.svg'
 import { COLORS, FONTS } from '../../constants'
 
-
 export default function SupportOfficerDashboard() {
+  const { currentUser, logout } = useAuth() // Added this line
+  
   const navItems = [
     { 
       name: 'Dashboard', 
@@ -34,13 +36,17 @@ export default function SupportOfficerDashboard() {
   ]
 
   const bottomNavItems = [
-    
     { 
       name: 'Settings', 
       path: '/support-officer/settings', 
       icon: SettingsIcon
     },
-    
+    { 
+      name: 'Logout', 
+      path: '#',
+      icon: LogoutIcon, // Using settings icon as placeholder
+      isLogout: true
+    }
   ]
 
   const renderIcon = (IconComponent, isActive) => (
@@ -55,6 +61,14 @@ export default function SupportOfficerDashboard() {
       }} 
     />
   )
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex" style={{ fontFamily: FONTS.family.sans }}>
@@ -104,32 +118,46 @@ export default function SupportOfficerDashboard() {
           <ul className="space-y-2">
             {bottomNavItems.map((item) => (
               <li key={item.name}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) => 
-                    `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'font-medium' : ''}`
-                  }
-                  style={({ isActive }) => ({ 
-                    backgroundColor: isActive ? COLORS.primary : 'transparent',
-                    color: isActive ? COLORS.background : COLORS.mainTextColor,
-                    fontSize: FONTS.sizes.sm
-                  })}
-                >
-                  {({ isActive }) => (
-                    <>
-                      {renderIcon(item.icon, isActive)}
-                      {item.name}
-                      {item.count > 0 && (
-                        <span 
-                          className="ml-auto text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
-                          style={{ backgroundColor: COLORS.danger }}
-                        >
-                          {item.count}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </NavLink>
+                {item.isLogout ? (
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-4 py-3 rounded-lg transition-colors text-left hover:bg-gray-100"
+                    style={{ 
+                      color: COLORS.mainTextColor,
+                      fontSize: FONTS.sizes.sm
+                    }}
+                  >
+                    {renderIcon(item.icon, false)}
+                    {item.name}
+                  </button>
+                ) : (
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) => 
+                      `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'font-medium' : ''}`
+                    }
+                    style={({ isActive }) => ({ 
+                      backgroundColor: isActive ? COLORS.primary : 'transparent',
+                      color: isActive ? COLORS.background : COLORS.mainTextColor,
+                      fontSize: FONTS.sizes.sm
+                    })}
+                  >
+                    {({ isActive }) => (
+                      <>
+                        {renderIcon(item.icon, isActive)}
+                        {item.name}
+                        {item.count > 0 && (
+                          <span 
+                            className="ml-auto text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                            style={{ backgroundColor: COLORS.danger }}
+                          >
+                            {item.count}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </NavLink>
+                )}
               </li>
             ))}
           </ul>
