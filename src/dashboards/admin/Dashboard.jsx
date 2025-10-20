@@ -9,10 +9,12 @@ import ReportsIcon from '../../assets/reports_icon.svg'
 import AlertsIcon from '../../assets/alerts_icon.svg'
 import SettingsIcon from '../../assets/settings_icon.svg'
 import UserIcon from '../../assets/user_icon.svg'
-
+import { useAuth } from '../../contexts/AuthContext'
 import HelpIcon from '../../assets/help_icon.svg'
+import LogoutIcon from '../../assets/logout_icon.svg' // You'll need to add this icon
 
 export default function AdminDashboard() {
+  const { currentUser, logout } = useAuth()
   const navItems = [
     { 
       name: 'Dashboard', 
@@ -37,13 +39,17 @@ export default function AdminDashboard() {
   ]
 
   const bottomNavItems = [
-    
     { 
       name: 'Settings', 
       path: '/station-owner/settings', 
       icon: SettingsIcon
     },
-    
+    { 
+      name: 'Logout', 
+      path: '#', // Use '#' since this is a button, not a navigation link
+      icon: LogoutIcon,
+      isLogout: true // Flag to identify logout button
+    }
   ]
 
   const renderIcon = (IconComponent, isActive) => (
@@ -58,6 +64,16 @@ export default function AdminDashboard() {
       }} 
     />
   )
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Optional: You can add a toast notification here
+      console.log('Logged out successfully');
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex" style={{ fontFamily: FONTS.family.sans }}>
@@ -106,35 +122,55 @@ export default function AdminDashboard() {
 
         {/* Bottom Navigation */}
         <div className="p-4 border-t" style={{ borderColor: COLORS.border }}>
+          {/* User Info (Optional) */}
+          {currentUser && (
+            <div className="px-4 py-3 mb-4 rounded-lg" style={{ backgroundColor: COLORS.background }}>
+              <p className="text-sm font-medium" style={{ color: COLORS.mainTextColor }}>
+                {currentUser.name}
+              </p>
+              <p className="text-xs" style={{ color: COLORS.secondaryText }}>
+                {currentUser.email}
+              </p>
+            </div>
+          )}
+
           <ul className="space-y-2">
             {bottomNavItems.map((item) => (
               <li key={item.name}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) => 
-                    `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'font-medium' : ''}`
-                  }
-                  style={({ isActive }) => ({ 
-                    backgroundColor: isActive ? COLORS.primary : 'transparent',
-                    color: isActive ? COLORS.background : COLORS.mainTextColor,
-                    fontSize: FONTS.sizes.sm
-                  })}
-                >
-                  {({ isActive }) => (
-                    <>
-                      {renderIcon(item.icon, isActive)}
-                      {item.name}
-                      {item.count > 0 && (
-                        <span 
-                          className="ml-auto text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
-                          style={{ backgroundColor: COLORS.danger }}
-                        >
-                          {item.count}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </NavLink>
+                {item.isLogout ? (
+                  // Logout Button
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-4 py-3 rounded-lg transition-colors text-left hover:bg-gray-100"
+                    style={{ 
+                      color: COLORS.mainTextColor,
+                      fontSize: FONTS.sizes.sm
+                    }}
+                  >
+                    {renderIcon(item.icon, false)}
+                    {item.name}
+                  </button>
+                ) : (
+                  // Regular Navigation Link
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) => 
+                      `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'font-medium' : ''}`
+                    }
+                    style={({ isActive }) => ({ 
+                      backgroundColor: isActive ? COLORS.primary : 'transparent',
+                      color: isActive ? COLORS.background : COLORS.mainTextColor,
+                      fontSize: FONTS.sizes.sm
+                    })}
+                  >
+                    {({ isActive }) => (
+                      <>
+                        {renderIcon(item.icon, isActive)}
+                        {item.name}
+                      </>
+                    )}
+                  </NavLink>
+                )}
               </li>
             ))}
           </ul>
