@@ -1,10 +1,9 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { COLORS, FONTS } from '../../../../constants';
 import Button from '../../../../components/ui/Button';
 import html2pdf from 'html2pdf.js';
 
 const RevenueBreakdownModal = ({ isOpen, onClose, data, getMonthName }) => {
-    const reportRef = useRef();
 
     if (!isOpen || !data) return null;
 
@@ -60,7 +59,7 @@ const RevenueBreakdownModal = ({ isOpen, onClose, data, getMonthName }) => {
                 ${getMonthName(month)} ${year}
             </h2>
             
-            ${Object.entries(breakdownByStation).map(([stationId, station]) => `
+            ${Object.entries(breakdownByStation).map(([, station]) => `
                 <div style="margin-bottom: 25px; page-break-inside: avoid;">
                     <h3 style="
                         background-color: #f8f9fa; 
@@ -90,7 +89,7 @@ const RevenueBreakdownModal = ({ isOpen, onClose, data, getMonthName }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            ${station.transactions.map((transaction, idx) => `
+                            ${station.transactions.map((transaction) => `
                                 <tr>
                                     <td style="border: 1px solid #ddd; padding: 6px;">
                                         ${new Date(transaction.createdAt).toLocaleDateString()}
@@ -210,8 +209,8 @@ const RevenueBreakdownModal = ({ isOpen, onClose, data, getMonthName }) => {
 
     return (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/10 bg-opacity-30 flex items-center justify-center z-50 p-4">
-            <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-xl overflow-hidden">
-                <div className="flex flex-col h-full">
+        <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-xl overflow-hidden">
+            <div className="flex flex-col" style={{ height: '90vh', maxHeight: '90vh' }}>
                     {/* Header */}
                     <div className="flex justify-between items-center p-6 border-b" style={{ borderColor: COLORS.stroke }}>
                         <div>
@@ -231,7 +230,7 @@ const RevenueBreakdownModal = ({ isOpen, onClose, data, getMonthName }) => {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 overflow-y-auto p-6">
+                    <div className="overflow-y-auto p-6" style={{ flex: '1 1 auto' }}>
                         <div className="space-y-6">
                             {Object.entries(breakdownByStation).map(([stationId, station]) => (
                                 <div key={stationId} className="border rounded-lg" style={{ borderColor: COLORS.stroke }}>
@@ -329,7 +328,7 @@ const RevenueBreakdownModal = ({ isOpen, onClose, data, getMonthName }) => {
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-end gap-3 p-6 border-t" style={{ borderColor: COLORS.stroke }}>
+                    <div className="flex justify-end gap-3 p-6 border-t" style={{ borderColor: COLORS.stroke, flex: '0 0 auto' }}>
                         <Button variant="outline" onClick={onClose}>
                             Close
                         </Button>
