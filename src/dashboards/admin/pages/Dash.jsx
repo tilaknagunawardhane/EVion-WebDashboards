@@ -360,7 +360,7 @@ export default function AdminDashboardPage() {
                         {/* User Growth Chart */}
                         <div>
                             <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                                User Growth
+                                Station Map
                             </h2>
                             <OverviewCard>
                                 <StationsMap 
