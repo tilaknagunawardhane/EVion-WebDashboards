@@ -363,17 +363,29 @@ export default function AdminDashboardPage() {
                                 User Growth
                             </h2>
                             <OverviewCard>
-                                <div className="flex flex-col">
-                                    <div className="flex space-x-4 mb-9">
-                                        <span style={{ color: COLORS.secondaryText }}>
-                                            New Users: {newUsers.toLocaleString()}
-                                        </span>
-                                        <span style={{ color: COLORS.secondaryText }}>
-                                            Active Users: {activeUsers.toLocaleString()}
-                                        </span>
+                                <StationsMap 
+                                    stations={stations} 
+                                    onStationClick={handleStationClick}
+                                />
+                                <div className="mt-3 text-center text-sm" style={{ color: COLORS.secondaryText }}>
+                                    {stations.length} stations loaded • Click on markers for details
+                                </div>
+                                <div className="flex flex-wrap gap-4 mt-2 justify-center">
+                                    <div className="flex items-center">
+                                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS.primary }}></div>
+                                        <span className="text-xs">Open</span>
                                     </div>
-                                    <div className="h-86">
-                                        <UserGrowthChart data={dashboardData.userGrowth} />
+                                    <div className="flex items-center">
+                                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS.secondaryText }}></div>
+                                        <span className="text-xs">Closed</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS.HighlightText }}></div>
+                                        <span className="text-xs">Reviewing</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS.danger }}></div>
+                                        <span className="text-xs">Disabled</span>
                                     </div>
                                 </div>
                             </OverviewCard>
@@ -452,144 +464,105 @@ export default function AdminDashboardPage() {
                     </div>
                 </section>
 
-                {/* Connector Status with Map Section */}
+                {/* Connector Status with Station Status and Quick Summary Section */}
                 <section className="mb-8">
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                        {/* Map Section - takes 2 columns */}
-                        <div className="lg:col-span-2">
+                        {/* Left Side - Charger Status (1 column) */}
+                        <div className="lg:col-span-1">
                             <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                                All Stations Map
+                                Charger Status
+                            </h2>
+                            <StatusCard
+                                value={dashboardData.stats.chargers.faulted}
+                                total={dashboardData.stats.chargers.total}
+                            >
+                                <ConnectorStatusChart
+                                    faulted={dashboardData.stats.chargers.faulted}
+                                    operational={dashboardData.stats.chargers.total - dashboardData.stats.chargers.faulted}
+                                />
+                            </StatusCard>
+                        </div>
+
+                        {/* Middle - Station Status (1 column) */}
+                        <div className="lg:col-span-1">
+                            <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
+                                Station Status
                             </h2>
                             <OverviewCard>
-                                <StationsMap 
-                                    stations={stations} 
-                                    onStationClick={handleStationClick}
-                                />
-                                <div className="mt-3 text-center text-sm" style={{ color: COLORS.secondaryText }}>
-                                    {stations.length} stations loaded • Click on markers for details
-                                </div>
-                                <div className="flex flex-wrap gap-4 mt-2 justify-center">
-                                    <div className="flex items-center">
-                                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS.primary }}></div>
-                                        <span className="text-xs">Open</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS.secondaryText }}></div>
-                                        <span className="text-xs">Closed</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS.HighlightText }}></div>
-                                        <span className="text-xs">Reviewing</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS.danger }}></div>
-                                        <span className="text-xs">Disabled</span>
-                                    </div>
+                                <div className="space-y-3 p-4">
+                                    {(() => {
+                                        const statusCounts = stations.reduce((acc, station) => {
+                                            const status = station.status?.toLowerCase() || 'unknown';
+                                            acc[status] = (acc[status] || 0) + 1;
+                                            return acc;
+                                        }, {});
+
+                                        const statusOrder = ['open', 'closed', 'reviewing', 'disabled_by_so', 'deleted'];
+                                        
+                                        return statusOrder.map(status => {
+                                            if (statusCounts[status]) {
+                                                return (
+                                                    <div key={status} className="flex justify-between items-center">
+                                                        <span className="text-sm capitalize" style={{ color: COLORS.mainTextColor }}>
+                                                            {status.replace('_', ' ')}
+                                                        </span>
+                                                        <span className="font-semibold" style={{ color: getStationStatusColor(status) }}>
+                                                            {statusCounts[status]}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        }).filter(Boolean);
+                                    })()}
                                 </div>
                             </OverviewCard>
                         </div>
 
-                        {/* Right Side Section - takes 2 columns */}
-                        <div className="lg:col-span-2">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                {/* Connector Status Section */}
-                                <div className="lg:col-span-1">
-                                    <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                                        Charger Status
-                                    </h2>
-                                    <StatusCard
-                                        value={dashboardData.stats.chargers.faulted}
-                                        total={dashboardData.stats.chargers.total}
-                                    >
-                                        <ConnectorStatusChart
-                                            faulted={dashboardData.stats.chargers.faulted}
-                                            operational={dashboardData.stats.chargers.total - dashboardData.stats.chargers.faulted}
-                                        />
-                                    </StatusCard>
-                                </div>
-
-                                {/* Station Status Summary */}
-                                <div className="lg:col-span-1">
-                                    <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                                        Station Status
-                                    </h2>
+                        {/* Right Side - Quick Summary (2 columns, 2x2 grid) */}
+                        {dashboardData.summary && (
+                            <div className="lg:col-span-2">
+                                <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
+                                    Quick Summary
+                                </h2>
+                                <div className="grid grid-cols-2 gap-4">
                                     <OverviewCard>
-                                        <div className="space-y-3 p-4">
-                                            {(() => {
-                                                const statusCounts = stations.reduce((acc, station) => {
-                                                    const status = station.status?.toLowerCase() || 'unknown';
-                                                    acc[status] = (acc[status] || 0) + 1;
-                                                    return acc;
-                                                }, {});
-
-                                                const statusOrder = ['open', 'closed', 'reviewing', 'disabled_by_so', 'deleted'];
-                                                
-                                                return statusOrder.map(status => {
-                                                    if (statusCounts[status]) {
-                                                        return (
-                                                            <div key={status} className="flex justify-between items-center">
-                                                                <span className="text-sm capitalize" style={{ color: COLORS.mainTextColor }}>
-                                                                    {status.replace('_', ' ')}
-                                                                </span>
-                                                                <span className="font-semibold" style={{ color: getStationStatusColor(status) }}>
-                                                                    {statusCounts[status]}
-                                                                </span>
-                                                            </div>
-                                                        );
-                                                    }
-                                                    return null;
-                                                }).filter(Boolean);
-                                            })()}
+                                        <div style={{ padding: '16px' }}>
+                                            <p style={{ color: COLORS.secondaryText, fontSize: '14px' }}>Active Sessions</p>
+                                            <p style={{ color: COLORS.mainTextColor, fontSize: '24px', fontWeight: 'bold' }}>
+                                                {dashboardData.summary.sessions.active}
+                                            </p>
+                                        </div>
+                                    </OverviewCard>
+                                    <OverviewCard>
+                                        <div style={{ padding: '16px' }}>
+                                            <p style={{ color: COLORS.secondaryText, fontSize: '14px' }}>Upcoming Bookings</p>
+                                            <p style={{ color: COLORS.mainTextColor, fontSize: '24px', fontWeight: 'bold' }}>
+                                                {dashboardData.summary.bookings.upcoming}
+                                            </p>
+                                        </div>
+                                    </OverviewCard>
+                                    <OverviewCard>
+                                        <div style={{ padding: '16px' }}>
+                                            <p style={{ color: COLORS.secondaryText, fontSize: '14px' }}>Completed Bookings</p>
+                                            <p style={{ color: COLORS.mainTextColor, fontSize: '24px', fontWeight: 'bold' }}>
+                                                {dashboardData.summary.bookings.completed}
+                                            </p>
+                                        </div>
+                                    </OverviewCard>
+                                    <OverviewCard>
+                                        <div style={{ padding: '16px' }}>
+                                            <p style={{ color: COLORS.secondaryText, fontSize: '14px' }}>Total Sessions</p>
+                                            <p style={{ color: COLORS.mainTextColor, fontSize: '24px', fontWeight: 'bold' }}>
+                                                {dashboardData.summary.sessions.total}
+                                            </p>
                                         </div>
                                     </OverviewCard>
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </section>
-
-                {/* Optional: Session Summary Section */}
-                {dashboardData.summary && (
-                    <section className="mb-8">
-                        <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.mainTextColor }}>
-                            Quick Summary
-                        </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <OverviewCard>
-                                <div style={{ padding: '16px' }}>
-                                    <p style={{ color: COLORS.secondaryText, fontSize: '14px' }}>Active Sessions</p>
-                                    <p style={{ color: COLORS.mainTextColor, fontSize: '24px', fontWeight: 'bold' }}>
-                                        {dashboardData.summary.sessions.active}
-                                    </p>
-                                </div>
-                            </OverviewCard>
-                            <OverviewCard>
-                                <div style={{ padding: '16px' }}>
-                                    <p style={{ color: COLORS.secondaryText, fontSize: '14px' }}>Upcoming Bookings</p>
-                                    <p style={{ color: COLORS.mainTextColor, fontSize: '24px', fontWeight: 'bold' }}>
-                                        {dashboardData.summary.bookings.upcoming}
-                                    </p>
-                                </div>
-                            </OverviewCard>
-                            <OverviewCard>
-                                <div style={{ padding: '16px' }}>
-                                    <p style={{ color: COLORS.secondaryText, fontSize: '14px' }}>Completed Bookings</p>
-                                    <p style={{ color: COLORS.mainTextColor, fontSize: '24px', fontWeight: 'bold' }}>
-                                        {dashboardData.summary.bookings.completed}
-                                    </p>
-                                </div>
-                            </OverviewCard>
-                            <OverviewCard>
-                                <div style={{ padding: '16px' }}>
-                                    <p style={{ color: COLORS.secondaryText, fontSize: '14px' }}>Total Sessions</p>
-                                    <p style={{ color: COLORS.mainTextColor, fontSize: '24px', fontWeight: 'bold' }}>
-                                        {dashboardData.summary.sessions.total}
-                                    </p>
-                                </div>
-                            </OverviewCard>
-                        </div>
-                    </section>
-                )}
             </div>
         </LoadScript>
     )
